@@ -8,11 +8,13 @@ FastAPI 메인 엔드포인트 및 라우팅 제어 모듈
 import os
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Query
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Query, status
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, StreamingResponse
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from typing import List, Optional
+import urllib.parse
 
 from app.database import get_db, init_db, BASE_DIR
 from app.models import (
@@ -26,6 +28,8 @@ from app.models import (
     TransferPlan,
     MatchingHistoryLog,
     MonthlyOrderPlan,
+    UserAccount,
+    SystemSnapshot,
 )
 from app.schemas import (
     ProductMasterCreate,
@@ -43,15 +47,35 @@ from app.schemas import (
     MonthlyOrderPlanUpdate,
     MessageResponse,
     FileUploadResponse,
+    Token,
+    UserAccountResponse,
+    SystemSnapshotResponse,
 )
+from app.core.auth import verify_password, get_password_hash, create_access_token, get_current_user, get_current_admin
+from app.core.snapshot import start_scheduler, stop_scheduler, create_snapshot
+from app.core.excel_parser import generate_template, parse_excel_file
 
 
 # ── 애플리케이션 수명주기 ────────────────────────────────────────────
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """서버 시작 시 DB 테이블 자동 생성"""
+    """서버 시작 시 DB 테이블 자동 생성 및 백그라운드 구동"""
     init_db()
+    from app.database import SessionLocal
+    db = SessionLocal()
+    try:
+        admin = db.query(UserAccount).filter(UserAccount.username == "admin").first()
+        if not admin:
+            db.add(UserAccount(username="admin", password_hash=get_password_hash("admin123"), role="ADMIN", name="시스템 관리자"))
+            db.commit()
+    except Exception as e:
+        print("Initialization error:", e)
+    finally:
+        db.close()
+        
+    start_scheduler()
     yield
+    stop_scheduler()
 
 
 app = FastAPI(
@@ -81,11 +105,64 @@ async def serve_dashboard():
     """메인 통합 대시보드 화면"""
     return FileResponse(os.path.join(WEB_DIR, "index.html"))
 
+@app.get("/inventory", include_in_schema=False)
+async def serve_inventory():
+    return FileResponse(os.path.join(WEB_DIR, "inventory.html"))
+
+@app.get("/expiry", include_in_schema=False)
+async def serve_expiry():
+    return FileResponse(os.path.join(WEB_DIR, "expiry.html"))
 
 @app.get("/order-plan", include_in_schema=False)
 async def serve_order_plan():
     """월 1회 발주 제안 편집 및 수정 저장 화면"""
     return FileResponse(os.path.join(WEB_DIR, "order_plan.html"))
+
+@app.get("/matching", include_in_schema=False)
+async def serve_matching():
+    return FileResponse(os.path.join(WEB_DIR, "matching.html"))
+
+@app.get("/users", include_in_schema=False)
+async def serve_users():
+    return FileResponse(os.path.join(WEB_DIR, "users.html"))
+
+# ═══════════════════════════════════════════════════════════════════════
+# 시스템 및 인증 API
+# ═══════════════════════════════════════════════════════════════════════
+
+@app.post("/api/auth/login", response_model=Token, tags=["인증"])
+def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+    user = db.query(UserAccount).filter(UserAccount.username == form_data.username).first()
+    if not user or not verify_password(form_data.password, user.password_hash):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(data={"sub": user.username, "role": user.role})
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/api/auth/me", response_model=UserAccountResponse, tags=["인증"])
+def read_users_me(current_user: UserAccount = Depends(get_current_user)):
+    return current_user
+
+@app.get("/api/excel/template", tags=["데이터 수집"])
+def download_excel_template():
+    output = generate_template()
+    filename = urllib.parse.quote("SCM_데이터입력양식.xlsx")
+    headers = {'Content-Disposition': f"attachment; filename*=UTF-8''{filename}"}
+    return StreamingResponse(output, headers=headers, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+
+@app.post("/api/snapshot/manual", response_model=SystemSnapshotResponse, tags=["시스템 관리"])
+def trigger_manual_snapshot(current_user: UserAccount = Depends(get_current_admin)):
+    snapshot = create_snapshot(user_id=current_user.id, is_auto=False)
+    if not snapshot:
+        raise HTTPException(status_code=500, detail="스냅샷 생성 실패")
+    return snapshot
+
+@app.get("/api/snapshot/list", response_model=List[SystemSnapshotResponse], tags=["시스템 관리"])
+def list_snapshots(db: Session = Depends(get_db), current_user: UserAccount = Depends(get_current_admin)):
+    return db.query(SystemSnapshot).order_by(SystemSnapshot.created_at.desc()).limit(20).all()
 
 
 # ═══════════════════════════════════════════════════════════════════════

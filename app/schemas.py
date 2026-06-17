@@ -9,6 +9,42 @@ from pydantic import BaseModel, Field
 
 
 # ═══════════════════════════════════════════════════════════════════════
+# 시스템 관리 영역 스키마
+# ═══════════════════════════════════════════════════════════════════════
+
+class UserAccountBase(BaseModel):
+    username: str
+    role: str = Field(pattern="^(ADMIN|OPERATOR)$")
+    name: str
+
+class UserAccountCreate(UserAccountBase):
+    password: str
+
+class UserAccountResponse(UserAccountBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
+    role: Optional[str] = None
+
+class SystemSnapshotResponse(BaseModel):
+    id: int
+    snapshot_path: str
+    created_at: str
+    created_by: Optional[int] = None
+    is_auto: bool
+
+    class Config:
+        from_attributes = True
+
+# ═══════════════════════════════════════════════════════════════════════
 # 상품 마스터 스키마
 # ═══════════════════════════════════════════════════════════════════════
 

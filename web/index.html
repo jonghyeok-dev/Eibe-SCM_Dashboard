@@ -10,19 +10,30 @@
 </head>
 <body>
     <div class="app-wrapper" id="dashboard-page">
-        <header class="app-header">
-            <div class="header-brand">
+        <aside class="app-sidebar">
+            <div class="sidebar-brand">
                 <div class="logo-icon">S</div>
                 <h1>SCM Dashboard</h1>
             </div>
-            <nav class="header-nav">
+            <nav class="sidebar-nav">
                 <a href="/" class="active">대시보드</a>
+                <a href="/inventory">현재고 보유량</a>
+                <a href="/expiry">유통기한 상세</a>
                 <a href="/order-plan">발주 계획</a>
+                <a href="/matching">매칭 시스템</a>
+                <a href="/users">운영 (Admin)</a>
             </nav>
-            <div class="header-actions">
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="sidebar-user-avatar">A</div>
+                    <div class="user-details">
+                        <span class="user-name" id="sidebar-user-name">로그인 필요</span>
+                        <span class="user-role" id="sidebar-user-role"></span>
+                    </div>
+                </div>
                 <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">Dark Mode</button>
             </div>
-        </header>
+        </aside>
 
         <main class="main-content">
             <div id="alert-panel"></div>

@@ -9,12 +9,49 @@ from sqlalchemy import (
     Integer,
     Text,
     Float,
+    Boolean,
     ForeignKey,
     CheckConstraint,
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
 from app.database import Base
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 3.0. 시스템 관리 영역 (System Admin Tables)
+# ═══════════════════════════════════════════════════════════════════════
+
+class UserAccount(Base):
+    """3.0.1. 사용자 계정 테이블 - 권한 및 인증 관리"""
+    __tablename__ = "USER_ACCOUNT"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(Text, unique=True, nullable=False)
+    password_hash = Column(Text, nullable=False)
+    role = Column(Text, nullable=False) # ADMIN or OPERATOR
+    name = Column(Text, nullable=False)
+
+    __table_args__ = (
+        CheckConstraint(
+            "role IN ('ADMIN', 'OPERATOR')",
+            name="chk_user_role",
+        ),
+    )
+
+
+class SystemSnapshot(Base):
+    """3.0.2. 시스템 스냅샷 테이블 - 백업 관리"""
+    __tablename__ = "SYSTEM_SNAPSHOT"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    snapshot_path = Column(Text, nullable=False)
+    created_at = Column(Text, nullable=False) # 기본값은 DB 삽입 시 처리 예정
+    created_by = Column(Integer, ForeignKey("USER_ACCOUNT.id"), nullable=True)
+    is_auto = Column(Boolean, default=True)
+
+    # Relationships
+    creator = relationship("UserAccount")
 
 
 # ═══════════════════════════════════════════════════════════════════════

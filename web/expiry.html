@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCM Dashboard | 재고 유통기한 상세</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="app-wrapper">
+        <aside class="app-sidebar">
+            <div class="sidebar-brand">
+                <div class="logo-icon">S</div>
+                <h1>SCM Dashboard</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/">대시보드</a>
+                <a href="/inventory">현재고 보유량</a>
+                <a href="/expiry" class="active">유통기한 상세</a>
+                <a href="/order-plan">발주 계획</a>
+                <a href="/matching">매칭 시스템</a>
+                <a href="/users">운영 (Admin)</a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="sidebar-user-avatar">A</div>
+                    <div class="user-details">
+                        <span class="user-name" id="sidebar-user-name">로그인 필요</span>
+                        <span class="user-role" id="sidebar-user-role"></span>
+                    </div>
+                </div>
+                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">Dark Mode</button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div id="alert-panel"></div>
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">FEFO 기반 유통기한 임박 및 폐기 예상</h2>
+                    <button class="btn btn--secondary" onclick="window.location.reload()">새로고침</button>
+                </div>
+                <div class="card-body card-body--no-pad">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="expiry-table">
+                            <thead>
+                                <tr>
+                                    <th>거점</th>
+                                    <th>품목</th>
+                                    <th>잔여 수량 (캔)</th>
+                                    <th>유통기한</th>
+                                    <th>잔여일수</th>
+                                    <th>리스크 금액</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <p>데이터가 없습니다.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <div id="toast-container" class="toast-container"></div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            Theme.init();
+            // TODO: Expiry calculation logic fetch from backend
+        });
+    </script>
+</body>
+</html>
