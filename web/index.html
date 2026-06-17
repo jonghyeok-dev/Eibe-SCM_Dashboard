@@ -11,38 +11,41 @@
 <body>
     <div class="app-wrapper" id="dashboard-page">
         <aside class="app-sidebar">
+            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
             <div class="sidebar-brand">
                 <div class="logo-icon">S</div>
                 <h1>SCM Dashboard</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/" class="active">대시보드</a>
-                <a href="/inventory">현재고 보유량</a>
-                <a href="/expiry">유통기한 상세</a>
-                <a href="/order-plan">발주 계획</a>
-                <a href="/matching">매칭 시스템</a>
-                <a href="/users">운영 (Admin)</a>
+                <a href="/" class="active"><span class="nav-icon">●</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
+                <a href="/expiry"><span class="nav-icon">●</span><span>Expiry</span></a>
+                <a href="/order-plan"><span class="nav-icon">●</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
+                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
                     <div class="user-avatar" id="sidebar-user-avatar">A</div>
                     <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">로그인 필요</span>
+                        <span class="user-name" id="sidebar-user-name">Guest</span>
                         <span class="user-role" id="sidebar-user-role"></span>
                     </div>
                 </div>
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">Dark Mode</button>
+                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
+                    <span class="toggle-icon">☾</span>
+                    <span class="theme-toggle-text">Dark</span>
+                </button>
+                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
             </div>
         </aside>
 
         <main class="main-content">
-            <div id="alert-panel"></div>
-
             <section class="kpi-grid">
                 <div class="kpi-card">
                     <span class="kpi-label">전사 총 현재고</span>
                     <div class="kpi-value" id="kpi-total-stock">-</div>
-                    <div class="kpi-sub">캔 (전 거점 합계)</div>
+                    <div class="kpi-sub">캔 (전 창고 합계)</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">재고 자산 금액</span>
@@ -82,15 +85,15 @@
             <section class="content-grid content-grid--two">
                 <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">거점별 현재고 현황</h2>
-                        <span class="badge badge--primary" id="ffc-count-badge">0개 거점</span>
+                        <h2 class="card-title">창고별 현재고 현황</h2>
+                        <span class="badge badge--primary" id="ffc-count-badge">0</span>
                     </div>
                     <div class="card-body card-body--no-pad">
                         <div class="data-table-wrapper">
                             <table class="data-table" id="inventory-table">
                                 <thead>
                                     <tr>
-                                        <th>거점</th>
+                                        <th>창고</th>
                                         <th>품목코드</th>
                                         <th>현재고 (캔)</th>
                                         <th>유통기한</th>

@@ -91,6 +91,7 @@ class FFCMaster(Base):
     ffc_type = Column(Text, nullable=False)                         # ONLINE / OFFLINE / BUYOUT
     allowed_expiry_days = Column(Integer, default=90)               # 허용 잔여 유통기한 임계일수
     ffc_moq = Column(Integer, default=0)                            # 거점 이관 최소 수량
+    avg_transport_cost = Column(Float, default=0)                   # 평균 용차비용 (원)
 
     __table_args__ = (
         CheckConstraint(
@@ -122,6 +123,25 @@ class FFCMaster(Base):
         foreign_keys="LogisticsCostMaster.arrival_ffc_id",
         back_populates="arrival_ffc",
     )
+
+
+class FFCProductMOQ(Base):
+    """3.1.4. 창고-상품별 이관 MOQ 테이블 - SKU별 이관 최소 수량 오버라이드"""
+
+    __tablename__ = "FFC_PRODUCT_MOQ"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    ffc_id = Column(Integer, ForeignKey("FFC_MASTER.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("PRODUCT_MASTER.id"), nullable=False)
+    transfer_moq = Column(Integer, nullable=False, default=0)  # SKU별 이관 최소 수량 (캔)
+
+    __table_args__ = (
+        UniqueConstraint("ffc_id", "product_id", name="uq_ffc_product_moq"),
+    )
+
+    # Relationships
+    ffc = relationship("FFCMaster", backref="product_moqs")
+    product = relationship("ProductMaster", backref="ffc_moqs")
 
 
 class LogisticsCostMaster(Base):
@@ -310,6 +330,7 @@ class MonthlyOrderPlan(Base):
     product_id = Column(Integer, ForeignKey("PRODUCT_MASTER.id"), nullable=False)
     system_suggested_qty = Column(Integer, nullable=False)          # 시스템 제안 수량
     user_modified_qty = Column(Integer, nullable=False)             # 실무자 수정 최종 수량
+    version = Column(Integer, default=1)                            # 낙관적 잠금 버전
     updated_at = Column(Text)                                       # 수정 일시
 
     __table_args__ = (

@@ -9,32 +9,36 @@
 <body>
     <div class="app-wrapper">
         <aside class="app-sidebar">
+            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
             <div class="sidebar-brand">
                 <div class="logo-icon">S</div>
                 <h1>SCM Dashboard</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/">대시보드</a>
-                <a href="/inventory">현재고 보유량</a>
-                <a href="/expiry" class="active">유통기한 상세</a>
-                <a href="/order-plan">발주 계획</a>
-                <a href="/matching">매칭 시스템</a>
-                <a href="/users">운영 (Admin)</a>
+                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
+                <a href="/expiry" class="active"><span class="nav-icon">●</span><span>Expiry</span></a>
+                <a href="/order-plan"><span class="nav-icon">●</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
+                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
                     <div class="user-avatar" id="sidebar-user-avatar">A</div>
                     <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">로그인 필요</span>
+                        <span class="user-name" id="sidebar-user-name">Guest</span>
                         <span class="user-role" id="sidebar-user-role"></span>
                     </div>
                 </div>
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">Dark Mode</button>
+                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
+                    <span class="toggle-icon">☾</span>
+                    <span class="theme-toggle-text">Dark</span>
+                </button>
+                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
             </div>
         </aside>
 
         <main class="main-content">
-            <div id="alert-panel"></div>
             <section class="card">
                 <div class="card-header">
                     <h2 class="card-title">FEFO 기반 유통기한 임박 및 폐기 예상</h2>
@@ -45,7 +49,7 @@
                         <table class="data-table" id="expiry-table">
                             <thead>
                                 <tr>
-                                    <th>거점</th>
+                                    <th>창고</th>
                                     <th>품목</th>
                                     <th>잔여 수량 (캔)</th>
                                     <th>유통기한</th>
@@ -73,7 +77,6 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            // TODO: Expiry calculation logic fetch from backend
         });
     </script>
 </body>

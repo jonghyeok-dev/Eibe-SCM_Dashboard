@@ -79,6 +79,7 @@ class FFCMasterBase(BaseModel):
     ffc_type: str = Field(..., pattern="^(ONLINE|OFFLINE|BUYOUT)$")
     allowed_expiry_days: int = Field(default=90, ge=0)
     ffc_moq: int = Field(default=0, ge=0)
+    avg_transport_cost: float = Field(default=0, ge=0, description="평균 용차비용 (원)")
 
 
 class FFCMasterCreate(FFCMasterBase):
@@ -318,3 +319,42 @@ class FileUploadResponse(BaseModel):
     rows_processed: int
     rows_inserted: int
     rows_updated: int = 0
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 창고-상품별 이관 MOQ 스키마
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class FFCProductMOQBase(BaseModel):
+    ffc_id: int
+    product_id: int
+    transfer_moq: int = Field(default=0, ge=0, description="SKU별 이관 최소 수량 (캔)")
+
+
+class FFCProductMOQCreate(FFCProductMOQBase):
+    pass
+
+
+class FFCProductMOQResponse(FFCProductMOQBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 발주 계획 일괄 저장 스키마
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class OrderPlanBulkItem(BaseModel):
+    product_id: int
+    target_month: str = Field(..., description="YYYY-MM")
+    user_modified_qty: int = Field(..., ge=0)
+    version: int = Field(default=1)
+
+
+class OrderPlanBulkSave(BaseModel):
+    plans: list[OrderPlanBulkItem]
+

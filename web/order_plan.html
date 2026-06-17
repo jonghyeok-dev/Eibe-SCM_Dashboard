@@ -5,79 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCM Dashboard | 발주 계획</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="app-wrapper" id="order-plan-page">
         <aside class="app-sidebar">
+            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
             <div class="sidebar-brand">
                 <div class="logo-icon">S</div>
                 <h1>SCM Dashboard</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/">대시보드</a>
-                <a href="/inventory">현재고 보유량</a>
-                <a href="/expiry">유통기한 상세</a>
-                <a href="/order-plan" class="active">발주 계획</a>
-                <a href="/matching">매칭 시스템</a>
-                <a href="/users">운영 (Admin)</a>
+                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
+                <a href="/expiry"><span class="nav-icon">●</span><span>Expiry</span></a>
+                <a href="/order-plan" class="active"><span class="nav-icon">●</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
+                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
                     <div class="user-avatar" id="sidebar-user-avatar">A</div>
                     <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">로그인 필요</span>
+                        <span class="user-name" id="sidebar-user-name">Guest</span>
                         <span class="user-role" id="sidebar-user-role"></span>
                     </div>
                 </div>
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">Dark Mode</button>
+                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
+                    <span class="toggle-icon">☾</span>
+                    <span class="theme-toggle-text">Dark</span>
+                </button>
+                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
             </div>
         </aside>
 
         <main class="main-content">
-            <section class="card" style="margin-bottom: var(--space-xl);">
+            <!-- 발주 수량 입력 (최상단 Sticky) -->
+            <section class="card section-gap sticky-section">
                 <div class="card-header">
-                    <h2 class="card-title">발주 대상 연월 선택</h2>
+                    <h2 class="card-title">발주 수량 입력</h2>
+                    <div class="btn-group">
+                        <button class="btn btn--primary" onclick="OrderPlan.saveAll()">전체 저장</button>
+                        <button class="btn btn--secondary" onclick="window.location.href='/api/order-plan/export'">발주계획 내보내기</button>
+                        <button class="btn btn--secondary" onclick="OrderPlan.load()">새로고침</button>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div style="display: flex; align-items: center; gap: var(--space-lg);">
-                        <div style="min-width: 200px;">
-                            <select class="form-select" id="target-month">
-                                <option value="">선택하세요</option>
-                            </select>
-                        </div>
-                        <button class="btn btn--primary" id="btn-load-plan" onclick="OrderPlan.load()">불러오기</button>
+                <div class="card-body card-body--no-pad">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="order-input-table">
+                            <thead>
+                                <tr>
+                                    <th>품목코드</th>
+                                    <th>품목명</th>
+                                    <th class="text-right">시스템 제안</th>
+                                    <th class="text-right">발주 수량 (입력)</th>
+                                    <th class="text-center">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="5"><div class="empty-state"><p>시뮬레이션을 실행하면 데이터가 표시됩니다.</p></div></td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
 
-            <section class="card">
+            <!-- 컨트롤 패널 -->
+            <section class="card section-gap">
                 <div class="card-header">
-                    <h2 class="card-title">발주 수량 편집 그리드</h2>
-                    <button class="btn btn--primary" id="btn-save-plan" onclick="OrderPlan.saveAll()">저장</button>
+                    <h2 class="card-title">시뮬레이션 설정</h2>
                 </div>
-                <div class="card-body card-body--no-pad">
+                <div class="card-body">
+                    <div class="sim-controls">
+                        <div class="form-group" style="min-width: 200px;">
+                            <label class="form-label">품목 선택</label>
+                            <select class="form-select" id="product-selector" onchange="OrderPlan.onProductChange()">
+                                <option value="">전체 품목 (요약)</option>
+                            </select>
+                        </div>
+                        <div class="slider-wrap">
+                            <label>가중치 계수</label>
+                            <input type="range" id="weight-slider" min="0.5" max="2.0" step="0.05" value="1.0">
+                            <span class="slider-value" id="weight-value">1.00x</span>
+                        </div>
+                        <button class="btn btn--primary" onclick="OrderPlan.runSimulation()">시뮬레이션 실행</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 재고일수 히트맵 (접기/열기) -->
+            <section class="card section-gap">
+                <div class="card-header collapsible-header" id="heatmap-header" onclick="toggleCollapsible('heatmap-header')">
+                    <h2 class="card-title">재고일수 히트맵 (24주)</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="card-body collapsible-body" id="heatmap-body">
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-md); font-size: 0.82rem;">
+                        품목별 주차별 예상 재고일수입니다. 빨강(&lt;2주) / 노랑(2~4주) / 녹색(&gt;4주)
+                    </p>
                     <div class="data-table-wrapper">
-                        <table class="data-table" id="order-plan-table">
-                            <thead>
-                                <tr>
-                                    <th>품목 코드</th>
-                                    <th>품목명</th>
-                                    <th>시스템 제안 수량</th>
-                                    <th>실무자 수정 수량</th>
-                                    <th>차이</th>
-                                    <th>상태</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="6">
-                                        <div class="empty-state">
-                                            <p>대상 연월을 선택하고 불러오기 버튼을 클릭하세요.</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
+                        <table class="heatmap-table" id="heatmap-table">
+                            <thead><tr><th>품목</th></tr></thead>
+                            <tbody><tr><td>시뮬레이션 실행 후 표시됩니다.</td></tr></tbody>
                         </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6개월 시각화 (접기/열기) -->
+            <section class="card section-gap-lg">
+                <div class="card-header collapsible-header" id="chart-header" onclick="toggleCollapsible('chart-header')">
+                    <h2 class="card-title" id="chart-title">재고 추이 시뮬레이션 (24주)</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="card-body collapsible-body" id="chart-body">
+                    <div class="chart-container" style="height: 420px;">
+                        <canvas id="simulation-chart"></canvas>
                     </div>
                 </div>
             </section>
@@ -87,73 +130,256 @@
     <div id="toast-container" class="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script>
+        let simChart = null;
+
         const OrderPlan = {
-            plans: [],
-            initMonthSelector() {
-                const select = document.getElementById('target-month');
-                const now = new Date();
-                for (let i = -2; i <= 6; i++) {
-                    const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-                    const val = d.toISOString().substring(0, 7);
-                    const opt = document.createElement('option');
-                    opt.value = val;
-                    opt.textContent = val;
-                    select.appendChild(opt);
-                }
-            },
+            simData: [],
+            weightFactor: 1.0,
+
             async load() {
-                const month = document.getElementById('target-month').value;
-                if (!month) { Toast.show('대상 연월을 선택하세요'); return; }
                 try {
-                    this.plans = await API.get(`/api/order-plan?target_month=${month}`);
-                    this.render();
-                    Toast.show(`${month} 발주 계획 로드 완료`);
-                } catch (err) { Toast.show('발주 계획 로드 실패'); }
+                    const products = await API.get('/api/products');
+                    const selector = document.getElementById('product-selector');
+                    selector.innerHTML = '<option value="">전체 품목 (요약)</option>';
+                    products.forEach(p => {
+                        selector.innerHTML += `<option value="${p.id}">${p.product_code} - ${p.product_name}</option>`;
+                    });
+                    await this.runSimulation();
+                } catch(e) { console.error(e); }
             },
-            render() {
-                const tbody = document.querySelector('#order-plan-table tbody');
-                if (!this.plans.length) {
-                    tbody.innerHTML = `<tr><td colspan="6"><div class="empty-state"><p>해당 월의 발주 계획이 없습니다.</p></div></td></tr>`;
+
+            onProductChange() {
+                this.renderChart();
+            },
+
+            async runSimulation() {
+                this.weightFactor = parseFloat(document.getElementById('weight-slider').value);
+                try {
+                    this.simData = await API.get(`/api/order-plan/simulation?weight_factor=${this.weightFactor}`);
+                    this.renderInputTable();
+                    this.renderChart();
+                    this.renderHeatmap();
+                    Toast.show('시뮬레이션 완료');
+                } catch(e) { console.error(e); }
+            },
+
+            renderChart() {
+                const selectedProduct = document.getElementById('product-selector').value;
+                const canvas = document.getElementById('simulation-chart');
+
+                if (simChart) { simChart.destroy(); simChart = null; }
+
+                if (!this.simData.length) return;
+
+                let data;
+                if (selectedProduct) {
+                    data = this.simData.find(d => d.product_id === parseInt(selectedProduct));
+                    if (!data) return;
+                    document.getElementById('chart-title').textContent = 
+                        `재고 추이: ${data.product_code} - ${data.product_name} (24주)`;
+                } else {
+                    data = {
+                        simulation: Array.from({length: 24}, (_, i) => {
+                            let ending = 0, inbound_exp = 0, demand = 0;
+                            this.simData.forEach(d => {
+                                if (d.simulation[i]) {
+                                    ending += d.simulation[i].ending_stock;
+                                    inbound_exp += d.simulation[i].inbound_expected;
+                                    demand += d.simulation[i].weekly_demand;
+                                }
+                            });
+                            return { week: i + 1, ending_stock: ending, inbound_expected: inbound_exp, weekly_demand: demand };
+                        })
+                    };
+                    document.getElementById('chart-title').textContent = '전체 품목 합산 재고 추이 (24주)';
+                }
+
+                const labels = data.simulation.map(s => `W${s.week}`);
+                const endingStocks = data.simulation.map(s => Math.round(s.ending_stock));
+                const inboundExpected = data.simulation.map(s => s.inbound_expected);
+                const weeklyDemand = data.simulation.map(s => Math.round(s.weekly_demand));
+
+                simChart = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: '예상 기말 재고',
+                                data: endingStocks,
+                                type: 'line',
+                                borderColor: '#29AD39',
+                                backgroundColor: 'rgba(41, 173, 57, 0.08)',
+                                fill: true, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5,
+                                tension: 0.3, yAxisID: 'y', order: 0,
+                            },
+                            {
+                                label: '입고 예정',
+                                data: inboundExpected,
+                                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                                borderRadius: 4, yAxisID: 'y', order: 2,
+                            },
+                            {
+                                label: '주간 출고 (예측)',
+                                data: weeklyDemand,
+                                type: 'line',
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                                borderDash: [6, 3], borderWidth: 2, pointRadius: 0,
+                                fill: false, tension: 0, yAxisID: 'y2', order: 1,
+                            }
+                        ],
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            y: {
+                                type: 'linear', position: 'left',
+                                title: { display: true, text: '재고량 / 입고량 (캔)' },
+                                beginAtZero: true,
+                            },
+                            y2: {
+                                type: 'linear', position: 'right',
+                                title: { display: true, text: '주간 출고량 (캔)' },
+                                beginAtZero: true,
+                                grid: { drawOnChartArea: false },
+                            },
+                        },
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => `${ctx.dataset.label}: ${Format.number(ctx.parsed.y)} 캔`
+                                }
+                            }
+                        }
+                    }
+                });
+            },
+
+            renderHeatmap() {
+                const table = document.getElementById('heatmap-table');
+                if (!this.simData.length) {
+                    table.innerHTML = '<thead><tr><th>품목</th></tr></thead><tbody><tr><td>시뮬레이션 실행 후 표시됩니다.</td></tr></tbody>';
                     return;
                 }
-                tbody.innerHTML = this.plans.map(plan => {
-                    const diff = plan.user_modified_qty - plan.system_suggested_qty;
-                    const diffClass = diff > 0 ? 'badge--warning' : diff < 0 ? 'badge--danger' : 'badge--primary';
-                    const diffText = diff > 0 ? `+${Format.number(diff)}` : diff < 0 ? Format.number(diff) : '±0';
+
+                // 헤더: 품목 + W1~W24 (4주 단위로 간격)
+                const weeks = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24];
+                let headerHtml = '<tr><th style="min-width:120px;">품목</th>';
+                weeks.forEach(w => { headerHtml += `<th>W${w}</th>`; });
+                headerHtml += '</tr>';
+
+                // 바디: 품목별 재고일수
+                let bodyHtml = '';
+                this.simData.forEach(d => {
+                    bodyHtml += `<tr><td class="row-label">${d.product_code}</td>`;
+                    weeks.forEach(w => {
+                        const weekData = d.simulation[w - 1];
+                        if (!weekData || d.weekly_avg_outflow <= 0) {
+                            bodyHtml += '<td><div class="heatmap-cell risk-safe">-</div></td>';
+                            return;
+                        }
+                        const invDays = weekData.ending_stock / d.weekly_avg_outflow;
+                        let riskClass = 'risk-safe';
+                        if (invDays < 2) riskClass = 'risk-high';
+                        else if (invDays < 4) riskClass = 'risk-mid';
+                        else if (invDays < 8) riskClass = 'risk-low';
+                        bodyHtml += `<td><div class="heatmap-cell ${riskClass}">${invDays.toFixed(1)}</div></td>`;
+                    });
+                    bodyHtml += '</tr>';
+                });
+
+                table.innerHTML = `<thead>${headerHtml}</thead><tbody>${bodyHtml || '<tr><td colspan="' + (weeks.length + 1) + '">데이터 없음</td></tr>'}</tbody>`;
+            },
+
+            renderInputTable() {
+                const tbody = document.querySelector('#order-input-table tbody');
+                if (!this.simData.length) {
+                    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>데이터가 없습니다.</p></div></td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = this.simData.map(d => {
+                    const savedValue = d.saved_qty !== null ? d.saved_qty : d.suggested_qty;
                     return `
-                        <tr data-plan-id="${plan.plan_id}">
-                            <td style="font-family: var(--font-mono);">${plan.product_id}</td>
-                            <td>-</td>
-                            <td style="font-family: var(--font-mono);">${Format.number(plan.system_suggested_qty)}</td>
-                            <td>
-                                <input type="number" class="form-input" value="${plan.user_modified_qty}" data-plan-id="${plan.plan_id}" style="width: 140px; text-align: right;" onchange="OrderPlan.markModified(this)">
+                        <tr data-product-id="${d.product_id}" data-target-month="${d.target_month}" data-version="${d.version || 1}">
+                            <td class="mono">${d.product_code}</td>
+                            <td>${d.product_name}</td>
+                            <td class="text-right mono" style="color: var(--accent-blue);">${Format.number(d.suggested_qty)}</td>
+                            <td class="text-right">
+                                <input type="number" class="form-input order-qty-input" value="${savedValue}" 
+                                       min="0" step="${d.hub_moq}" style="width: 130px; text-align: right;"
+                                       onchange="OrderPlan.onQtyChange(this)">
                             </td>
-                            <td><span class="badge ${diffClass}">${diffText}</span></td>
-                            <td><span class="badge badge--primary">저장됨</span></td>
+                            <td class="text-center">
+                                <span class="badge ${d.saved_qty !== null ? 'badge--primary' : 'badge--blue'}">
+                                    ${d.saved_qty !== null ? '저장됨' : '미저장'}
+                                </span>
+                            </td>
                         </tr>`;
                 }).join('');
             },
-            markModified(input) {
+
+            onQtyChange(input) {
+                const statusCell = input.closest('tr').querySelector('td:last-child');
+                statusCell.innerHTML = '<span class="badge badge--warning">수정됨</span>';
+                // 히트맵과 차트에 반영하기 위해 로컬 시뮬레이션 데이터 업데이트
                 const row = input.closest('tr');
-                row.querySelector('td:last-child').innerHTML = '<span class="badge badge--warning">수정됨</span>';
-            },
-            async saveAll() {
-                const inputs = document.querySelectorAll('#order-plan-table input[data-plan-id]');
-                let saved = 0;
-                for (const input of inputs) {
-                    const planId = input.dataset.planId;
-                    const qty = parseInt(input.value, 10);
-                    if (isNaN(qty) || qty < 0) continue;
-                    try {
-                        await API.post(`/api/order-plan/save?plan_id=${planId}`, { user_modified_qty: qty });
-                        saved++;
-                        input.closest('tr').querySelector('td:last-child').innerHTML = '<span class="badge badge--primary">저장 완료</span>';
-                    } catch (err) { Toast.show(`저장 실패: Plan #${planId}`); }
+                const productId = parseInt(row.dataset.productId);
+                const newQty = parseInt(input.value) || 0;
+                const productData = this.simData.find(d => d.product_id === productId);
+                if (productData) {
+                    // 추가 발주 수량 반영하여 시뮬레이션 재계산 (간단 로컬 계산)
+                    const diff = newQty - (productData.suggested_qty || 0);
+                    if (productData.simulation.length > 0) {
+                        // 마지막 주에 추가 입고로 반영
+                        const lastWeek = productData.simulation[productData.simulation.length - 1];
+                        lastWeek.ending_stock = Math.max(0, lastWeek.ending_stock + diff);
+                    }
                 }
-                if (saved > 0) Toast.show(`${saved}건 저장 완료`);
+                this.renderHeatmap();
+                this.renderChart();
+            },
+
+            async saveAll() {
+                const rows = document.querySelectorAll('#order-input-table tbody tr[data-product-id]');
+                const plans = [];
+                rows.forEach(row => {
+                    const product_id = parseInt(row.dataset.productId);
+                    const target_month = row.dataset.targetMonth;
+                    const version = parseInt(row.dataset.version) || 1;
+                    const qty = parseInt(row.querySelector('.order-qty-input').value) || 0;
+                    plans.push({ product_id, target_month, user_modified_qty: qty, version });
+                });
+
+                if (!plans.length) { Toast.show('저장할 데이터가 없습니다'); return; }
+
+                try {
+                    await API.post('/api/order-plan/bulk-save', { plans });
+                    Toast.show(`${plans.length}건 발주 계획 저장 완료`);
+                    rows.forEach(row => {
+                        const v = parseInt(row.dataset.version) || 1;
+                        row.dataset.version = v + 1;
+                        row.querySelector('td:last-child').innerHTML = '<span class="badge badge--primary">저장 완료</span>';
+                    });
+                } catch(e) {}
             }
         };
-        document.addEventListener('DOMContentLoaded', () => { OrderPlan.initMonthSelector(); });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            Theme.init();
+            ChartDefaults.init();
+
+            const slider = document.getElementById('weight-slider');
+            const sliderVal = document.getElementById('weight-value');
+            slider.addEventListener('input', (e) => {
+                sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
+            });
+
+            OrderPlan.load();
+        });
     </script>
 </body>
 </html>
