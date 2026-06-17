@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SCM ERP Dashboard">
+    <title>SCM Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="app-wrapper" id="dashboard-page">
+        <header class="app-header">
+            <div class="header-brand">
+                <div class="logo-icon">S</div>
+                <h1>SCM Dashboard</h1>
+            </div>
+            <nav class="header-nav">
+                <a href="/" class="active">대시보드</a>
+                <a href="/order-plan">발주 계획</a>
+            </nav>
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">Dark Mode</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div id="alert-panel"></div>
+
+            <section class="kpi-grid">
+                <div class="kpi-card">
+                    <span class="kpi-label">전사 총 현재고</span>
+                    <div class="kpi-value" id="kpi-total-stock">-</div>
+                    <div class="kpi-sub">캔 (전 거점 합계)</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">재고 자산 금액</span>
+                    <div class="kpi-value" id="kpi-total-value">0</div>
+                    <div class="kpi-sub">원화 환산 총액</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">품절 위험 품목</span>
+                    <div class="kpi-value" id="kpi-risk-count">0</div>
+                    <div class="kpi-sub">6개월 뒤 공백 예상</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">폐기 리스크 총액</span>
+                    <div class="kpi-value" id="kpi-expiry-risk">0</div>
+                    <div class="kpi-sub">유통기한 임박 재고</div>
+                </div>
+            </section>
+
+            <section class="content-grid" style="margin-bottom: var(--space-2xl);">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">수요-물류 이중 트랙 시각화</h2>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <label style="font-size: 0.8rem; font-weight: 500;">가중치</label>
+                            <input type="range" id="weight-slider" min="0.5" max="2.0" step="0.05" value="1.0" style="width: 100px;">
+                            <span id="weight-value" style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-main);">1.0x</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="dual-track-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="content-grid content-grid--two">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">거점별 현재고 현황</h2>
+                        <span class="badge badge--primary" id="ffc-count-badge">0개 거점</span>
+                    </div>
+                    <div class="card-body card-body--no-pad">
+                        <div class="data-table-wrapper">
+                            <table class="data-table" id="inventory-table">
+                                <thead>
+                                    <tr>
+                                        <th>거점</th>
+                                        <th>품목코드</th>
+                                        <th>현재고 (캔)</th>
+                                        <th>유통기한</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                <p>데이터가 없습니다.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">입고 예정 파이프라인</h2>
+                        <button class="btn btn--secondary" onclick="Dashboard.loadKPIs()">새로고침</button>
+                    </div>
+                    <div class="card-body card-body--no-pad">
+                        <div class="data-table-wrapper">
+                            <table class="data-table" id="expected-inbound-table">
+                                <thead>
+                                    <tr>
+                                        <th>참조번호</th>
+                                        <th>품목</th>
+                                        <th>수량 (캔)</th>
+                                        <th>ETA</th>
+                                        <th>상태</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                <p>입고 예정 데이터가 없습니다.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const slider = document.getElementById('weight-slider');
+        const sliderVal = document.getElementById('weight-value');
+        if (slider) {
+            slider.addEventListener('input', (e) => {
+                sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
+            });
+        }
+    </script>
+</body>
+</html>
