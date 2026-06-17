@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCM Dashboard | 재고 유통기한 상세</title>
+    <title>EIBE SCM | 유통기한 관리</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="app-wrapper">
         <aside class="app-sidebar">
-            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
             <div class="sidebar-brand">
-                <div class="logo-icon">S</div>
-                <h1>SCM Dashboard</h1>
+                <div class="logo-icon">EI</div>
+                <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
-                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
-                <a href="/expiry" class="active"><span class="nav-icon">●</span><span>Expiry</span></a>
-                <a href="/order-plan"><span class="nav-icon">●</span><span>Order Plan</span></a>
-                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
-                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
+                <a href="/"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">📦</span><span>Inventory</span></a>
+                <a href="/expiry" class="active"><span class="nav-icon">⏳</span><span>Expiry</span></a>
+                <a href="/order-plan"><span class="nav-icon">📋</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">🚛</span><span>입고 관리</span></a>
+                <a href="/users"><span class="nav-icon">⚙️</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
@@ -39,10 +43,38 @@
         </aside>
 
         <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Expiry Management</h1>
+                <p class="page-subtitle">FEFO 기반 유통기한 임박 및 폐기 리스크 관리</p>
+            </div>
+
+            <section class="kpi-grid section-gap">
+                <div class="kpi-card">
+                    <span class="kpi-label">유통기한 임박 품목</span>
+                    <div class="kpi-value">7</div>
+                    <div class="kpi-sub">90일 이내 만료</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">폐기 리스크 총액</span>
+                    <div class="kpi-value">₩45,200,000</div>
+                    <div class="kpi-sub">원화 환산 기준</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">위험 등급 품목</span>
+                    <div class="kpi-value">2</div>
+                    <div class="kpi-sub">30일 이내 만료</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">관리 대상 창고</span>
+                    <div class="kpi-value">3</div>
+                    <div class="kpi-sub">임박 재고 보유 창고</div>
+                </div>
+            </section>
+
             <section class="card">
                 <div class="card-header">
                     <h2 class="card-title">FEFO 기반 유통기한 임박 및 폐기 예상</h2>
-                    <button class="btn btn--secondary" onclick="window.location.reload()">새로고침</button>
+                    <button class="btn btn--secondary btn--sm" onclick="window.location.reload()">새로고침</button>
                 </div>
                 <div class="card-body card-body--no-pad">
                     <div class="data-table-wrapper">
@@ -51,19 +83,68 @@
                                 <tr>
                                     <th>창고</th>
                                     <th>품목</th>
-                                    <th>잔여 수량 (캔)</th>
+                                    <th class="text-right">잔여 수량 (캔)</th>
                                     <th>유통기한</th>
-                                    <th>잔여일수</th>
-                                    <th>리스크 금액</th>
+                                    <th class="text-right">잔여일수</th>
+                                    <th class="text-right">리스크 금액</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="6">
-                                        <div class="empty-state">
-                                            <p>데이터가 없습니다.</p>
-                                        </div>
-                                    </td>
+                                    <td><span class="status-dot status-dot--red"></span>쿠팡 FFC</td>
+                                    <td>SN-004 산양분유 4단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">1,200</td>
+                                    <td>2026-07-05</td>
+                                    <td class="text-right"><span class="badge badge--danger">17일</span></td>
+                                    <td class="text-right mono">₩24,000,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--red"></span>오프라인 FFC</td>
+                                    <td>SN-003 산양분유 3단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">800</td>
+                                    <td>2026-07-12</td>
+                                    <td class="text-right"><span class="badge badge--danger">24일</span></td>
+                                    <td class="text-right mono">₩18,000,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>용인 메인창고</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">3,500</td>
+                                    <td>2026-08-20</td>
+                                    <td class="text-right"><span class="badge badge--warning">63일</span></td>
+                                    <td class="text-right mono">₩78,750,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>온라인 FFC</td>
+                                    <td>SN-002 산양분유 2단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">2,100</td>
+                                    <td>2026-08-25</td>
+                                    <td class="text-right"><span class="badge badge--warning">68일</span></td>
+                                    <td class="text-right mono">₩44,100,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>바이아웃 채널</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">1,800</td>
+                                    <td>2026-09-01</td>
+                                    <td class="text-right"><span class="badge badge--warning">75일</span></td>
+                                    <td class="text-right mono">₩40,500,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>용인 메인창고</td>
+                                    <td>SN-002 산양분유 2단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">5,200</td>
+                                    <td>2026-09-15</td>
+                                    <td class="text-right"><span class="badge badge--green">89일</span></td>
+                                    <td class="text-right mono">₩109,200,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>쿠팡 FFC</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">4,600</td>
+                                    <td>2026-09-18</td>
+                                    <td class="text-right"><span class="badge badge--green">92일</span></td>
+                                    <td class="text-right mono">₩103,500,000</td>
                                 </tr>
                             </tbody>
                         </table>

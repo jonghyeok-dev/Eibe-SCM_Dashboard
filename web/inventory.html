@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCM Dashboard | 현재고 보유량</title>
+    <title>EIBE SCM | 현재고 보유량</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="app-wrapper">
         <aside class="app-sidebar">
-            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
             <div class="sidebar-brand">
-                <div class="logo-icon">S</div>
-                <h1>SCM Dashboard</h1>
+                <div class="logo-icon">EI</div>
+                <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
-                <a href="/inventory" class="active"><span class="nav-icon">●</span><span>Inventory</span></a>
-                <a href="/expiry"><span class="nav-icon">●</span><span>Expiry</span></a>
-                <a href="/order-plan"><span class="nav-icon">●</span><span>Order Plan</span></a>
-                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
-                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
+                <a href="/"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="/inventory" class="active"><span class="nav-icon">📦</span><span>Inventory</span></a>
+                <a href="/expiry"><span class="nav-icon">⏳</span><span>Expiry</span></a>
+                <a href="/order-plan"><span class="nav-icon">📋</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">🚛</span><span>입고 관리</span></a>
+                <a href="/users"><span class="nav-icon">⚙️</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
@@ -39,6 +43,11 @@
         </aside>
 
         <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Inventory</h1>
+                <p class="page-subtitle">창고별 현재고 보유량 관리</p>
+            </div>
+
             <!-- 상단: 업로드/다운로드 -->
             <section class="card section-gap">
                 <div class="card-header">
@@ -56,22 +65,22 @@
             <section class="kpi-grid section-gap" id="inventory-kpi">
                 <div class="kpi-card">
                     <span class="kpi-label">전사 총 현재고</span>
-                    <div class="kpi-value" id="inv-total-qty">-</div>
+                    <div class="kpi-value" id="inv-total-qty">127,450</div>
                     <div class="kpi-sub">캔 (전 창고 합계)</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">재고 자산 금액</span>
-                    <div class="kpi-value" id="inv-total-value">-</div>
+                    <div class="kpi-value" id="inv-total-value">₩2,845,300,000</div>
                     <div class="kpi-sub">원화 환산 총액</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">등록 창고 수</span>
-                    <div class="kpi-value" id="inv-ffc-count">-</div>
+                    <div class="kpi-value" id="inv-ffc-count">5</div>
                     <div class="kpi-sub">풀필먼트 창고</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">이관 추천 건수</span>
-                    <div class="kpi-value" id="inv-transfer-count">-</div>
+                    <div class="kpi-value" id="inv-transfer-count">4</div>
                     <div class="kpi-sub">4주 이내 소진 예상 품목</div>
                 </div>
             </section>
@@ -83,6 +92,11 @@
                     <div class="btn-group">
                         <select class="form-select" id="ffc-filter" style="width: auto; min-width: 160px;">
                             <option value="">전체 창고</option>
+                            <option value="1">용인 메인창고 (HUB)</option>
+                            <option value="2">온라인 FFC (FFC_ON)</option>
+                            <option value="3">오프라인 FFC (FFC_OFF)</option>
+                            <option value="4">바이아웃 채널 (BUYOUT)</option>
+                            <option value="5">쿠팡 FFC (FFC_CP)</option>
                         </select>
                     </div>
                 </div>
@@ -100,7 +114,62 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td colspan="6"><div class="empty-state"><p>데이터를 로드하는 중입니다...</p></div></td></tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>용인 메인창고</td>
+                                    <td class="mono">SN-001</td>
+                                    <td>산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">42,500</td>
+                                    <td class="text-right mono">₩956,250,000</td>
+                                    <td style="color: var(--text-muted);">4건 배치</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>용인 메인창고</td>
+                                    <td class="mono">SN-002</td>
+                                    <td>산양분유 2단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">28,000</td>
+                                    <td class="text-right mono">₩588,000,000</td>
+                                    <td style="color: var(--text-muted);">3건 배치</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>온라인 FFC</td>
+                                    <td class="mono">SN-001</td>
+                                    <td>산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">18,200</td>
+                                    <td class="text-right mono">₩409,500,000</td>
+                                    <td style="color: var(--text-muted);">2건 배치</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>온라인 FFC</td>
+                                    <td class="mono">SN-003</td>
+                                    <td>산양분유 3단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">8,750</td>
+                                    <td class="text-right mono">₩196,875,000</td>
+                                    <td style="color: var(--text-muted);">2건 배치</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>오프라인 FFC</td>
+                                    <td class="mono">SN-002</td>
+                                    <td>산양분유 2단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">12,400</td>
+                                    <td class="text-right mono">₩260,400,000</td>
+                                    <td style="color: var(--text-muted);">2건 배치</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--green"></span>바이아웃 채널</td>
+                                    <td class="mono">SN-001</td>
+                                    <td>산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">15,300</td>
+                                    <td class="text-right mono">₩344,250,000</td>
+                                    <td style="color: var(--text-muted);">1건 배치</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>쿠팡 FFC</td>
+                                    <td class="mono">SN-004</td>
+                                    <td>산양분유 4단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">2,300</td>
+                                    <td class="text-right mono">₩46,000,000</td>
+                                    <td style="color: var(--text-muted);">1건 배치</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -131,7 +200,54 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td colspan="10"><div class="empty-state"><p>이관 추천 데이터가 없습니다.</p></div></td></tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--red"></span>쿠팡 FFC</td>
+                                    <td class="mono">SN-004</td>
+                                    <td>산양분유 4단계</td>
+                                    <td class="text-right mono">2,300</td>
+                                    <td class="text-right mono">820</td>
+                                    <td class="text-right"><span class="badge badge--danger">2.8주</span></td>
+                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">4,800</td>
+                                    <td class="mono">2,400</td>
+                                    <td>2026-06-23</td>
+                                    <td class="text-right mono">18,500</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>온라인 FFC</td>
+                                    <td class="mono">SN-003</td>
+                                    <td>산양분유 3단계</td>
+                                    <td class="text-right mono">8,750</td>
+                                    <td class="text-right mono">2,500</td>
+                                    <td class="text-right"><span class="badge badge--warning">3.5주</span></td>
+                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">7,500</td>
+                                    <td class="mono">2,400</td>
+                                    <td>2026-06-25</td>
+                                    <td class="text-right mono">22,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>오프라인 FFC</td>
+                                    <td class="mono">SN-002</td>
+                                    <td>산양분유 2단계</td>
+                                    <td class="text-right mono">12,400</td>
+                                    <td class="text-right mono">3,200</td>
+                                    <td class="text-right"><span class="badge badge--warning">3.9주</span></td>
+                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">9,600</td>
+                                    <td class="mono">4,800</td>
+                                    <td>2026-06-27</td>
+                                    <td class="text-right mono">28,000</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="status-dot status-dot--amber"></span>바이아웃 채널</td>
+                                    <td class="mono">SN-001</td>
+                                    <td>산양분유 1단계</td>
+                                    <td class="text-right mono">15,300</td>
+                                    <td class="text-right mono">4,100</td>
+                                    <td class="text-right"><span class="badge badge--warning">3.7주</span></td>
+                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">12,300</td>
+                                    <td class="mono">4,800</td>
+                                    <td>2026-06-26</td>
+                                    <td class="text-right mono">42,500</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -166,7 +282,23 @@
                 <div class="data-table-wrapper" style="max-height: 300px; overflow-y: auto;">
                     <table class="data-table" id="moq-list-table">
                         <thead><tr><th>창고</th><th>품목</th><th class="text-right">이관 MOQ</th></tr></thead>
-                        <tbody><tr><td colspan="3"><div class="empty-state">설정된 MOQ가 없습니다.</div></td></tr></tbody>
+                        <tbody>
+                            <tr>
+                                <td>온라인 FFC</td>
+                                <td class="mono">SN-001</td>
+                                <td class="text-right mono" style="font-weight:600;">2,400</td>
+                            </tr>
+                            <tr>
+                                <td>오프라인 FFC</td>
+                                <td class="mono">SN-002</td>
+                                <td class="text-right mono" style="font-weight:600;">4,800</td>
+                            </tr>
+                            <tr>
+                                <td>쿠팡 FFC</td>
+                                <td class="mono">SN-004</td>
+                                <td class="text-right mono" style="font-weight:600;">2,400</td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 <div class="modal-actions">
@@ -236,16 +368,12 @@
                     });
                 });
 
-                tbody.innerHTML = rows.length ? rows.join('') :
-                    '<tr><td colspan="6"><div class="empty-state"><p>데이터가 없습니다.</p></div></td></tr>';
+                if (rows.length) tbody.innerHTML = rows.join('');
             },
 
             renderTransferRecs(recs) {
                 const tbody = document.querySelector('#transfer-rec-table tbody');
-                if (!recs.length) {
-                    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><p>현재 이관이 필요한 품목이 없습니다.</p></div></td></tr>';
-                    return;
-                }
+                if (!recs.length) return;
                 tbody.innerHTML = recs.map(r => {
                     const urgency = r.weeks_remaining < 2 ? 'badge--danger' : 'badge--warning';
                     return `
@@ -282,10 +410,7 @@
                 try {
                     const moqs = await API.get('/api/ffc-product-moq');
                     const tbody = document.querySelector('#moq-list-table tbody');
-                    if (!moqs.length) {
-                        tbody.innerHTML = '<tr><td colspan="3"><div class="empty-state">설정된 MOQ가 없습니다.</div></td></tr>';
-                        return;
-                    }
+                    if (!moqs.length) return;
                     const ffcMap = Object.fromEntries(this.ffcs.map(f => [f.id, f.ffc_name]));
                     const prodMap = Object.fromEntries(this.products.map(p => [p.id, p.product_code]));
                     tbody.innerHTML = moqs.map(m => `
@@ -322,7 +447,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            InventoryPage.load();
+            // InventoryPage.load(); // API 연동 시 활성화
 
             document.getElementById('inventory-upload').addEventListener('change', (e) => {
                 const file = e.target.files[0];

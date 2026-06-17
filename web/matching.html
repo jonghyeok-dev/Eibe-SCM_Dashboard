@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCM Dashboard | 매칭 시스템</title>
+    <title>EIBE SCM | 입고 관리</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="app-wrapper">
         <aside class="app-sidebar">
-            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
             <div class="sidebar-brand">
-                <div class="logo-icon">S</div>
-                <h1>SCM Dashboard</h1>
+                <div class="logo-icon">EI</div>
+                <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
-                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
-                <a href="/expiry"><span class="nav-icon">●</span><span>Expiry</span></a>
-                <a href="/order-plan"><span class="nav-icon">●</span><span>Order Plan</span></a>
-                <a href="/matching" class="active"><span class="nav-icon">●</span><span>Matching</span></a>
-                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
+                <a href="/"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">📦</span><span>Inventory</span></a>
+                <a href="/expiry"><span class="nav-icon">⏳</span><span>Expiry</span></a>
+                <a href="/order-plan"><span class="nav-icon">📋</span><span>Order Plan</span></a>
+                <a href="/matching" class="active"><span class="nav-icon">🚛</span><span>입고 관리</span></a>
+                <a href="/users"><span class="nav-icon">⚙️</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
@@ -39,6 +43,11 @@
         </aside>
 
         <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Receiving Management</h1>
+                <p class="page-subtitle">입고 관리 — 발주서 기반 생산-인보이스 매칭 및 데이터 수집</p>
+            </div>
+
             <!-- 양식 다운로드 + 업로드 -->
             <section class="card section-gap">
                 <div class="card-header">
@@ -49,16 +58,16 @@
                         아래 양식을 다운로드하여 데이터를 작성한 후 업로드하세요. 각 기능에 맞는 개별 양식을 사용할 수 있습니다.
                     </p>
 
-                    <h3 style="font-size: 0.95rem; font-weight: 700; margin-bottom: var(--space-md); color: var(--text-primary);">양식 개별 다운로드</h3>
+                    <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: var(--space-md); color: var(--text-primary);">양식 개별 다운로드</h3>
                     <div class="template-grid" style="margin-bottom: var(--space-xl);">
                         <div class="template-card" onclick="downloadTemplate('production')">
                             <span class="label">생산완료</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('invoice')">
-                            <span class="label">매입인보이스</span>
+                            <span class="label">발주서 (매입인보이스)</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('expected_inbound')">
-                            <span class="label">입고예정</span>
+                            <span class="label">발주서 (입고예정)</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('current_inventory')">
                             <span class="label">현재고스냅샷</span>
@@ -67,8 +76,8 @@
 
                     <div class="upload-panel">
                         <div>
-                            <h3 style="margin-bottom: 5px;">엑셀 데이터 업로드</h3>
-                            <p style="font-size: 0.85rem; color: var(--text-muted);">작성한 양식 파일을 선택하여 업로드하세요.</p>
+                            <h3 style="margin-bottom: 5px; font-size: 0.9rem;">엑셀 데이터 업로드</h3>
+                            <p style="font-size: 0.82rem; color: var(--text-muted);">작성한 양식 파일을 선택하여 업로드하세요.</p>
                         </div>
                         <div style="flex: 1;"></div>
                         <input type="file" id="excel-upload" accept=".xlsx" style="display: none;">
@@ -77,10 +86,11 @@
                 </div>
             </section>
 
-            <!-- 매칭 보드 -->
-            <section class="card">
+            <!-- 발주서 기반 매칭 보드 -->
+            <section class="card section-gap">
                 <div class="card-header">
-                    <h2 class="card-title">생산-인보이스 매칭 보드</h2>
+                    <h2 class="card-title">발주서 매칭 보드</h2>
+                    <span class="badge badge--primary">생산-인보이스 자동 대조</span>
                 </div>
                 <div class="card-body">
                     <div class="split-grid">
@@ -88,24 +98,129 @@
                             <div class="card-header"><h3 class="card-title">생산 완료 리스트</h3></div>
                             <div class="card-body card-body--no-pad">
                                 <table class="data-table">
-                                    <thead><tr><th>품목</th><th>생산수량</th><th>제조년월</th></tr></thead>
+                                    <thead><tr><th>품목</th><th class="text-right">생산수량</th><th>제조년월</th></tr></thead>
                                     <tbody>
-                                        <tr><td colspan="3"><div class="empty-state">대기중인 데이터 없음</div></td></tr>
+                                        <tr>
+                                            <td>SN-001 산양분유 1단계</td>
+                                            <td class="text-right mono" style="font-weight:600;">24,000</td>
+                                            <td>2026-05</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SN-002 산양분유 2단계</td>
+                                            <td class="text-right mono" style="font-weight:600;">18,000</td>
+                                            <td>2026-05</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SN-003 산양분유 3단계</td>
+                                            <td class="text-right mono" style="font-weight:600;">12,000</td>
+                                            <td>2026-06</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SN-004 산양분유 4단계</td>
+                                            <td class="text-right mono" style="font-weight:600;">9,600</td>
+                                            <td>2026-06</td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                         <div class="card" style="box-shadow: none;">
-                            <div class="card-header"><h3 class="card-title">매입 인보이스</h3></div>
+                            <div class="card-header"><h3 class="card-title">발주서 (매입 인보이스 + 입고예정)</h3></div>
                             <div class="card-body card-body--no-pad">
                                 <table class="data-table">
-                                    <thead><tr><th>인보이스 번호</th><th>품목</th><th>수량</th></tr></thead>
+                                    <thead><tr><th>인보이스 번호</th><th>품목</th><th class="text-right">수량</th><th>상태</th></tr></thead>
                                     <tbody>
-                                        <tr><td colspan="3"><div class="empty-state">대기중인 데이터 없음</div></td></tr>
+                                        <tr>
+                                            <td class="mono">INV-2026-0501</td>
+                                            <td>SN-001</td>
+                                            <td class="text-right mono" style="font-weight:600;">24,000</td>
+                                            <td><span class="badge badge--green">매칭완료</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">INV-2026-0502</td>
+                                            <td>SN-002</td>
+                                            <td class="text-right mono" style="font-weight:600;">18,000</td>
+                                            <td><span class="badge badge--green">매칭완료</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">INV-2026-0601</td>
+                                            <td>SN-003</td>
+                                            <td class="text-right mono" style="font-weight:600;">12,000</td>
+                                            <td><span class="badge badge--warning">검토중</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="mono">INV-2026-0602</td>
+                                            <td>SN-004</td>
+                                            <td class="text-right mono" style="font-weight:600;">9,600</td>
+                                            <td><span class="badge badge--blue">대기중</span></td>
+                                        </tr>
                                     </tbody>
                                 </table>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 매칭 이력 -->
+            <section class="card">
+                <div class="card-header">
+                    <h2 class="card-title">매칭 처리 이력</h2>
+                    <button class="btn btn--secondary btn--sm" onclick="window.location.href='/api/matching/export'">매칭이력 엑셀 다운로드</button>
+                </div>
+                <div class="card-body card-body--no-pad">
+                    <div class="data-table-wrapper">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>생산년월</th>
+                                    <th>인보이스번호</th>
+                                    <th>품목</th>
+                                    <th class="text-right">생산수량</th>
+                                    <th class="text-right">인보이스수량</th>
+                                    <th class="text-right">불일치율</th>
+                                    <th>매칭일시</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>2026-05</td>
+                                    <td class="mono">INV-2026-0501</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono">24,000</td>
+                                    <td class="text-right mono">24,000</td>
+                                    <td class="text-right"><span class="badge badge--green">0.0%</span></td>
+                                    <td style="color: var(--text-muted);">2026-06-10 14:30</td>
+                                </tr>
+                                <tr>
+                                    <td>2026-05</td>
+                                    <td class="mono">INV-2026-0502</td>
+                                    <td>SN-002 산양분유 2단계</td>
+                                    <td class="text-right mono">18,000</td>
+                                    <td class="text-right mono">17,850</td>
+                                    <td class="text-right"><span class="badge badge--warning">0.8%</span></td>
+                                    <td style="color: var(--text-muted);">2026-06-10 14:32</td>
+                                </tr>
+                                <tr>
+                                    <td>2026-04</td>
+                                    <td class="mono">INV-2026-0401</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono">20,000</td>
+                                    <td class="text-right mono">20,000</td>
+                                    <td class="text-right"><span class="badge badge--green">0.0%</span></td>
+                                    <td style="color: var(--text-muted);">2026-05-08 11:15</td>
+                                </tr>
+                                <tr>
+                                    <td>2026-04</td>
+                                    <td class="mono">INV-2026-0403</td>
+                                    <td>SN-003 산양분유 3단계</td>
+                                    <td class="text-right mono">10,000</td>
+                                    <td class="text-right mono">9,800</td>
+                                    <td class="text-right"><span class="badge badge--warning">2.0%</span></td>
+                                    <td style="color: var(--text-muted);">2026-05-08 11:18</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>

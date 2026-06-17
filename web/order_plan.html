@@ -3,25 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCM Dashboard | 발주 계획</title>
+    <title>EIBE SCM | 발주 계획</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <div class="app-wrapper" id="order-plan-page">
         <aside class="app-sidebar">
-            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
             <div class="sidebar-brand">
-                <div class="logo-icon">S</div>
-                <h1>SCM Dashboard</h1>
+                <div class="logo-icon">EI</div>
+                <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
-                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
-                <a href="/expiry"><span class="nav-icon">●</span><span>Expiry</span></a>
-                <a href="/order-plan" class="active"><span class="nav-icon">●</span><span>Order Plan</span></a>
-                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
-                <a href="/users"><span class="nav-icon">●</span><span>Admin</span></a>
+                <a href="/"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">📦</span><span>Inventory</span></a>
+                <a href="/expiry"><span class="nav-icon">⏳</span><span>Expiry</span></a>
+                <a href="/order-plan" class="active"><span class="nav-icon">📋</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">🚛</span><span>입고 관리</span></a>
+                <a href="/users"><span class="nav-icon">⚙️</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
@@ -40,13 +44,18 @@
         </aside>
 
         <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Order Plan</h1>
+                <p class="page-subtitle">시뮬레이션 기반 발주 수량 계획 및 재고 추이 분석</p>
+            </div>
+
             <!-- 발주 수량 입력 (최상단 Sticky) -->
             <section class="card section-gap sticky-section">
                 <div class="card-header">
                     <h2 class="card-title">발주 수량 입력</h2>
                     <div class="btn-group">
                         <button class="btn btn--primary" onclick="OrderPlan.saveAll()">전체 저장</button>
-                        <button class="btn btn--secondary" onclick="window.location.href='/api/order-plan/export'">발주계획 내보내기</button>
+                        <button class="btn btn--secondary" onclick="window.location.href='/api/order-plan/export'">발주계획 엑셀 다운로드</button>
                         <button class="btn btn--secondary" onclick="OrderPlan.load()">새로고침</button>
                     </div>
                 </div>
@@ -63,7 +72,42 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td colspan="5"><div class="empty-state"><p>시뮬레이션을 실행하면 데이터가 표시됩니다.</p></div></td></tr>
+                                <tr data-product-id="1" data-target-month="2026-07" data-version="1">
+                                    <td class="mono">SN-001</td>
+                                    <td>산양분유 1단계</td>
+                                    <td class="text-right mono" style="color: var(--accent-main);">24,000</td>
+                                    <td class="text-right">
+                                        <input type="number" class="form-input order-qty-input" value="24000" min="0" step="2400" style="width: 130px; text-align: right;">
+                                    </td>
+                                    <td class="text-center"><span class="badge badge--primary">저장됨</span></td>
+                                </tr>
+                                <tr data-product-id="2" data-target-month="2026-07" data-version="1">
+                                    <td class="mono">SN-002</td>
+                                    <td>산양분유 2단계</td>
+                                    <td class="text-right mono" style="color: var(--accent-main);">18,000</td>
+                                    <td class="text-right">
+                                        <input type="number" class="form-input order-qty-input" value="18000" min="0" step="2400" style="width: 130px; text-align: right;">
+                                    </td>
+                                    <td class="text-center"><span class="badge badge--primary">저장됨</span></td>
+                                </tr>
+                                <tr data-product-id="3" data-target-month="2026-07" data-version="1">
+                                    <td class="mono">SN-003</td>
+                                    <td>산양분유 3단계</td>
+                                    <td class="text-right mono" style="color: var(--accent-main);">12,000</td>
+                                    <td class="text-right">
+                                        <input type="number" class="form-input order-qty-input" value="14400" min="0" step="2400" style="width: 130px; text-align: right;">
+                                    </td>
+                                    <td class="text-center"><span class="badge badge--warning">수정됨</span></td>
+                                </tr>
+                                <tr data-product-id="4" data-target-month="2026-07" data-version="1">
+                                    <td class="mono">SN-004</td>
+                                    <td>산양분유 4단계</td>
+                                    <td class="text-right mono" style="color: var(--accent-main);">9,600</td>
+                                    <td class="text-right">
+                                        <input type="number" class="form-input order-qty-input" value="9600" min="0" step="2400" style="width: 130px; text-align: right;">
+                                    </td>
+                                    <td class="text-center"><span class="badge badge--blue">미저장</span></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -81,6 +125,10 @@
                             <label class="form-label">품목 선택</label>
                             <select class="form-select" id="product-selector" onchange="OrderPlan.onProductChange()">
                                 <option value="">전체 품목 (요약)</option>
+                                <option value="1">SN-001 - 산양분유 1단계</option>
+                                <option value="2">SN-002 - 산양분유 2단계</option>
+                                <option value="3">SN-003 - 산양분유 3단계</option>
+                                <option value="4">SN-004 - 산양분유 4단계</option>
                             </select>
                         </div>
                         <div class="slider-wrap">
@@ -105,8 +153,72 @@
                     </p>
                     <div class="data-table-wrapper">
                         <table class="heatmap-table" id="heatmap-table">
-                            <thead><tr><th>품목</th></tr></thead>
-                            <tbody><tr><td>시뮬레이션 실행 후 표시됩니다.</td></tr></tbody>
+                            <thead>
+                                <tr>
+                                    <th style="min-width:120px;">품목</th>
+                                    <th>W1</th><th>W2</th><th>W3</th><th>W4</th>
+                                    <th>W6</th><th>W8</th><th>W10</th><th>W12</th>
+                                    <th>W16</th><th>W20</th><th>W24</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="row-label">SN-001</td>
+                                    <td><div class="heatmap-cell risk-safe">12.5</div></td>
+                                    <td><div class="heatmap-cell risk-safe">11.8</div></td>
+                                    <td><div class="heatmap-cell risk-safe">10.2</div></td>
+                                    <td><div class="heatmap-cell risk-low">7.5</div></td>
+                                    <td><div class="heatmap-cell risk-low">6.1</div></td>
+                                    <td><div class="heatmap-cell risk-low">5.0</div></td>
+                                    <td><div class="heatmap-cell risk-mid">3.8</div></td>
+                                    <td><div class="heatmap-cell risk-mid">2.9</div></td>
+                                    <td><div class="heatmap-cell risk-mid">2.1</div></td>
+                                    <td><div class="heatmap-cell risk-high">1.5</div></td>
+                                    <td><div class="heatmap-cell risk-high">0.8</div></td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">SN-002</td>
+                                    <td><div class="heatmap-cell risk-safe">9.2</div></td>
+                                    <td><div class="heatmap-cell risk-safe">8.5</div></td>
+                                    <td><div class="heatmap-cell risk-low">7.1</div></td>
+                                    <td><div class="heatmap-cell risk-low">5.8</div></td>
+                                    <td><div class="heatmap-cell risk-low">4.5</div></td>
+                                    <td><div class="heatmap-cell risk-mid">3.2</div></td>
+                                    <td><div class="heatmap-cell risk-mid">2.5</div></td>
+                                    <td><div class="heatmap-cell risk-high">1.8</div></td>
+                                    <td><div class="heatmap-cell risk-high">1.0</div></td>
+                                    <td><div class="heatmap-cell risk-high">0.4</div></td>
+                                    <td><div class="heatmap-cell risk-high">0.0</div></td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">SN-003</td>
+                                    <td><div class="heatmap-cell risk-low">5.8</div></td>
+                                    <td><div class="heatmap-cell risk-low">4.9</div></td>
+                                    <td><div class="heatmap-cell risk-mid">3.8</div></td>
+                                    <td><div class="heatmap-cell risk-mid">2.9</div></td>
+                                    <td><div class="heatmap-cell risk-high">1.8</div></td>
+                                    <td><div class="heatmap-cell risk-high">0.9</div></td>
+                                    <td><div class="heatmap-cell risk-high">0.0</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                </tr>
+                                <tr>
+                                    <td class="row-label">SN-004</td>
+                                    <td><div class="heatmap-cell risk-mid">3.2</div></td>
+                                    <td><div class="heatmap-cell risk-mid">2.5</div></td>
+                                    <td><div class="heatmap-cell risk-high">1.8</div></td>
+                                    <td><div class="heatmap-cell risk-high">1.0</div></td>
+                                    <td><div class="heatmap-cell risk-high">0.2</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                    <td><div class="heatmap-cell risk-safe">-</div></td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -115,7 +227,7 @@
             <!-- 6개월 시각화 (접기/열기) -->
             <section class="card section-gap-lg">
                 <div class="card-header collapsible-header" id="chart-header" onclick="toggleCollapsible('chart-header')">
-                    <h2 class="card-title" id="chart-title">재고 추이 시뮬레이션 (24주)</h2>
+                    <h2 class="card-title" id="chart-title">전체 품목 합산 재고 추이 (24주)</h2>
                     <span class="collapse-icon">▼</span>
                 </div>
                 <div class="card-body collapsible-body" id="chart-body">
@@ -169,7 +281,11 @@
 
                 if (simChart) { simChart.destroy(); simChart = null; }
 
-                if (!this.simData.length) return;
+                if (!this.simData.length) {
+                    // 샘플 차트 렌더링
+                    this.renderSampleChart(canvas);
+                    return;
+                }
 
                 let data;
                 if (selectedProduct) {
@@ -199,6 +315,18 @@
                 const inboundExpected = data.simulation.map(s => s.inbound_expected);
                 const weeklyDemand = data.simulation.map(s => Math.round(s.weekly_demand));
 
+                this.createChart(canvas, labels, endingStocks, inboundExpected, weeklyDemand);
+            },
+
+            renderSampleChart(canvas) {
+                const labels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24'];
+                const endingStocks = [127000,122000,117000,112000,108000,103000,98000,93000,89000,84000,80000,75000,71000,67000,63000,59000,55000,51000,48000,44000,41000,37000,34000,31000];
+                const inboundExpected = [0,0,0,6000,0,0,24000,0,0,0,12000,0,0,18000,0,0,0,9600,0,0,24000,0,0,0];
+                const weeklyDemand = [5200,5100,5300,4800,5000,5100,5200,4900,5100,4800,5000,5200,4900,5100,5000,4800,5200,5100,4900,5000,4800,5100,5200,5000];
+                this.createChart(canvas, labels, endingStocks, inboundExpected, weeklyDemand);
+            },
+
+            createChart(canvas, labels, endingStocks, inboundExpected, weeklyDemand) {
                 simChart = new Chart(canvas.getContext('2d'), {
                     type: 'bar',
                     data: {
@@ -208,23 +336,23 @@
                                 label: '예상 기말 재고',
                                 data: endingStocks,
                                 type: 'line',
-                                borderColor: '#29AD39',
-                                backgroundColor: 'rgba(41, 173, 57, 0.08)',
+                                borderColor: '#1b64da',
+                                backgroundColor: 'rgba(27, 100, 218, 0.06)',
                                 fill: true, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5,
                                 tension: 0.3, yAxisID: 'y', order: 0,
                             },
                             {
                                 label: '입고 예정',
                                 data: inboundExpected,
-                                backgroundColor: 'rgba(59, 130, 246, 0.6)',
+                                backgroundColor: 'rgba(29, 167, 80, 0.5)',
                                 borderRadius: 4, yAxisID: 'y', order: 2,
                             },
                             {
                                 label: '주간 출고 (예측)',
                                 data: weeklyDemand,
                                 type: 'line',
-                                borderColor: '#ef4444',
-                                backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                                borderColor: '#e53535',
+                                backgroundColor: 'rgba(229, 53, 53, 0.04)',
                                 borderDash: [6, 3], borderWidth: 2, pointRadius: 0,
                                 fill: false, tension: 0, yAxisID: 'y2', order: 1,
                             }
@@ -259,19 +387,15 @@
             },
 
             renderHeatmap() {
-                const table = document.getElementById('heatmap-table');
-                if (!this.simData.length) {
-                    table.innerHTML = '<thead><tr><th>품목</th></tr></thead><tbody><tr><td>시뮬레이션 실행 후 표시됩니다.</td></tr></tbody>';
-                    return;
-                }
+                // API 데이터가 없으면 샘플 유지
+                if (!this.simData.length) return;
 
-                // 헤더: 품목 + W1~W24 (4주 단위로 간격)
+                const table = document.getElementById('heatmap-table');
                 const weeks = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24];
                 let headerHtml = '<tr><th style="min-width:120px;">품목</th>';
                 weeks.forEach(w => { headerHtml += `<th>W${w}</th>`; });
                 headerHtml += '</tr>';
 
-                // 바디: 품목별 재고일수
                 let bodyHtml = '';
                 this.simData.forEach(d => {
                     bodyHtml += `<tr><td class="row-label">${d.product_code}</td>`;
@@ -296,10 +420,7 @@
 
             renderInputTable() {
                 const tbody = document.querySelector('#order-input-table tbody');
-                if (!this.simData.length) {
-                    tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><p>데이터가 없습니다.</p></div></td></tr>';
-                    return;
-                }
+                if (!this.simData.length) return;
 
                 tbody.innerHTML = this.simData.map(d => {
                     const savedValue = d.saved_qty !== null ? d.saved_qty : d.suggested_qty;
@@ -307,7 +428,7 @@
                         <tr data-product-id="${d.product_id}" data-target-month="${d.target_month}" data-version="${d.version || 1}">
                             <td class="mono">${d.product_code}</td>
                             <td>${d.product_name}</td>
-                            <td class="text-right mono" style="color: var(--accent-blue);">${Format.number(d.suggested_qty)}</td>
+                            <td class="text-right mono" style="color: var(--accent-main);">${Format.number(d.suggested_qty)}</td>
                             <td class="text-right">
                                 <input type="number" class="form-input order-qty-input" value="${savedValue}" 
                                        min="0" step="${d.hub_moq}" style="width: 130px; text-align: right;"
@@ -331,10 +452,8 @@
                 const newQty = parseInt(input.value) || 0;
                 const productData = this.simData.find(d => d.product_id === productId);
                 if (productData) {
-                    // 추가 발주 수량 반영하여 시뮬레이션 재계산 (간단 로컬 계산)
                     const diff = newQty - (productData.suggested_qty || 0);
                     if (productData.simulation.length > 0) {
-                        // 마지막 주에 추가 입고로 반영
                         const lastWeek = productData.simulation[productData.simulation.length - 1];
                         lastWeek.ending_stock = Math.max(0, lastWeek.ending_stock + diff);
                     }
@@ -378,7 +497,11 @@
                 sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
             });
 
-            OrderPlan.load();
+            // 샘플 차트 렌더링
+            const canvas = document.getElementById('simulation-chart');
+            if (canvas && typeof Chart !== 'undefined') {
+                OrderPlan.renderSampleChart(canvas);
+            }
         });
     </script>
 </body>

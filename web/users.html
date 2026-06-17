@@ -3,24 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCM Dashboard | 시스템 운영 (Admin)</title>
+    <title>EIBE SCM | 시스템 운영</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="app-wrapper">
         <aside class="app-sidebar">
-            <button class="sidebar-collapse-btn" onclick="Sidebar.toggle()" title="접기/펼치기">◀</button>
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
             <div class="sidebar-brand">
-                <div class="logo-icon">S</div>
-                <h1>SCM Dashboard</h1>
+                <div class="logo-icon">EI</div>
+                <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon">●</span><span>Dashboard</span></a>
-                <a href="/inventory"><span class="nav-icon">●</span><span>Inventory</span></a>
-                <a href="/expiry"><span class="nav-icon">●</span><span>Expiry</span></a>
-                <a href="/order-plan"><span class="nav-icon">●</span><span>Order Plan</span></a>
-                <a href="/matching"><span class="nav-icon">●</span><span>Matching</span></a>
-                <a href="/users" class="active"><span class="nav-icon">●</span><span>Admin</span></a>
+                <a href="/"><span class="nav-icon">📊</span><span>Dashboard</span></a>
+                <a href="/inventory"><span class="nav-icon">📦</span><span>Inventory</span></a>
+                <a href="/expiry"><span class="nav-icon">⏳</span><span>Expiry</span></a>
+                <a href="/order-plan"><span class="nav-icon">📋</span><span>Order Plan</span></a>
+                <a href="/matching"><span class="nav-icon">🚛</span><span>입고 관리</span></a>
+                <a href="/users" class="active"><span class="nav-icon">⚙️</span><span>Admin</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
@@ -39,11 +43,16 @@
         </aside>
 
         <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Admin</h1>
+                <p class="page-subtitle">시스템 운영 — 데이터 양식, 창고, 사용자 및 백업 관리</p>
+            </div>
+
             <!-- 데이터 양식 관리 -->
             <section class="card section-gap">
                 <div class="card-header">
                     <h2 class="card-title">데이터 양식 관리</h2>
-                    <button class="btn btn--primary" onclick="downloadTemplate('all')">전체 양식 일괄 다운로드</button>
+                    <button class="btn btn--primary" onclick="downloadTemplate('all')">전체 양식 엑셀 다운로드</button>
                 </div>
                 <div class="card-body">
                     <p style="color: var(--text-muted); margin-bottom: var(--space-lg); font-size: 0.85rem;">
@@ -63,10 +72,10 @@
                             <span class="label">생산완료</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('invoice')">
-                            <span class="label">매입인보이스</span>
+                            <span class="label">발주서 (매입인보이스)</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('expected_inbound')">
-                            <span class="label">입고예정</span>
+                            <span class="label">발주서 (입고예정)</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('current_inventory')">
                             <span class="label">현재고스냅샷</span>
@@ -96,7 +105,76 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td colspan="7"><div class="empty-state">로딩 중...</div></td></tr>
+                                <tr>
+                                    <td class="mono">HUB</td>
+                                    <td>용인 메인창고</td>
+                                    <td><span class="badge badge--primary">OFFLINE</span></td>
+                                    <td class="text-right mono">180일</td>
+                                    <td class="text-right mono">0</td>
+                                    <td class="text-right mono">₩0</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn--secondary btn--sm" onclick="AdminPage.editWarehouse(1, 'HUB', '용인 메인창고', 'OFFLINE', 180, 0, 0)">수정</button>
+                                            <button class="btn btn--danger btn--sm" onclick="AdminPage.deleteWarehouse(1, '용인 메인창고')">삭제</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">FFC_ON</td>
+                                    <td>온라인 FFC</td>
+                                    <td><span class="badge badge--blue">ONLINE</span></td>
+                                    <td class="text-right mono">90일</td>
+                                    <td class="text-right mono">2,400</td>
+                                    <td class="text-right mono">₩85,000</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn--secondary btn--sm" onclick="AdminPage.editWarehouse(2, 'FFC_ON', '온라인 FFC', 'ONLINE', 90, 2400, 85000)">수정</button>
+                                            <button class="btn btn--danger btn--sm" onclick="AdminPage.deleteWarehouse(2, '온라인 FFC')">삭제</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">FFC_OFF</td>
+                                    <td>오프라인 FFC</td>
+                                    <td><span class="badge badge--primary">OFFLINE</span></td>
+                                    <td class="text-right mono">60일</td>
+                                    <td class="text-right mono">4,800</td>
+                                    <td class="text-right mono">₩120,000</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn--secondary btn--sm" onclick="AdminPage.editWarehouse(3, 'FFC_OFF', '오프라인 FFC', 'OFFLINE', 60, 4800, 120000)">수정</button>
+                                            <button class="btn btn--danger btn--sm" onclick="AdminPage.deleteWarehouse(3, '오프라인 FFC')">삭제</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">BUYOUT</td>
+                                    <td>바이아웃 채널</td>
+                                    <td><span class="badge badge--warning">BUYOUT</span></td>
+                                    <td class="text-right mono">45일</td>
+                                    <td class="text-right mono">4,800</td>
+                                    <td class="text-right mono">₩95,000</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn--secondary btn--sm" onclick="AdminPage.editWarehouse(4, 'BUYOUT', '바이아웃 채널', 'BUYOUT', 45, 4800, 95000)">수정</button>
+                                            <button class="btn btn--danger btn--sm" onclick="AdminPage.deleteWarehouse(4, '바이아웃 채널')">삭제</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono">FFC_CP</td>
+                                    <td>쿠팡 FFC</td>
+                                    <td><span class="badge badge--blue">ONLINE</span></td>
+                                    <td class="text-right mono">90일</td>
+                                    <td class="text-right mono">2,400</td>
+                                    <td class="text-right mono">₩75,000</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <button class="btn btn--secondary btn--sm" onclick="AdminPage.editWarehouse(5, 'FFC_CP', '쿠팡 FFC', 'ONLINE', 90, 2400, 75000)">수정</button>
+                                            <button class="btn btn--danger btn--sm" onclick="AdminPage.deleteWarehouse(5, '쿠팡 FFC')">삭제</button>
+                                        </div>
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -122,7 +200,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td colspan="4"><div class="empty-state">로딩 중...</div></td></tr>
+                                    <tr>
+                                        <td class="mono">admin</td>
+                                        <td>관리자</td>
+                                        <td><span class="badge badge--primary">ADMIN</span></td>
+                                        <td><span style="color: var(--text-muted); font-size: 0.78rem;">시스템 계정</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mono">operator1</td>
+                                        <td>박종혁</td>
+                                        <td><span class="badge badge--blue">OPERATOR</span></td>
+                                        <td><button class="btn btn--danger btn--sm" onclick="AdminPage.deleteUser(2, 'operator1')">삭제</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mono">operator2</td>
+                                        <td>김민수</td>
+                                        <td><span class="badge badge--blue">OPERATOR</span></td>
+                                        <td><button class="btn btn--danger btn--sm" onclick="AdminPage.deleteUser(3, 'operator2')">삭제</button></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -146,7 +241,26 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr><td colspan="3"><div class="empty-state"><p>스냅샷 이력이 없습니다.</p></div></td></tr>
+                                    <tr>
+                                        <td>2026-06-18 00:00:00</td>
+                                        <td style="font-size: 0.78rem; color: var(--text-muted);">local_erp_20260618_000000.db</td>
+                                        <td><span class="badge badge--primary">자동</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2026-06-17 12:30:00</td>
+                                        <td style="font-size: 0.78rem; color: var(--text-muted);">local_erp_20260617_123000.db</td>
+                                        <td><span class="badge badge--warning">수동</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2026-06-17 00:00:00</td>
+                                        <td style="font-size: 0.78rem; color: var(--text-muted);">local_erp_20260617_000000.db</td>
+                                        <td><span class="badge badge--primary">자동</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2026-06-16 00:00:00</td>
+                                        <td style="font-size: 0.78rem; color: var(--text-muted);">local_erp_20260616_000000.db</td>
+                                        <td><span class="badge badge--primary">자동</span></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -243,10 +357,7 @@
                 try {
                     const warehouses = await API.get('/api/ffc');
                     const tbody = document.querySelector('#warehouse-table tbody');
-                    if (!warehouses.length) {
-                        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">등록된 창고가 없습니다.</div></td></tr>';
-                        return;
-                    }
+                    if (!warehouses.length) return;
                     tbody.innerHTML = warehouses.map(w => `
                         <tr>
                             <td class="mono">${w.ffc_code}</td>
@@ -339,6 +450,7 @@
                 try {
                     const users = await API.get('/api/users');
                     const tbody = document.querySelector('#users-table tbody');
+                    if (!users.length) return;
                     tbody.innerHTML = users.map(u => `
                         <tr>
                             <td class="mono">${u.username}</td>
@@ -419,7 +531,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            AdminPage.load();
+            // AdminPage.load(); // API 연동 시 활성화
         });
     </script>
 </body>

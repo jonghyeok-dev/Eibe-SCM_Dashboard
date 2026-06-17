@@ -1,5 +1,5 @@
 /**
- * SCM ERP Dashboard - 메인 JavaScript 모듈
+ * EIBE SCM - 메인 JavaScript 모듈
  */
 
 const API = {
@@ -86,6 +86,7 @@ const Auth = {
     },
     isLoggedIn() { return !!API.getToken(); },
     redirectToLogin() {
+        localStorage.removeItem('scm_token');
         if (window.location.pathname !== '/login') {
             window.location.href = '/login';
         }
@@ -158,12 +159,12 @@ const Theme = {
         if (typeof Chart !== 'undefined') {
             Chart.helpers.each(Chart.instances, function(instance) {
                 const isDark = next === 'dark';
-                if (instance.options.scales?.x?.grid) instance.options.scales.x.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e2e8f0';
-                if (instance.options.scales?.y?.grid) instance.options.scales.y.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e2e8f0';
+                if (instance.options.scales?.x?.grid) instance.options.scales.x.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb';
+                if (instance.options.scales?.y?.grid) instance.options.scales.y.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb';
                 if (instance.options.plugins?.tooltip) {
-                    instance.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-                    instance.options.plugins.tooltip.titleColor = isDark ? '#e8e8e8' : '#0f172a';
-                    instance.options.plugins.tooltip.bodyColor = isDark ? '#e8e8e8' : '#0f172a';
+                    instance.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(30, 30, 38, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+                    instance.options.plugins.tooltip.titleColor = isDark ? '#ececf1' : '#191f28';
+                    instance.options.plugins.tooltip.bodyColor = isDark ? '#ececf1' : '#191f28';
                 }
                 instance.update();
             });
@@ -201,15 +202,15 @@ const ChartDefaults = {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         
         Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = isDark ? '#a0a0a0' : '#94a3b8';
+        Chart.defaults.color = isDark ? '#a1a1aa' : '#8b95a1';
         Chart.defaults.elements.line.tension = 0.35;
         Chart.defaults.scale.grid = {
-            color: isDark ? 'rgba(100, 100, 100, 0.15)' : '#e2e8f0',
+            color: isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb',
             drawBorder: false,
         };
-        Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-        Chart.defaults.plugins.tooltip.titleColor = isDark ? '#e8e8e8' : '#0f172a';
-        Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#e8e8e8' : '#0f172a';
+        Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(30, 30, 38, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = isDark ? '#ececf1' : '#191f28';
+        Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#ececf1' : '#191f28';
     },
 
     createDualTrackChart(canvasId, labels, demandData, depletionData) {
@@ -224,15 +225,15 @@ const ChartDefaults = {
                     {
                         label: 'A선 - 순수 수요 예측',
                         data: demandData,
-                        borderColor: '#29AD39',
-                        backgroundColor: 'rgba(41, 173, 57, 0.1)',
+                        borderColor: '#1b64da',
+                        backgroundColor: 'rgba(27, 100, 218, 0.06)',
                         fill: true, borderWidth: 2,
                     },
                     {
                         label: 'B선 - 실제 재고 소멸',
                         data: depletionData,
-                        borderColor: '#ef4444',
-                        backgroundColor: 'rgba(239, 68, 68, 0.05)',
+                        borderColor: '#e53535',
+                        backgroundColor: 'rgba(229, 53, 53, 0.04)',
                         fill: true, borderWidth: 2, borderDash: [6, 3],
                     },
                 ],
