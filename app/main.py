@@ -33,6 +33,10 @@ from app.models import (
     MonthlyOrderPlan,
     UserAccount,
     SystemSnapshot,
+    SalesHistory,
+    OrderQuantity,
+    ProductionComplete,
+    InvoiceQuantity,
 )
 from app.schemas import (
     ProductMasterCreate,
@@ -57,6 +61,15 @@ from app.schemas import (
     UserAccountCreate,
     SystemSnapshotResponse,
     OrderPlanBulkSave,
+    SalesHistoryCreate,
+    SalesHistoryResponse,
+    OrderQuantityCreate,
+    OrderQuantityResponse,
+    ProductionCompleteCreate,
+    ProductionCompleteResponse,
+    InvoiceQuantityCreate,
+    InvoiceQuantityResponse,
+    PendingMatchesResponse,
 )
 from app.core.auth import verify_password, get_password_hash, create_access_token, get_current_user, get_current_admin
 from app.core.snapshot import start_scheduler, stop_scheduler, create_snapshot
@@ -920,3 +933,153 @@ def export_order_plan(db: Session = Depends(get_db)):
 def health_check():
     """서버 상태 확인"""
     return MessageResponse(message="OK", detail="SCM ERP 서버가 정상 가동 중입니다.")
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 판매 실적 API
+# ═══════════════════════════════════════════════════════════════════════
+
+
+@app.get("/api/sales", response_model=List[SalesHistoryResponse], tags=["판매 실적"])
+def get_sales(
+    product_id: Optional[int] = Query(None),
+    db: Session = Depends(get_db),
+):
+    """판매 실적 조회"""
+    query = db.query(SalesHistory)
+    if product_id:
+        query = query.filter(SalesHistory.product_id == product_id)
+    return query.order_by(SalesHistory.base_date.desc()).all()
+
+
+@app.post("/api/sales", response_model=SalesHistoryResponse, tags=["판매 실적"])
+def create_sales(sales: SalesHistoryCreate, db: Session = Depends(get_db)):
+    """판매 실적 등록"""
+    db_sales = SalesHistory(
+        **sales.model_dump(),
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.add(db_sales)
+    db.commit()
+    db.refresh(db_sales)
+    return db_sales
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 입고 관리 3분리 API
+# ═══════════════════════════════════════════════════════════════════════
+
+
+@app.get("/api/inbound/order-qty", response_model=List[OrderQuantityResponse], tags=["입고 관리"])
+def get_order_quantities(db: Session = Depends(get_db)):
+    """발주수량 목록 조회"""
+    return db.query(OrderQuantity).order_by(OrderQuantity.id.desc()).all()
+
+
+@app.post("/api/inbound/order-qty", response_model=OrderQuantityResponse, tags=["입고 관리"])
+def create_order_quantity(oq: OrderQuantityCreate, db: Session = Depends(get_db)):
+    """발주수량 등록"""
+    db_oq = OrderQuantity(
+        **oq.model_dump(),
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.add(db_oq)
+    db.commit()
+    db.refresh(db_oq)
+    return db_oq
+
+
+@app.get("/api/inbound/production", response_model=List[ProductionCompleteResponse], tags=["입고 관리"])
+def get_production_complete(db: Session = Depends(get_db)):
+    """생산완료수량 목록 조회"""
+    return db.query(ProductionComplete).order_by(ProductionComplete.id.desc()).all()
+
+
+@app.post("/api/inbound/production", response_model=ProductionCompleteResponse, tags=["입고 관리"])
+def create_production_complete(pc: ProductionCompleteCreate, db: Session = Depends(get_db)):
+    """생산완료수량 등록"""
+    db_pc = ProductionComplete(
+        **pc.model_dump(),
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.add(db_pc)
+    db.commit()
+    db.refresh(db_pc)
+    return db_pc
+
+
+@app.get("/api/inbound/invoice", response_model=List[InvoiceQuantityResponse], tags=["입고 관리"])
+def get_invoice_quantities(db: Session = Depends(get_db)):
+    """인보이스수량 목록 조회"""
+    return db.query(InvoiceQuantity).order_by(InvoiceQuantity.id.desc()).all()
+
+
+@app.post("/api/inbound/invoice", response_model=InvoiceQuantityResponse, tags=["입고 관리"])
+def create_invoice_quantity(iq: InvoiceQuantityCreate, db: Session = Depends(get_db)):
+    """인보이스수량 등록"""
+    db_iq = InvoiceQuantity(
+        **iq.model_dump(),
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    )
+    db.add(db_iq)
+    db.commit()
+    db.refresh(db_iq)
+    return db_iq
+
+
+@app.get("/api/inbound/pending-matches", response_model=PendingMatchesResponse, tags=["입고 관리"])
+def get_pending_matches(db: Session = Depends(get_db)):
+    """미매칭 항목 수 조회 (메인 요약 할일 위젯용)"""
+    pending_prod = db.query(ProductionComplete).filter(
+        ProductionComplete.match_status == "PENDING"
+    ).count()
+    pending_inv = db.query(InvoiceQuantity).filter(
+        InvoiceQuantity.match_status == "PENDING"
+    ).count()
+    return PendingMatchesResponse(
+        pending_count=pending_prod + pending_inv,
+        pending_production=pending_prod,
+        pending_invoice=pending_inv,
+    )
+
+
+@app.post("/api/inbound/auto-match", response_model=MessageResponse, tags=["입고 관리"])
+def run_auto_match(db: Session = Depends(get_db)):
+    """자동 매칭 실행 — 상품코드+세일즈오더+생산년월 완벽 일치 기준"""
+    matched_count = 0
+
+    # 1) 생산완료 → 발주수량 매칭
+    pending_prods = db.query(ProductionComplete).filter(
+        ProductionComplete.match_status == "PENDING"
+    ).all()
+    for prod in pending_prods:
+        order = db.query(OrderQuantity).filter(
+            OrderQuantity.product_id == prod.product_id,
+            OrderQuantity.sales_order_no == prod.sales_order_no,
+        ).first()
+        if order:
+            prod.match_status = "MATCHED"
+            prod.matched_order_id = order.id
+            matched_count += 1
+
+    # 2) 인보이스 → 생산완료 매칭
+    pending_invs = db.query(InvoiceQuantity).filter(
+        InvoiceQuantity.match_status == "PENDING"
+    ).all()
+    for inv in pending_invs:
+        prod = db.query(ProductionComplete).filter(
+            ProductionComplete.product_id == inv.product_id,
+            ProductionComplete.sales_order_no == inv.sales_order_no,
+            ProductionComplete.production_ym_no == inv.production_ym_no,
+        ).first()
+        if prod:
+            inv.match_status = "MATCHED"
+            inv.matched_production_id = prod.id
+            matched_count += 1
+
+    db.commit()
+    return MessageResponse(
+        message=f"자동 매칭 완료: {matched_count}건 매칭됨",
+        detail=f"생산완료 {len(pending_prods)}건 중, 인보이스 {len(pending_invs)}건 중 검사"
+    )
+

@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="EIBE SCM Dashboard - Login">
-    <title>EIBE SCM | Login</title>
+    <meta name="description" content="EIBE SCM Dashboard - 로그인">
+    <title>EIBE SCM | 로그인</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="login-wrapper">
         <div class="login-card">
-            <div class="login-logo">EI</div>
+            <div class="login-logo"><img src="/static/img/eibelogo.png" alt="EIBE"></div>
             <h1>EIBE SCM</h1>
             <p class="login-sub">Supply Chain Management System</p>
 
@@ -42,12 +42,10 @@
     </div>
 
     <script>
-        // 테마 적용
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         updateLoginThemeBtn(savedTheme);
 
-        // 이미 로그인 된 상태면 대시보드로
         if (localStorage.getItem('scm_token')) {
             window.location.href = '/';
         }

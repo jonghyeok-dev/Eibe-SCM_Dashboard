@@ -16,16 +16,16 @@
                 </svg>
             </button>
             <div class="sidebar-brand">
-                <div class="logo-icon">EI</div>
+                <img src="/static/img/eibelogo.png" alt="EIBE" class="sidebar-logo-img">
                 <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon">📊</span><span>Dashboard</span></a>
-                <a href="/inventory"><span class="nav-icon">📦</span><span>Inventory</span></a>
-                <a href="/expiry"><span class="nav-icon">⏳</span><span>Expiry</span></a>
-                <a href="/order-plan" class="active"><span class="nav-icon">📋</span><span>Order Plan</span></a>
-                <a href="/matching"><span class="nav-icon">🚛</span><span>입고 관리</span></a>
-                <a href="/users"><span class="nav-icon">⚙️</span><span>Admin</span></a>
+                <a href="/"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
+                <a href="/inventory"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>유통기한 관리</span></a>
+                <a href="/order-plan" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
+                <a href="/matching"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고 관리</span></a>
+                <a href="/users"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>시스템 운영</span></a>
             </nav>
             <div class="sidebar-footer">
                 <div class="user-info">
@@ -45,7 +45,7 @@
 
         <main class="main-content">
             <div class="page-header">
-                <h1 class="page-title">Order Plan</h1>
+                <h1 class="page-title">발주 계획</h1>
                 <p class="page-subtitle">시뮬레이션 기반 발주 수량 계획 및 재고 추이 분석</p>
             </div>
 
@@ -310,7 +310,7 @@
                     document.getElementById('chart-title').textContent = '전체 품목 합산 재고 추이 (24주)';
                 }
 
-                const labels = data.simulation.map(s => `W${s.week}`);
+                const labels = data.simulation.map(s => Format.weekLabel(s.week));
                 const endingStocks = data.simulation.map(s => Math.round(s.ending_stock));
                 const inboundExpected = data.simulation.map(s => s.inbound_expected);
                 const weeklyDemand = data.simulation.map(s => Math.round(s.weekly_demand));
@@ -319,7 +319,7 @@
             },
 
             renderSampleChart(canvas) {
-                const labels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24'];
+                const labels = Format.weekLabels(24);
                 const endingStocks = [127000,122000,117000,112000,108000,103000,98000,93000,89000,84000,80000,75000,71000,67000,63000,59000,55000,51000,48000,44000,41000,37000,34000,31000];
                 const inboundExpected = [0,0,0,6000,0,0,24000,0,0,0,12000,0,0,18000,0,0,0,9600,0,0,24000,0,0,0];
                 const weeklyDemand = [5200,5100,5300,4800,5000,5100,5200,4900,5100,4800,5000,5200,4900,5100,5000,4800,5200,5100,4900,5000,4800,5100,5200,5000];
@@ -393,7 +393,7 @@
                 const table = document.getElementById('heatmap-table');
                 const weeks = [1, 2, 3, 4, 6, 8, 10, 12, 16, 20, 24];
                 let headerHtml = '<tr><th style="min-width:120px;">품목</th>';
-                weeks.forEach(w => { headerHtml += `<th>W${w}</th>`; });
+                weeks.forEach(w => { headerHtml += `<th>${Format.weekLabel(w)}</th>`; });
                 headerHtml += '</tr>';
 
                 let bodyHtml = '';

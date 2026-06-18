@@ -1,5 +1,6 @@
 /**
  * EIBE SCM - Main JavaScript Module
+ * Clean corporate design, no AI emojis
  */
 
 const API = {
@@ -130,7 +131,7 @@ const Auth = {
                 avatarEl.textContent = user.name.charAt(0);
                 window._currentUserRole = user.role;
             } catch(e) {
-                // Token might be expired - silently ignore
+                // Token might be expired
             }
         } else {
             nameEl.textContent = 'Guest';
@@ -143,7 +144,21 @@ const Auth = {
 const Format = {
     number(val) { return val == null || isNaN(val) ? '0' : Number(val).toLocaleString('ko-KR'); },
     currency(val) { return val == null || isNaN(val) ? '₩0' : '₩' + Number(val).toLocaleString('ko-KR'); },
-    percent(val) { return val == null || isNaN(val) ? '0%' : Number(val).toFixed(1) + '%'; }
+    percent(val) { return val == null || isNaN(val) ? '0%' : Number(val).toFixed(1) + '%'; },
+    weekLabel(weekNum) {
+        const d = new Date();
+        d.setDate(d.getDate() + (weekNum - 1) * 7);
+        const month = d.getMonth() + 1;
+        const weekOfMonth = Math.ceil(d.getDate() / 7);
+        return `${month}월 ${weekOfMonth}주차`;
+    },
+    weekLabels(count) {
+        const labels = [];
+        for (let i = 0; i < count; i++) {
+            labels.push(this.weekLabel(i + 1));
+        }
+        return labels;
+    }
 };
 
 const Theme = {
@@ -153,7 +168,7 @@ const Theme = {
         this._initialized = true;
         
         const authOk = Auth.init();
-        if (authOk === false) return; // redirect happening
+        if (authOk === false) return;
         
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
@@ -224,31 +239,41 @@ const ChartDefaults = {
         Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#e8e8e8' : '#191f28';
     },
 
-    createDualTrackChart(canvasId, labels, demandData, depletionData) {
+    createDualTrackChart(canvasId, labels, demandData, depletionData, salesData) {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return null;
 
+        const datasets = [
+            {
+                label: '예상 재고 추이',
+                data: demandData,
+                borderColor: '#29AD3A',
+                backgroundColor: 'rgba(41, 173, 58, 0.06)',
+                fill: true, borderWidth: 2,
+            },
+            {
+                label: '재고 소멸선',
+                data: depletionData,
+                borderColor: '#e53535',
+                backgroundColor: 'rgba(229, 53, 53, 0.04)',
+                fill: true, borderWidth: 2, borderDash: [6, 3],
+            },
+        ];
+
+        if (salesData && salesData.length) {
+            datasets.push({
+                label: '실제 판매량',
+                data: salesData,
+                type: 'bar',
+                backgroundColor: 'rgba(41, 173, 58, 0.35)',
+                borderRadius: 3,
+                order: 2,
+            });
+        }
+
         return new Chart(canvas.getContext('2d'), {
             type: 'line',
-            data: {
-                labels,
-                datasets: [
-                    {
-                        label: 'A선 - 순수 수요 예측',
-                        data: demandData,
-                        borderColor: '#1b64da',
-                        backgroundColor: 'rgba(27, 100, 218, 0.06)',
-                        fill: true, borderWidth: 2,
-                    },
-                    {
-                        label: 'B선 - 실제 재고 소멸',
-                        data: depletionData,
-                        borderColor: '#e53535',
-                        backgroundColor: 'rgba(229, 53, 53, 0.04)',
-                        fill: true, borderWidth: 2, borderDash: [6, 3],
-                    },
-                ],
-            },
+            data: { labels, datasets },
             options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false } }
         });
     }
@@ -281,6 +306,18 @@ const Toast = {
         }, 3000);
     }
 };
+
+/** Tabs helper */
+function switchTab(tabGroupId, tabName) {
+    const group = document.getElementById(tabGroupId);
+    if (!group) return;
+    group.querySelectorAll('.tab-nav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+    group.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === `tab-${tabName}`);
+    });
+}
 
 /** Excel template download helper */
 function downloadTemplate(type) {
@@ -321,38 +358,43 @@ const Dashboard = {
             const data = await API.get(`/api/order-plan/simulation?weight_factor=${weightFactor}`);
             if (!data || !data.length) return;
 
-            // Update chart with real simulation data
             const canvas = document.getElementById('dual-track-chart');
             if (!canvas || typeof Chart === 'undefined') return;
 
-            // Aggregate all products
-            const labels = [];
-            const demandData = [];
+            const weeks = data[0].simulation ? data[0].simulation.length : 24;
+            const labels = Format.weekLabels(weeks);
             const depletionData = [];
-            
-            const weeks = data[0].simulation.length;
+            const demandData = [];
+
             for (let i = 0; i < weeks; i++) {
-                labels.push(`W${i + 1}`);
-                let totalDemand = 0;
                 let totalEnding = 0;
+                let totalDemand = 0;
                 data.forEach(d => {
-                    if (d.simulation[i]) {
-                        totalDemand += d.simulation[i].weekly_demand;
+                    if (d.simulation && d.simulation[i]) {
                         totalEnding += d.simulation[i].ending_stock;
+                        totalDemand += d.simulation[i].weekly_demand;
                     }
                 });
-                demandData.push(Math.round(totalDemand));
                 depletionData.push(Math.round(totalEnding));
+                demandData.push(Math.round(totalDemand));
             }
+
+            // Build cumulative demand depletion line
+            let cumulativeDemand = depletionData[0] || 0;
+            const demandLine = [cumulativeDemand];
+            for (let i = 0; i < demandData.length; i++) {
+                cumulativeDemand -= demandData[i];
+                demandLine.push(Math.round(cumulativeDemand));
+            }
+            demandLine.pop(); // align length
 
             if (this.dualTrackChart) {
                 this.dualTrackChart.destroy();
                 this.dualTrackChart = null;
             }
             ChartDefaults.init();
-            this.dualTrackChart = ChartDefaults.createDualTrackChart('dual-track-chart', labels, 
-                demandData.map((d, i) => depletionData[0] - demandData.slice(0, i+1).reduce((a,b)=>a+b, 0) + depletionData[0]),
-                depletionData
+            this.dualTrackChart = ChartDefaults.createDualTrackChart(
+                'dual-track-chart', labels, demandLine, depletionData
             );
         } catch(e) {
             // Keep sample data if API fails

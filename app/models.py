@@ -339,3 +339,85 @@ class MonthlyOrderPlan(Base):
 
     # Relationships
     product = relationship("ProductMaster", back_populates="order_plans")
+
+
+class SalesHistory(Base):
+    """판매 실적 테이블 — 주차별 실제 판매량"""
+    __tablename__ = "SALES_HISTORY"
+
+    sales_id = Column(Integer, primary_key=True, autoincrement=True)
+    ffc_id = Column(Integer, ForeignKey("FFC_MASTER.id"), nullable=False)
+    product_id = Column(Integer, ForeignKey("PRODUCT_MASTER.id"), nullable=False)
+    base_date = Column(Text, nullable=False)            # 주차 기준일 (YYYY-MM-DD)
+    sales_qty = Column(Integer, nullable=False)          # 실제 판매 수량 (캔)
+    created_at = Column(Text)
+
+    # Relationships
+    ffc = relationship("FFCMaster")
+    product = relationship("ProductMaster")
+
+
+class OrderQuantity(Base):
+    """발주수량 — 매월 발주한 상품코드별 수량"""
+    __tablename__ = "ORDER_QUANTITY"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(Integer, ForeignKey("PRODUCT_MASTER.id"), nullable=False)
+    order_month = Column(Text, nullable=False)              # 발주월 (YYYY-MM)
+    sales_order_no = Column(Text, nullable=False)            # 세일즈 오더 No.
+    order_qty = Column(Integer, nullable=False)              # 발주 수량 (캔)
+    created_at = Column(Text)
+
+    # Relationships
+    product = relationship("ProductMaster")
+
+
+class ProductionComplete(Base):
+    """생산완료수량 — 공급사 생산완료 raw 데이터"""
+    __tablename__ = "PRODUCTION_COMPLETE"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(Integer, ForeignKey("PRODUCT_MASTER.id"), nullable=False)
+    sales_order_no = Column(Text, nullable=False)            # 세일즈 오더 No.
+    production_ym_no = Column(Text, nullable=False)          # 생산년월 넘버
+    production_qty = Column(Integer, nullable=False)         # 생산 수량 (캔)
+    match_status = Column(Text, default="PENDING")           # PENDING / MATCHED / MANUAL
+    matched_order_id = Column(Integer, ForeignKey("ORDER_QUANTITY.id"), nullable=True)
+    created_at = Column(Text)
+
+    __table_args__ = (
+        CheckConstraint(
+            "match_status IN ('PENDING', 'MATCHED', 'MANUAL')",
+            name="chk_prod_match_status",
+        ),
+    )
+
+    # Relationships
+    product = relationship("ProductMaster")
+    matched_order = relationship("OrderQuantity")
+
+
+class InvoiceQuantity(Base):
+    """인보이스수량 — 인보이스 발행 데이터"""
+    __tablename__ = "INVOICE_QUANTITY"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    product_id = Column(Integer, ForeignKey("PRODUCT_MASTER.id"), nullable=False)
+    sales_order_no = Column(Text, nullable=False)            # 세일즈 오더 No.
+    production_ym_no = Column(Text, nullable=False)          # 생산년월 넘버
+    invoice_no = Column(Text, nullable=False)                # 인보이스 번호
+    invoice_qty = Column(Integer, nullable=False)            # 인보이스 수량 (캔)
+    match_status = Column(Text, default="PENDING")           # PENDING / MATCHED / MANUAL
+    matched_production_id = Column(Integer, ForeignKey("PRODUCTION_COMPLETE.id"), nullable=True)
+    created_at = Column(Text)
+
+    __table_args__ = (
+        CheckConstraint(
+            "match_status IN ('PENDING', 'MATCHED', 'MANUAL')",
+            name="chk_inv_match_status",
+        ),
+    )
+
+    # Relationships
+    product = relationship("ProductMaster")
+    matched_production = relationship("ProductionComplete")

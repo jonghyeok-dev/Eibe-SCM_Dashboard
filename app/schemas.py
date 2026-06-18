@@ -358,3 +358,101 @@ class OrderPlanBulkItem(BaseModel):
 class OrderPlanBulkSave(BaseModel):
     plans: list[OrderPlanBulkItem]
 
+
+# ═══════════════════════════════════════════════════════════════════════
+# 판매 실적 스키마
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class SalesHistoryBase(BaseModel):
+    ffc_id: int
+    product_id: int
+    base_date: str = Field(..., description="주차 기준일 (YYYY-MM-DD)")
+    sales_qty: int = Field(..., ge=0, description="실제 판매 수량 (캔)")
+
+
+class SalesHistoryCreate(SalesHistoryBase):
+    pass
+
+
+class SalesHistoryResponse(SalesHistoryBase):
+    sales_id: int
+    created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 입고 관리 3분리 스키마
+# ═══════════════════════════════════════════════════════════════════════
+
+
+class OrderQuantityBase(BaseModel):
+    product_id: int
+    order_month: str = Field(..., description="발주월 (YYYY-MM)")
+    sales_order_no: str = Field(..., description="세일즈 오더 No.")
+    order_qty: int = Field(..., ge=0, description="발주 수량 (캔)")
+
+
+class OrderQuantityCreate(OrderQuantityBase):
+    pass
+
+
+class OrderQuantityResponse(OrderQuantityBase):
+    id: int
+    created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class ProductionCompleteBase(BaseModel):
+    product_id: int
+    sales_order_no: str
+    production_ym_no: str = Field(..., description="생산년월 넘버")
+    production_qty: int = Field(..., ge=0, description="생산 수량 (캔)")
+
+
+class ProductionCompleteCreate(ProductionCompleteBase):
+    pass
+
+
+class ProductionCompleteResponse(ProductionCompleteBase):
+    id: int
+    match_status: str = "PENDING"
+    matched_order_id: Optional[int] = None
+    created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class InvoiceQuantityBase(BaseModel):
+    product_id: int
+    sales_order_no: str
+    production_ym_no: str
+    invoice_no: str
+    invoice_qty: int = Field(..., ge=0, description="인보이스 수량 (캔)")
+
+
+class InvoiceQuantityCreate(InvoiceQuantityBase):
+    pass
+
+
+class InvoiceQuantityResponse(InvoiceQuantityBase):
+    id: int
+    match_status: str = "PENDING"
+    matched_production_id: Optional[int] = None
+    created_at: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class PendingMatchesResponse(BaseModel):
+    pending_count: int
+    pending_production: int = 0
+    pending_invoice: int = 0
+
+

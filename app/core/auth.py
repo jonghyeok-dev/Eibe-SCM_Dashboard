@@ -9,10 +9,10 @@ from app.models import UserAccount
 from app.schemas import TokenData
 import bcrypt
 
-# 보안 설정 (테스트용 하드코딩 - 실제 프로덕션에서는 환경변수 사용 권장)
+# 보안 설정 (로컬 환경용)
 SECRET_KEY = "scmdashboard_super_secret_key_for_local_env"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7일 유지 (로컬 환경 편의성)
+ACCESS_TOKEN_EXPIRE_HOURS = 12  # 12시간 유지
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -35,7 +35,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
