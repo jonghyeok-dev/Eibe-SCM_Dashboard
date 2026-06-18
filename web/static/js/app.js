@@ -1,5 +1,5 @@
 /**
- * EIBE SCM - 메인 JavaScript 모듈
+ * EIBE SCM - Main JavaScript Module
  */
 
 const API = {
@@ -27,7 +27,9 @@ const API = {
             }
             return await res.json();
         } catch (error) {
-            if (error.message !== 'Unauthorized') Toast.show(error.message, 'error');
+            if (error.message !== 'Unauthorized' && error.message !== 'Conflict') {
+                Toast.show(error.message, 'error');
+            }
             throw error;
         }
     },
@@ -76,13 +78,14 @@ const Auth = {
         const isLoginPage = window.location.pathname === '/login';
         if (!this.isLoggedIn() && !isLoginPage) {
             this.redirectToLogin();
-            return;
+            return false;
         }
         if (this.isLoggedIn() && isLoginPage) {
             window.location.href = '/';
-            return;
+            return false;
         }
         this.updateSidebarUI();
+        return true;
     },
     isLoggedIn() { return !!API.getToken(); },
     redirectToLogin() {
@@ -126,7 +129,9 @@ const Auth = {
                 roleEl.textContent = user.role;
                 avatarEl.textContent = user.name.charAt(0);
                 window._currentUserRole = user.role;
-            } catch(e) {}
+            } catch(e) {
+                // Token might be expired - silently ignore
+            }
         } else {
             nameEl.textContent = 'Guest';
             roleEl.textContent = '';
@@ -142,8 +147,14 @@ const Format = {
 };
 
 const Theme = {
+    _initialized: false,
     init() {
-        Auth.init();
+        if (this._initialized) return;
+        this._initialized = true;
+        
+        const authOk = Auth.init();
+        if (authOk === false) return; // redirect happening
+        
         const savedTheme = localStorage.getItem('theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         this.updateToggleButton(savedTheme);
@@ -162,9 +173,9 @@ const Theme = {
                 if (instance.options.scales?.x?.grid) instance.options.scales.x.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb';
                 if (instance.options.scales?.y?.grid) instance.options.scales.y.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb';
                 if (instance.options.plugins?.tooltip) {
-                    instance.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(30, 30, 38, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-                    instance.options.plugins.tooltip.titleColor = isDark ? '#ececf1' : '#191f28';
-                    instance.options.plugins.tooltip.bodyColor = isDark ? '#ececf1' : '#191f28';
+                    instance.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+                    instance.options.plugins.tooltip.titleColor = isDark ? '#e8e8e8' : '#191f28';
+                    instance.options.plugins.tooltip.bodyColor = isDark ? '#e8e8e8' : '#191f28';
                 }
                 instance.update();
             });
@@ -202,15 +213,15 @@ const ChartDefaults = {
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         
         Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = isDark ? '#a1a1aa' : '#8b95a1';
+        Chart.defaults.color = isDark ? '#a0a0a0' : '#8b95a1';
         Chart.defaults.elements.line.tension = 0.35;
         Chart.defaults.scale.grid = {
             color: isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb',
             drawBorder: false,
         };
-        Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(30, 30, 38, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-        Chart.defaults.plugins.tooltip.titleColor = isDark ? '#ececf1' : '#191f28';
-        Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#ececf1' : '#191f28';
+        Chart.defaults.plugins.tooltip.backgroundColor = isDark ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)';
+        Chart.defaults.plugins.tooltip.titleColor = isDark ? '#e8e8e8' : '#191f28';
+        Chart.defaults.plugins.tooltip.bodyColor = isDark ? '#e8e8e8' : '#191f28';
     },
 
     createDualTrackChart(canvasId, labels, demandData, depletionData) {
@@ -254,23 +265,30 @@ const Toast = {
             document.body.appendChild(this.container);
         }
     },
-    show(message) {
+    show(message, type) {
         if (!this.container) this.init();
         const toast = document.createElement('div');
         toast.className = 'toast';
+        if (type === 'error') toast.className += ' toast--error';
+        else if (type === 'success') toast.className += ' toast--success';
         toast.textContent = message;
         this.container.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(12px)';
+            toast.style.transition = 'all 0.2s ease';
+            setTimeout(() => toast.remove(), 200);
+        }, 3000);
     }
 };
 
-/** 엑셀 양식 다운로드 헬퍼 */
+/** Excel template download helper */
 function downloadTemplate(type) {
     const url = type === 'all' ? '/api/excel/template' : `/api/excel/template/${type}`;
     window.location.href = url;
 }
 
-/** 접기/열기 토글 */
+/** Collapsible toggle */
 function toggleCollapsible(headerId) {
     const header = document.getElementById(headerId);
     if (!header) return;
@@ -281,6 +299,8 @@ function toggleCollapsible(headerId) {
 }
 
 const Dashboard = {
+    dualTrackChart: null,
+    
     async loadKPIs() {
         try {
             const [products, inventory, ffcs] = await Promise.all([
@@ -288,10 +308,54 @@ const Dashboard = {
             ]);
             const totalStock = inventory.reduce((sum, inv) => sum + (inv.current_can_qty || 0), 0);
             
-            document.getElementById('kpi-total-stock').textContent = Format.number(totalStock);
-            document.getElementById('ffc-count-badge').textContent = `${ffcs.length}`;
+            const el = (id) => document.getElementById(id);
+            if (el('kpi-total-stock')) el('kpi-total-stock').textContent = Format.number(totalStock);
+            if (el('ffc-count-badge')) el('ffc-count-badge').textContent = `${ffcs.length}`;
         } catch (err) {
-            // silent
+            // API not available yet, keep sample data
+        }
+    },
+
+    async loadSimulation(weightFactor) {
+        try {
+            const data = await API.get(`/api/order-plan/simulation?weight_factor=${weightFactor}`);
+            if (!data || !data.length) return;
+
+            // Update chart with real simulation data
+            const canvas = document.getElementById('dual-track-chart');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            // Aggregate all products
+            const labels = [];
+            const demandData = [];
+            const depletionData = [];
+            
+            const weeks = data[0].simulation.length;
+            for (let i = 0; i < weeks; i++) {
+                labels.push(`W${i + 1}`);
+                let totalDemand = 0;
+                let totalEnding = 0;
+                data.forEach(d => {
+                    if (d.simulation[i]) {
+                        totalDemand += d.simulation[i].weekly_demand;
+                        totalEnding += d.simulation[i].ending_stock;
+                    }
+                });
+                demandData.push(Math.round(totalDemand));
+                depletionData.push(Math.round(totalEnding));
+            }
+
+            if (this.dualTrackChart) {
+                this.dualTrackChart.destroy();
+                this.dualTrackChart = null;
+            }
+            ChartDefaults.init();
+            this.dualTrackChart = ChartDefaults.createDualTrackChart('dual-track-chart', labels, 
+                demandData.map((d, i) => depletionData[0] - demandData.slice(0, i+1).reduce((a,b)=>a+b, 0) + depletionData[0]),
+                depletionData
+            );
+        } catch(e) {
+            // Keep sample data if API fails
         }
     }
 };
@@ -299,6 +363,6 @@ const Dashboard = {
 document.addEventListener('DOMContentLoaded', () => {
     Theme.init();
     Toast.init();
-    ChartDefaults.init();
+    if (typeof Chart !== 'undefined') ChartDefaults.init();
     if (document.getElementById('dashboard-page')) { Dashboard.loadKPIs(); }
 });

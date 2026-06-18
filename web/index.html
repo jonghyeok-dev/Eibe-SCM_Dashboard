@@ -209,23 +209,31 @@
     <div id="toast-container" class="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script>
-        const slider = document.getElementById('weight-slider');
-        const sliderVal = document.getElementById('weight-value');
-        if (slider) {
-            slider.addEventListener('input', (e) => {
-                sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
-            });
-        }
-
-        // 샘플 차트 데이터 렌더링
         document.addEventListener('DOMContentLoaded', () => {
+            const slider = document.getElementById('weight-slider');
+            const sliderVal = document.getElementById('weight-value');
+
+            if (slider) {
+                slider.addEventListener('input', (e) => {
+                    sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
+                });
+                // Trigger API simulation on slider release
+                slider.addEventListener('change', (e) => {
+                    const weight = parseFloat(e.target.value);
+                    Dashboard.loadSimulation(weight);
+                });
+            }
+
+            // Render sample chart initially, then try API
             const canvas = document.getElementById('dual-track-chart');
             if (canvas && typeof Chart !== 'undefined') {
                 ChartDefaults.init();
                 const labels = ['W1','W2','W3','W4','W5','W6','W7','W8','W9','W10','W11','W12','W13','W14','W15','W16','W17','W18','W19','W20','W21','W22','W23','W24'];
                 const demandData = [125000,122000,118000,114000,110000,107000,103000,99000,96000,92000,88000,85000,81000,78000,74000,71000,67000,64000,60000,57000,53000,50000,46000,43000];
                 const depletionData = [127450,123800,119500,114800,109600,104200,98500,92400,86800,80500,74300,68500,62100,56200,50800,45000,39500,34200,29400,25000,21000,17500,14500,12000];
-                ChartDefaults.createDualTrackChart('dual-track-chart', labels, demandData, depletionData);
+                Dashboard.dualTrackChart = ChartDefaults.createDualTrackChart('dual-track-chart', labels, demandData, depletionData);
+                // Try loading real data
+                Dashboard.loadSimulation(1.0);
             }
         });
     </script>

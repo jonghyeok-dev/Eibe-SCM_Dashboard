@@ -496,12 +496,19 @@
             slider.addEventListener('input', (e) => {
                 sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
             });
+            // Auto-run simulation when slider is released
+            slider.addEventListener('change', () => {
+                OrderPlan.runSimulation();
+            });
 
-            // 샘플 차트 렌더링
-            const canvas = document.getElementById('simulation-chart');
-            if (canvas && typeof Chart !== 'undefined') {
-                OrderPlan.renderSampleChart(canvas);
-            }
+            // Load data from API, fall back to sample chart
+            OrderPlan.load().catch(() => {
+                // If API not available, render sample chart
+                const canvas = document.getElementById('simulation-chart');
+                if (canvas && typeof Chart !== 'undefined') {
+                    OrderPlan.renderSampleChart(canvas);
+                }
+            });
         });
     </script>
 </body>

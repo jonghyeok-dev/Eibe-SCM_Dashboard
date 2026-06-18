@@ -447,7 +447,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            // InventoryPage.load(); // API 연동 시 활성화
+            InventoryPage.load().catch(() => {
+                // API not available, keep sample data
+            });
 
             document.getElementById('inventory-upload').addEventListener('change', (e) => {
                 const file = e.target.files[0];

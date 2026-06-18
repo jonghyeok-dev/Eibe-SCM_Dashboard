@@ -531,7 +531,9 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            // AdminPage.load(); // API 연동 시 활성화
+            AdminPage.load().catch(() => {
+                // API not available, keep sample data
+            });
         });
     </script>
 </body>
