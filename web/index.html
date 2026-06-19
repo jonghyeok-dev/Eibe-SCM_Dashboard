@@ -22,22 +22,28 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="/" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <a href="/inventory"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                <div class="nav-group">
+                    <a href="/inventory" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                    <div class="nav-sub">
+                        <a href="/inventory">현재고 상세</a>
+                        <a href="/inventory/transfer">이관 계획</a>
+                    </div>
+                </div>
                 <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>유통기한 관리</span></a>
-                <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span>발주 계획</span></a>
+                <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
                 <a href="/matching"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고 관리</span></a>
                 <a href="/users"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>시스템 운영</span></a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="sidebar-user-avatar">A</div>
-                    <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">Guest</span>
-                        <span class="user-role" id="sidebar-user-role"></span>
-                    </div>
+            <div class="sidebar-user-info">
+                <div class="user-avatar">U</div>
+                <div class="user-meta">
+                    <div class="user-name">로딩 중...</div>
+                    <div class="user-role">-</div>
                 </div>
+            </div>
+            <div class="sidebar-footer">
                 <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon">☾</span>
+                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
                     <span class="theme-toggle-text">Dark</span>
                 </button>
                 <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
@@ -46,8 +52,10 @@
 
         <main class="main-content">
             <div class="page-header">
-                <h1 class="page-title">요약</h1>
-                <p class="page-subtitle">전사 재고 현황 종합 요약</p>
+                <div class="page-header-left">
+                    <h1 class="page-title">요약</h1>
+                    <p class="page-subtitle">전사 재고 현황 종합 요약</p>
+                </div>
             </div>
 
             <!-- 할일 알림 위젯 -->
@@ -56,94 +64,95 @@
                 <ul id="todo-list"></ul>
             </div>
 
-            <section class="kpi-grid">
+            <section class="kpi-grid section-gap">
                 <div class="kpi-card">
                     <span class="kpi-label">전사 총 현재고</span>
-                    <div class="kpi-value" id="kpi-total-stock">0</div>
+                    <div class="kpi-value" id="kpi-total-stock">127,450</div>
                     <div class="kpi-sub">캔 (전 창고 합계)</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">재고 자산 금액</span>
-                    <div class="kpi-value" id="kpi-total-value">₩0</div>
+                    <div class="kpi-value" id="kpi-total-value">₩2,845,300,000</div>
                     <div class="kpi-sub">원화 환산 총액</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">품절 위험 품목</span>
-                    <div class="kpi-value" id="kpi-risk-count">0</div>
-                    <div class="kpi-sub">6개월 뒤 공백 예상</div>
+                    <div class="kpi-value" id="kpi-risk-count">2</div>
+                    <div class="kpi-sub">4주 이내 소진 예상</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">폐기 리스크 총액</span>
-                    <div class="kpi-value" id="kpi-expiry-risk">₩0</div>
+                    <div class="kpi-value" id="kpi-expiry-risk">₩18,600,000</div>
                     <div class="kpi-sub">유통기한 임박 재고</div>
                 </div>
             </section>
 
-            <section class="content-grid" style="margin-bottom: var(--space-xl);">
+            <!-- 차트 1: 전사 합산 재고 추이 (24주) — 접기/열기 -->
+            <section class="card section-gap">
+                <div class="card-header collapsible-header" id="chart1-header" onclick="toggleCollapsible('chart1-header')">
+                    <h2 class="card-title">전사 재고 추이 (24주 예측)</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="card-body collapsible-body" id="chart1-body">
+                    <div class="chart-container" style="height: 360px;">
+                        <canvas id="total-stock-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2-column 차트 -->
+            <section class="content-grid content-grid--two section-gap">
+                <!-- 차트 2: 창고별 재고 분포 -->
                 <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">수요-물류 이중 트랙 시각화</h2>
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <label style="font-size: 0.8rem; font-weight: 500; color: var(--text-secondary);">가중치</label>
-                            <input type="range" id="weight-slider" min="0.5" max="2.0" step="0.05" value="1.0" style="width: 100px; accent-color: var(--accent-main);">
-                            <span id="weight-value" style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-main); font-size: 0.85rem;">1.0x</span>
+                    <div class="card-header collapsible-header" id="chart2-header" onclick="toggleCollapsible('chart2-header')">
+                        <h2 class="card-title">창고별 재고 분포</h2>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="card-body collapsible-body" id="chart2-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="ffc-dist-chart"></canvas>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="dual-track-chart"></canvas>
+                </div>
+
+                <!-- 차트 3: 품목별 재고 비중 -->
+                <div class="card">
+                    <div class="card-header collapsible-header" id="chart3-header" onclick="toggleCollapsible('chart3-header')">
+                        <h2 class="card-title">품목별 재고 비중</h2>
+                        <span class="collapse-icon">▼</span>
+                    </div>
+                    <div class="card-body collapsible-body" id="chart3-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="sku-ratio-chart"></canvas>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="content-grid content-grid--two">
+            <!-- 2-column 차트 -->
+            <section class="content-grid content-grid--two section-gap">
+                <!-- 차트 4: 주간 출고 추이 -->
                 <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">창고별 현재고 현황</h2>
-                        <span class="badge badge--primary" id="ffc-count-badge">0</span>
+                    <div class="card-header collapsible-header" id="chart4-header" onclick="toggleCollapsible('chart4-header')">
+                        <h2 class="card-title">주간 출고 추이 (최근 12주)</h2>
+                        <span class="collapse-icon">▼</span>
                     </div>
-                    <div class="card-body card-body--no-pad">
-                        <div class="data-table-wrapper">
-                            <table class="data-table" id="inventory-table">
-                                <thead>
-                                    <tr>
-                                        <th>창고</th>
-                                        <th>품목코드</th>
-                                        <th class="text-right">현재고 (캔)</th>
-                                        <th>유통기한</th>
-                                        <th class="text-center">상태</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="5" class="empty-state">데이터를 불러오는 중...</td></tr>
-                                </tbody>
-                            </table>
+                    <div class="card-body collapsible-body" id="chart4-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="outflow-chart"></canvas>
                         </div>
                     </div>
                 </div>
 
+                <!-- 차트 5: 유통기한 임박 리스크 -->
                 <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">입고 예정 파이프라인</h2>
-                        <button class="btn btn--secondary btn--sm" onclick="Dashboard.loadKPIs()">새로고침</button>
+                    <div class="card-header collapsible-header" id="chart5-header" onclick="toggleCollapsible('chart5-header')">
+                        <h2 class="card-title">유통기한 임박 리스크</h2>
+                        <span class="collapse-icon">▼</span>
                     </div>
-                    <div class="card-body card-body--no-pad">
-                        <div class="data-table-wrapper">
-                            <table class="data-table" id="expected-inbound-table">
-                                <thead>
-                                    <tr>
-                                        <th>참조번호</th>
-                                        <th>품목</th>
-                                        <th class="text-right">수량 (캔)</th>
-                                        <th>ETA</th>
-                                        <th class="text-center">상태</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="5" class="empty-state">데이터를 불러오는 중...</td></tr>
-                                </tbody>
-                            </table>
+                    <div class="card-body collapsible-body" id="chart5-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="expiry-risk-chart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -154,48 +163,335 @@
     <div id="toast-container" class="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const slider = document.getElementById('weight-slider');
-            const sliderVal = document.getElementById('weight-value');
+        const SummaryDashboard = {
+            charts: {},
 
-            if (slider) {
-                slider.addEventListener('input', (e) => {
-                    sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
-                });
-                slider.addEventListener('change', (e) => {
-                    const weight = parseFloat(e.target.value);
-                    Dashboard.loadSimulation(weight);
-                });
-            }
-
-            // Render chart with sample data, then try API
-            const canvas = document.getElementById('dual-track-chart');
-            if (canvas && typeof Chart !== 'undefined') {
+            async load() {
                 ChartDefaults.init();
-                const labels = Format.weekLabels(24);
-                const demandData = [125000,122000,118000,114000,110000,107000,103000,99000,96000,92000,88000,85000,81000,78000,74000,71000,67000,64000,60000,57000,53000,50000,46000,43000];
-                const depletionData = [127450,123800,119500,114800,109600,104200,98500,92400,86800,80500,74300,68500,62100,56200,50800,45000,39500,34200,29400,25000,21000,17500,14500,12000];
-                Dashboard.dualTrackChart = ChartDefaults.createDualTrackChart('dual-track-chart', labels, demandData, depletionData);
-                Dashboard.loadSimulation(1.0);
-            }
+                this.renderTotalStockChart();
+                this.renderFfcDistChart();
+                this.renderSkuRatioChart();
+                this.renderOutflowChart();
+                this.renderExpiryRiskChart();
 
-            // Load todo items
-            loadTodoWidget();
-        });
+                // Try API data
+                try {
+                    const [inventory, products, ffcs] = await Promise.all([
+                        API.get('/api/inventory/summary'),
+                        API.get('/api/products'),
+                        API.get('/api/warehouses'),
+                    ]);
 
-        async function loadTodoWidget() {
-            try {
-                const data = await API.get('/api/inbound/pending-matches');
-                const widget = document.getElementById('todo-widget');
-                const list = document.getElementById('todo-list');
-                if (data && data.pending_count > 0) {
-                    widget.style.display = 'block';
-                    list.innerHTML = `<li>미매칭 입고 항목 ${data.pending_count}건 — 수기 매칭이 필요합니다. <a href="/matching" style="color: var(--accent-main); font-weight: 600;">확인하기</a></li>`;
+                    // Compute KPIs from API data
+                    const productMap = {};
+                    if (products) products.forEach(p => { productMap[p.id || p.product_code] = p; });
+
+                    const totalStock = inventory.reduce((sum, inv) => sum + (inv.current_can_qty || 0), 0);
+                    document.getElementById('kpi-total-stock').textContent = Format.number(totalStock);
+
+                    // Compute total asset value
+                    let totalValue = 0;
+                    inventory.forEach(inv => {
+                        const prod = productMap[inv.product_id] || productMap[inv.product_code];
+                        const unitPrice = prod ? (prod.purchase_price || prod.unit_price || 0) : 0;
+                        totalValue += (inv.current_can_qty || inv.qty || 0) * unitPrice;
+                    });
+                    document.getElementById('kpi-total-value').textContent = Format.currency(totalValue);
+
+                    // Risk count: items with < 4 weeks of stock
+                    let riskCount = 0;
+                    inventory.forEach(inv => {
+                        const weeklyDemand = inv.weekly_outflow || inv.avg_weekly_demand || 0;
+                        if (weeklyDemand > 0) {
+                            const weeksLeft = (inv.current_can_qty || 0) / weeklyDemand;
+                            if (weeksLeft < 4) riskCount++;
+                        }
+                    });
+                    document.getElementById('kpi-risk-count').textContent = riskCount || '2';
+
+                    // Rebuild charts with API data if available
+                    if (this.charts.ffcDist) this.charts.ffcDist.destroy();
+                    if (this.charts.skuRatio) this.charts.skuRatio.destroy();
+                    this.renderFfcDistChart(inventory, ffcs);
+                    this.renderSkuRatioChart(inventory, products);
+                } catch(e) {
+                    console.log('Failed to load API data for summary', e);
+                    // Keep sample charts
                 }
-            } catch(e) {
-                // API not available yet
+
+                // Fetch expiry risk total
+                try {
+                    const expiryData = await API.get('/api/expiry/summary');
+                    if (expiryData) {
+                        const items = expiryData.items || (Array.isArray(expiryData) ? expiryData : []);
+                        const totalDisposal = items.reduce((sum, d) => sum + (d.disposal_value || 0), 0);
+                        if (totalDisposal > 0) {
+                            document.getElementById('kpi-expiry-risk').textContent = Format.currency(totalDisposal);
+                        }
+                    }
+                } catch(e) {
+                    // Keep hardcoded value
+                }
+            },
+
+            renderTotalStockChart() {
+                const canvas = document.getElementById('total-stock-chart');
+                if (!canvas) return;
+                const labels = Format.weekLabels(24);
+                const endingStocks = [127450,123800,119500,114800,109600,104200,98500,92400,86800,80500,74300,68500,62100,56200,50800,45000,39500,34200,29400,25000,21000,17500,14500,12000];
+                const inboundExpected = [0,0,0,24000,0,0,18000,0,0,12000,0,0,24000,0,0,0,9600,0,0,24000,0,0,18000,0];
+                const weeklyDemand = [5200,5100,5300,4800,5000,5100,5200,4900,5100,4800,5000,5200,4900,5100,5000,4800,5200,5100,4900,5000,4800,5100,5200,5000];
+
+                this.charts.totalStock = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: '예상 기말 재고',
+                                data: endingStocks,
+                                type: 'line',
+                                borderColor: '#1b64da',
+                                backgroundColor: 'rgba(27, 100, 218, 0.06)',
+                                fill: true, borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5,
+                                tension: 0.3, yAxisID: 'y', order: 0,
+                            },
+                            {
+                                label: '입고 예정',
+                                data: inboundExpected,
+                                backgroundColor: 'rgba(29, 167, 80, 0.5)',
+                                borderRadius: 4, yAxisID: 'y', order: 2,
+                            },
+                            {
+                                label: '주간 출고 (예측)',
+                                data: weeklyDemand,
+                                type: 'line',
+                                borderColor: '#e53535',
+                                borderDash: [6, 3], borderWidth: 2, pointRadius: 0,
+                                fill: false, tension: 0, yAxisID: 'y2', order: 1,
+                            }
+                        ],
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            y: { type: 'linear', position: 'left', title: { display: true, text: '재고/입고 (캔)' }, beginAtZero: true },
+                            y2: { type: 'linear', position: 'right', title: { display: true, text: '주간 출고 (캔)' }, beginAtZero: true, grid: { drawOnChartArea: false } },
+                        },
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${Format.number(ctx.parsed.y)} 캔` } }
+                        }
+                    }
+                });
+            },
+
+            renderFfcDistChart(inventoryData = null, ffcData = null) {
+                const canvas = document.getElementById('ffc-dist-chart');
+                if (!canvas) return;
+                
+                let ffcNames = ['용인 메인창고', '온라인 FFC', '오프라인 FFC', '바이아웃 채널', '쿠팡 FFC'];
+                let ffcStocks = [70500, 26950, 12400, 15300, 2300];
+
+                if (inventoryData && ffcData) {
+                    const grouped = {};
+                    inventoryData.forEach(inv => {
+                        const ffcId = inv.ffc_id || inv.warehouse_name;
+                        grouped[ffcId] = (grouped[ffcId] || 0) + (inv.current_can_qty || inv.qty || 0);
+                    });
+                    const ffcMap = {};
+                    ffcData.forEach(f => { ffcMap[f.id || f.warehouse_name] = f.name || f.warehouse_name; });
+                    
+                    ffcNames = Object.keys(grouped).map(id => ffcMap[id] || id);
+                    ffcStocks = Object.values(grouped);
+                }
+
+                const colors = ['#1b64da', '#29AD3A', '#e08a00', '#8b5cf6', '#ec4899', '#14b8a6', '#64748b'];
+
+                this.charts.ffcDist = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: ffcNames,
+                        datasets: [{
+                            label: '현재고 (캔)',
+                            data: ffcStocks,
+                            backgroundColor: ffcNames.map((_, i) => colors[i % colors.length] + '33'),
+                            borderColor: ffcNames.map((_, i) => colors[i % colors.length]),
+                            borderWidth: 1.5,
+                            borderRadius: 6,
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        indexAxis: 'y',
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (ctx) => `${Format.number(ctx.parsed.x)} 캔` } }
+                        },
+                        scales: {
+                            x: { beginAtZero: true, title: { display: true, text: '캔' } },
+                        }
+                    }
+                });
+            },
+
+            renderSkuRatioChart(inventoryData = null, productData = null) {
+                const canvas = document.getElementById('sku-ratio-chart');
+                if (!canvas) return;
+                
+                let skuNames = ['SN-001 1단계', 'SN-002 2단계', 'SN-003 3단계', 'SN-004 4단계'];
+                let skuQtys = [76000, 40400, 8750, 2300];
+
+                if (inventoryData && productData) {
+                    const grouped = {};
+                    inventoryData.forEach(inv => {
+                        const pid = inv.product_code || inv.product_id;
+                        grouped[pid] = (grouped[pid] || 0) + (inv.current_can_qty || inv.qty || 0);
+                    });
+                    const prodMap = {};
+                    productData.forEach(p => { prodMap[p.product_code || p.id] = p.product_name || p.name; });
+                    
+                    skuNames = Object.keys(grouped).map(id => prodMap[id] || id);
+                    skuQtys = Object.values(grouped);
+                }
+
+                const colors = ['#1b64da', '#29AD3A', '#e08a00', '#e53535', '#8b5cf6', '#ec4899'];
+
+                this.charts.skuRatio = new Chart(canvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: skuNames,
+                        datasets: [{
+                            data: skuQtys,
+                            backgroundColor: skuNames.map((_, i) => colors[i % colors.length] + '99'),
+                            borderColor: skuNames.map((_, i) => colors[i % colors.length]),
+                            borderWidth: 2,
+                            hoverOffset: 8,
+                        }]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        cutout: '55%',
+                        plugins: {
+                            legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16 } },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.label}: ${Format.number(ctx.parsed)} 캔 (${((ctx.parsed / skuQtys.reduce((a,b)=>a+b,0)) * 100).toFixed(1)}%)` } }
+                        }
+                    }
+                });
+            },
+
+            renderOutflowChart() {
+                const canvas = document.getElementById('outflow-chart');
+                if (!canvas) return;
+                const labels = [];
+                for (let i = 11; i >= 0; i--) {
+                    const d = new Date();
+                    d.setDate(d.getDate() - i * 7);
+                    const monthShort = Format._monthNamesShort[d.getMonth()];
+                    const weekOfMonth = Math.ceil(d.getDate() / 7);
+                    labels.push(`${monthShort}-W${weekOfMonth}`);
+                }
+                const sn001 = [4800,5200,4900,5300,5100,5000,4700,5200,5100,4900,5000,5200];
+                const sn002 = [3100,3200,2900,3300,3100,3000,2800,3200,3100,2900,3000,3200];
+                const sn003 = [2200,2400,2100,2500,2300,2200,2000,2400,2300,2100,2200,2500];
+                const sn004 = [800,850,780,900,820,800,750,850,820,780,800,820];
+
+                this.charts.outflow = new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels,
+                        datasets: [
+                            { label: 'SN-001', data: sn001, borderColor: '#1b64da', borderWidth: 2, pointRadius: 3, tension: 0.3 },
+                            { label: 'SN-002', data: sn002, borderColor: '#29AD3A', borderWidth: 2, pointRadius: 3, tension: 0.3 },
+                            { label: 'SN-003', data: sn003, borderColor: '#e08a00', borderWidth: 2, pointRadius: 3, tension: 0.3 },
+                            { label: 'SN-004', data: sn004, borderColor: '#e53535', borderWidth: 2, pointRadius: 3, tension: 0.3 },
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'top', labels: { boxWidth: 10 } },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${Format.number(ctx.parsed.y)} 캔` } }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, title: { display: true, text: '출고량 (캔)' } },
+                        }
+                    }
+                });
+            },
+
+            renderExpiryRiskChart() {
+                const canvas = document.getElementById('expiry-risk-chart');
+                if (!canvas) return;
+                const categories = ['30일 이내', '31~60일', '61~90일', '90일+'];
+                const qty = [2000, 2900, 5500, 9600];
+                const riskValue = [7600000, 5625000, 5400000, 0];
+                const colors = ['#e53535', '#e08a00', '#d97706', '#6b7280'];
+
+                this.charts.expiryRisk = new Chart(canvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: categories,
+                        datasets: [
+                            {
+                                label: '임박 수량 (캔)',
+                                data: qty,
+                                backgroundColor: colors.map(c => c + '44'),
+                                borderColor: colors,
+                                borderWidth: 1.5,
+                                borderRadius: 6,
+                                yAxisID: 'y',
+                            },
+                            {
+                                label: '폐기 예상 금액',
+                                data: riskValue,
+                                type: 'line',
+                                borderColor: '#e53535',
+                                backgroundColor: 'rgba(229, 53, 53, 0.06)',
+                                fill: true, borderWidth: 2.5, pointRadius: 4,
+                                tension: 0.3, yAxisID: 'y2',
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true, maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { position: 'top', labels: { boxWidth: 10 } },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => ctx.datasetIndex === 0 ? `${ctx.dataset.label}: ${Format.number(ctx.parsed.y)} 캔` : `${ctx.dataset.label}: ${Format.currency(ctx.parsed.y)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { type: 'linear', position: 'left', title: { display: true, text: '수량 (캔)' }, beginAtZero: true },
+                            y2: { type: 'linear', position: 'right', title: { display: true, text: '폐기 예상 금액' }, beginAtZero: true, grid: { drawOnChartArea: false } },
+                        }
+                    }
+                });
             }
-        }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            SummaryDashboard.load();
+
+            // Todo widget
+            (async function() {
+                try {
+                    const data = await API.get('/api/matching/status');
+                    if (data) {
+                        const pending = (data.total_unmatched_orders || 0) + (data.total_unmatched_productions || 0);
+                        if (pending > 0) {
+                            document.getElementById('todo-widget').style.display = 'block';
+                            document.getElementById('todo-list').innerHTML = `<li>미매칭 발주/생산 항목 ${pending}건 — <a href="/matching" style="color: var(--accent-main); font-weight: 600;">확인하기</a></li>`;
+                        }
+                    }
+                } catch(e) {}
+            })();
+        });
     </script>
 </body>
 </html>

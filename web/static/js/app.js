@@ -59,6 +59,10 @@ const API = {
                 headers,
                 body: formData
             });
+            if (res.status === 401) {
+                Auth.redirectToLogin();
+                throw new Error('Unauthorized');
+            }
             if (!res.ok) {
                 const err = await res.json().catch(() => ({}));
                 throw new Error(err.detail || `Upload Error: ${res.status}`);
@@ -145,12 +149,17 @@ const Format = {
     number(val) { return val == null || isNaN(val) ? '0' : Number(val).toLocaleString('ko-KR'); },
     currency(val) { return val == null || isNaN(val) ? '₩0' : '₩' + Number(val).toLocaleString('ko-KR'); },
     percent(val) { return val == null || isNaN(val) ? '0%' : Number(val).toFixed(1) + '%'; },
+
+    _monthNamesEn: ['January','February','March','April','May','June','July','August','September','October','November','December'],
+    _monthNamesShort: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    _dayNamesKr: ['일','월','화','수','목','금','토'],
+
     weekLabel(weekNum) {
         const d = new Date();
         d.setDate(d.getDate() + (weekNum - 1) * 7);
-        const month = d.getMonth() + 1;
+        const monthShort = this._monthNamesShort[d.getMonth()];
         const weekOfMonth = Math.ceil(d.getDate() / 7);
-        return `${month}월 ${weekOfMonth}주차`;
+        return `${monthShort}-W${weekOfMonth}`;
     },
     weekLabels(count) {
         const labels = [];
@@ -158,6 +167,44 @@ const Format = {
             labels.push(this.weekLabel(i + 1));
         }
         return labels;
+    },
+    monthLabel(monthOffset) {
+        const d = new Date();
+        d.setMonth(d.getMonth() + monthOffset);
+        return `${this._monthNamesShort[d.getMonth()]} ${d.getFullYear()}`;
+    },
+    today() {
+        const d = new Date();
+        const year = d.getFullYear();
+        const month = d.getMonth() + 1;
+        const day = d.getDate();
+        const dayName = this._dayNamesKr[d.getDay()];
+        return `${year}년 ${month}월 ${day}일 (${dayName})`;
+    },
+    todayShort() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    },
+    dateTime(dateStr) {
+        if (!dateStr) {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:${String(d.getSeconds()).padStart(2,'0')}`;
+        }
+        return dateStr;
+    },
+    currentMonth() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    },
+    nextMonth() {
+        const d = new Date();
+        d.setMonth(d.getMonth() + 1);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    },
+    nextMonthDisplay() {
+        const d = new Date();
+        d.setMonth(d.getMonth() + 1);
+        return `${d.getFullYear()}년 ${d.getMonth()+1}월`;
     }
 };
 
@@ -183,16 +230,18 @@ const Theme = {
         this.updateToggleButton(next);
         
         if (typeof Chart !== 'undefined') {
-            Chart.helpers.each(Chart.instances, function(instance) {
-                const isDark = next === 'dark';
-                if (instance.options.scales?.x?.grid) instance.options.scales.x.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb';
-                if (instance.options.scales?.y?.grid) instance.options.scales.y.grid.color = isDark ? 'rgba(100, 100, 100, 0.15)' : '#e5e8eb';
-                if (instance.options.plugins?.tooltip) {
-                    instance.options.plugins.tooltip.backgroundColor = isDark ? 'rgba(26, 26, 26, 0.95)' : 'rgba(255, 255, 255, 0.95)';
-                    instance.options.plugins.tooltip.titleColor = isDark ? '#e8e8e8' : '#191f28';
-                    instance.options.plugins.tooltip.bodyColor = isDark ? '#e8e8e8' : '#191f28';
+            const style = getComputedStyle(document.documentElement);
+            Object.values(Chart.instances).forEach(chart => {
+                chart.options.scales = chart.options.scales || {};
+                Object.values(chart.options.scales).forEach(scale => {
+                    if (scale.ticks) scale.ticks.color = style.getPropertyValue('--text-secondary').trim();
+                    if (scale.grid) scale.grid.color = style.getPropertyValue('--border-default').trim();
+                    if (scale.title) scale.title.color = style.getPropertyValue('--text-secondary').trim();
+                });
+                if (chart.options.plugins?.legend?.labels) {
+                    chart.options.plugins.legend.labels.color = style.getPropertyValue('--text-primary').trim();
                 }
-                instance.update();
+                chart.update('none');
             });
         }
     },
@@ -201,7 +250,9 @@ const Theme = {
         if (btn) {
             const icon = btn.querySelector('.toggle-icon');
             const text = btn.querySelector('.theme-toggle-text');
-            if (icon) icon.textContent = theme === 'dark' ? '☀' : '☾';
+            if (icon) icon.innerHTML = theme === 'dark'
+                ? '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
+                : '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
             if (text) text.textContent = theme === 'dark' ? 'Light' : 'Dark';
         }
     }
@@ -335,76 +386,41 @@ function toggleCollapsible(headerId) {
     body.classList.toggle('hidden');
 }
 
-const Dashboard = {
-    dualTrackChart: null,
-    
-    async loadKPIs() {
-        try {
-            const [products, inventory, ffcs] = await Promise.all([
-                API.get('/api/products'), API.get('/api/inventory'), API.get('/api/ffc')
-            ]);
-            const totalStock = inventory.reduce((sum, inv) => sum + (inv.current_can_qty || 0), 0);
-            
-            const el = (id) => document.getElementById(id);
-            if (el('kpi-total-stock')) el('kpi-total-stock').textContent = Format.number(totalStock);
-            if (el('ffc-count-badge')) el('ffc-count-badge').textContent = `${ffcs.length}`;
-        } catch (err) {
-            // API not available yet, keep sample data
+/** Inject today's date into page header (right-aligned) */
+function injectTodayDate() {
+    const header = document.querySelector('.page-header');
+    if (!header) return;
+    const existing = header.querySelector('.page-date');
+    if (existing) return;
+    const dateEl = document.createElement('div');
+    dateEl.className = 'page-date';
+    dateEl.textContent = Format.today();
+    header.appendChild(dateEl);
+}
+
+/** Display logged-in user info in sidebar footer */
+async function loadSidebarUser() {
+    const userArea = document.querySelector('.sidebar-user-info');
+    if (!userArea) return;
+    try {
+        const user = await API.get('/api/auth/me');
+        if (user) {
+            userArea.querySelector('.user-name').textContent = user.name || user.username;
+            userArea.querySelector('.user-role').textContent = user.role === 'ADMIN' ? '관리자' : '운영자';
         }
-    },
-
-    async loadSimulation(weightFactor) {
-        try {
-            const data = await API.get(`/api/order-plan/simulation?weight_factor=${weightFactor}`);
-            if (!data || !data.length) return;
-
-            const canvas = document.getElementById('dual-track-chart');
-            if (!canvas || typeof Chart === 'undefined') return;
-
-            const weeks = data[0].simulation ? data[0].simulation.length : 24;
-            const labels = Format.weekLabels(weeks);
-            const depletionData = [];
-            const demandData = [];
-
-            for (let i = 0; i < weeks; i++) {
-                let totalEnding = 0;
-                let totalDemand = 0;
-                data.forEach(d => {
-                    if (d.simulation && d.simulation[i]) {
-                        totalEnding += d.simulation[i].ending_stock;
-                        totalDemand += d.simulation[i].weekly_demand;
-                    }
-                });
-                depletionData.push(Math.round(totalEnding));
-                demandData.push(Math.round(totalDemand));
-            }
-
-            // Build cumulative demand depletion line
-            let cumulativeDemand = depletionData[0] || 0;
-            const demandLine = [cumulativeDemand];
-            for (let i = 0; i < demandData.length; i++) {
-                cumulativeDemand -= demandData[i];
-                demandLine.push(Math.round(cumulativeDemand));
-            }
-            demandLine.pop(); // align length
-
-            if (this.dualTrackChart) {
-                this.dualTrackChart.destroy();
-                this.dualTrackChart = null;
-            }
-            ChartDefaults.init();
-            this.dualTrackChart = ChartDefaults.createDualTrackChart(
-                'dual-track-chart', labels, demandLine, depletionData
-            );
-        } catch(e) {
-            // Keep sample data if API fails
-        }
+    } catch(e) {
+        // Not logged in or API unavailable
     }
-};
+}
 
 document.addEventListener('DOMContentLoaded', () => {
     Theme.init();
     Toast.init();
+    injectTodayDate();
     if (typeof Chart !== 'undefined') ChartDefaults.init();
-    if (document.getElementById('dashboard-page')) { Dashboard.loadKPIs(); }
+    // Auth check (skip for login page)
+    if (!window.location.pathname.startsWith('/login')) {
+        Auth.init();
+        loadSidebarUser();
+    }
 });

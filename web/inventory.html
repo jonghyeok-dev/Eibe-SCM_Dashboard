@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EIBE SCM | 현재고 보유량</title>
+    <title>EIBE SCM | 현재고 현황</title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
@@ -20,22 +20,28 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="/"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <a href="/inventory" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                <div class="nav-group">
+                    <a href="/inventory" class="nav-parent active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                    <div class="nav-sub">
+                        <a href="/inventory" id="nav-inventory-sub" class="active">현재고 상세</a>
+                        <a href="/inventory/transfer" id="nav-transfer-sub">이관 계획</a>
+                    </div>
+                </div>
                 <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>유통기한 관리</span></a>
                 <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
                 <a href="/matching"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고 관리</span></a>
                 <a href="/users"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>시스템 운영</span></a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="sidebar-user-avatar">A</div>
-                    <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">Guest</span>
-                        <span class="user-role" id="sidebar-user-role"></span>
-                    </div>
+            <div class="sidebar-user-info">
+                <div class="user-avatar">U</div>
+                <div class="user-meta">
+                    <div class="user-name">로딩 중...</div>
+                    <div class="user-role">-</div>
                 </div>
+            </div>
+            <div class="sidebar-footer">
                 <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon">☾</span>
+                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
                     <span class="theme-toggle-text">Dark</span>
                 </button>
                 <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
@@ -44,61 +50,50 @@
 
         <main class="main-content">
             <div class="page-header">
-                <h1 class="page-title">현재고 현황</h1>
-                <p class="page-subtitle">창고별 현재고 보유량 관리</p>
+                <div class="page-header-left">
+                    <h1 class="page-title" id="main-page-title">현재고 현황</h1>
+                    <p class="page-subtitle" id="main-page-subtitle">창고별 현재고 보유량 및 이관 계획 관리</p>
+                </div>
             </div>
 
-            <!-- 상단: 업로드/다운로드 -->
-            <section class="card section-gap">
-                <div class="card-header">
-                    <h2 class="card-title">현재고 데이터 관리</h2>
-                    <div class="btn-group">
-                        <button class="btn btn--secondary" onclick="downloadTemplate('current_inventory')">현재고 양식 다운로드</button>
-                        <input type="file" id="inventory-upload" accept=".xlsx" style="display: none;">
-                        <button class="btn btn--primary" onclick="document.getElementById('inventory-upload').click()">현재고 엑셀 업로드</button>
-                        <button class="btn btn--secondary" onclick="InventoryPage.load()">새로고침</button>
-                    </div>
-                </div>
-            </section>
 
             <!-- KPI 요약 -->
             <section class="kpi-grid section-gap" id="inventory-kpi">
                 <div class="kpi-card">
                     <span class="kpi-label">전사 총 현재고</span>
-                    <div class="kpi-value" id="inv-total-qty">127,450</div>
+                    <div class="kpi-value" id="inv-total-qty">0</div>
                     <div class="kpi-sub">캔 (전 창고 합계)</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">재고 자산 금액</span>
-                    <div class="kpi-value" id="inv-total-value">₩2,845,300,000</div>
+                    <div class="kpi-value" id="inv-total-value">₩0</div>
                     <div class="kpi-sub">원화 환산 총액</div>
                 </div>
                 <div class="kpi-card">
                     <span class="kpi-label">등록 창고 수</span>
-                    <div class="kpi-value" id="inv-ffc-count">5</div>
+                    <div class="kpi-value" id="inv-ffc-count">0</div>
                     <div class="kpi-sub">풀필먼트 창고</div>
                 </div>
                 <div class="kpi-card">
-                    <span class="kpi-label">이관 추천 건수</span>
-                    <div class="kpi-value" id="inv-transfer-count">4</div>
-                    <div class="kpi-sub">4주 이내 소진 예상 품목</div>
+                    <span class="kpi-label">이관 계획 건수</span>
+                    <div class="kpi-value" id="inv-transfer-count">0</div>
+                    <div class="kpi-sub">등록된 이관 건수</div>
                 </div>
             </section>
 
             <!-- 창고별 현재고 상세 테이블 -->
-            <section class="card section-gap">
+            <section class="card" id="inventory-detail-section">
                 <div class="card-header">
                     <h2 class="card-title">창고별 현재고 상세</h2>
                     <div class="btn-group">
-                        <select class="form-select" id="ffc-filter" style="width: auto; min-width: 160px;">
-                            <option value="">전체 창고</option>
-                            <option value="1">용인 메인창고 (HUB)</option>
-                            <option value="2">온라인 FFC (FFC_ON)</option>
-                            <option value="3">오프라인 FFC (FFC_OFF)</option>
-                            <option value="4">바이아웃 채널 (BUYOUT)</option>
-                            <option value="5">쿠팡 FFC (FFC_CP)</option>
-                        </select>
+                        <button class="btn btn--secondary btn--sm" onclick="downloadTemplate('current_inventory')">양식 다운로드</button>
+                        <input type="file" id="inventory-upload" accept=".xlsx" style="display: none;">
+                        <button class="btn btn--primary btn--sm" onclick="document.getElementById('inventory-upload').click()">엑셀 업로드</button>
+                        <button class="btn btn--secondary btn--sm" onclick="InventoryPage.init()">새로고침</button>
                     </div>
+                </div>
+                <div class="card-body" style="padding-bottom: 0;">
+                    <div class="checkbox-filter-group" id="ffc-checkbox-filter"></div>
                 </div>
                 <div class="card-body card-body--no-pad">
                     <div class="data-table-wrapper">
@@ -114,73 +109,22 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><span class="status-dot status-dot--green"></span>용인 메인창고</td>
-                                    <td class="mono">SN-001</td>
-                                    <td>산양분유 1단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">42,500</td>
-                                    <td class="text-right mono">₩956,250,000</td>
-                                    <td style="color: var(--text-muted);">4건 배치</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--green"></span>용인 메인창고</td>
-                                    <td class="mono">SN-002</td>
-                                    <td>산양분유 2단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">28,000</td>
-                                    <td class="text-right mono">₩588,000,000</td>
-                                    <td style="color: var(--text-muted);">3건 배치</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--green"></span>온라인 FFC</td>
-                                    <td class="mono">SN-001</td>
-                                    <td>산양분유 1단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">18,200</td>
-                                    <td class="text-right mono">₩409,500,000</td>
-                                    <td style="color: var(--text-muted);">2건 배치</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--green"></span>온라인 FFC</td>
-                                    <td class="mono">SN-003</td>
-                                    <td>산양분유 3단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">8,750</td>
-                                    <td class="text-right mono">₩196,875,000</td>
-                                    <td style="color: var(--text-muted);">2건 배치</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--green"></span>오프라인 FFC</td>
-                                    <td class="mono">SN-002</td>
-                                    <td>산양분유 2단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">12,400</td>
-                                    <td class="text-right mono">₩260,400,000</td>
-                                    <td style="color: var(--text-muted);">2건 배치</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--green"></span>바이아웃 채널</td>
-                                    <td class="mono">SN-001</td>
-                                    <td>산양분유 1단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">15,300</td>
-                                    <td class="text-right mono">₩344,250,000</td>
-                                    <td style="color: var(--text-muted);">1건 배치</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--amber"></span>쿠팡 FFC</td>
-                                    <td class="mono">SN-004</td>
-                                    <td>산양분유 4단계</td>
-                                    <td class="text-right mono" style="font-weight:600;">2,300</td>
-                                    <td class="text-right mono">₩46,000,000</td>
-                                    <td style="color: var(--text-muted);">1건 배치</td>
-                                </tr>
+                                <tr><td colspan="6" class="empty-state">데이터를 불러오는 중...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- 이관 추천 패널 -->
-            <section class="card section-gap">
+            <!-- 이관 계획 -->
+            <section class="card section-gap" id="transfer-plan-section">
                 <div class="card-header">
-                    <h2 class="card-title">이관 추천 (용인 메인창고 → 풀필먼트)</h2>
-                    <button class="btn btn--secondary btn--sm" onclick="InventoryPage.showMOQModal()">이관 MOQ 설정</button>
+                    <h2 class="card-title">이관 계획 (용인 메인창고 → 풀필먼트)</h2>
+                    <div class="btn-group">
+                        <input type="file" id="transfer-upload" accept=".xlsx" style="display: none;">
+                        <button class="btn btn--secondary btn--sm" onclick="document.getElementById('transfer-upload').click()">엑셀 업로드</button>
+                        <button class="btn btn--primary btn--sm" onclick="InventoryPage.showTransferModal()">+ 이관 계획 추가</button>
+                    </div>
                 </div>
                 <div class="card-body card-body--no-pad">
                     <div class="data-table-wrapper">
@@ -193,116 +137,63 @@
                                     <th class="text-right">현재 재고</th>
                                     <th class="text-right">주평균 출고</th>
                                     <th class="text-right">잔여 주수</th>
-                                    <th class="text-right">추천 수량</th>
-                                    <th>이관 MOQ</th>
-                                    <th>추천 이관일</th>
+                                    <th class="text-right">이관 수량</th>
+                                    <th>이관일</th>
                                     <th class="text-right">HUB 가용량</th>
+                                    <th>관리</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td><span class="status-dot status-dot--red"></span>쿠팡 FFC</td>
-                                    <td class="mono">SN-004</td>
-                                    <td>산양분유 4단계</td>
-                                    <td class="text-right mono">2,300</td>
-                                    <td class="text-right mono">820</td>
-                                    <td class="text-right"><span class="badge badge--danger">2.8주</span></td>
-                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">4,800</td>
-                                    <td class="mono">2,400</td>
-                                    <td>2026-06-23</td>
-                                    <td class="text-right mono">18,500</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--amber"></span>온라인 FFC</td>
-                                    <td class="mono">SN-003</td>
-                                    <td>산양분유 3단계</td>
-                                    <td class="text-right mono">8,750</td>
-                                    <td class="text-right mono">2,500</td>
-                                    <td class="text-right"><span class="badge badge--warning">3.5주</span></td>
-                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">7,500</td>
-                                    <td class="mono">2,400</td>
-                                    <td>2026-06-25</td>
-                                    <td class="text-right mono">22,000</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--amber"></span>오프라인 FFC</td>
-                                    <td class="mono">SN-002</td>
-                                    <td>산양분유 2단계</td>
-                                    <td class="text-right mono">12,400</td>
-                                    <td class="text-right mono">3,200</td>
-                                    <td class="text-right"><span class="badge badge--warning">3.9주</span></td>
-                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">9,600</td>
-                                    <td class="mono">4,800</td>
-                                    <td>2026-06-27</td>
-                                    <td class="text-right mono">28,000</td>
-                                </tr>
-                                <tr>
-                                    <td><span class="status-dot status-dot--amber"></span>바이아웃 채널</td>
-                                    <td class="mono">SN-001</td>
-                                    <td>산양분유 1단계</td>
-                                    <td class="text-right mono">15,300</td>
-                                    <td class="text-right mono">4,100</td>
-                                    <td class="text-right"><span class="badge badge--warning">3.7주</span></td>
-                                    <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">12,300</td>
-                                    <td class="mono">4,800</td>
-                                    <td>2026-06-26</td>
-                                    <td class="text-right mono">42,500</td>
-                                </tr>
+                                <tr><td colspan="10" class="empty-state">데이터를 불러오는 중...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </section>
+
+
         </main>
     </div>
 
-    <!-- MOQ 설정 모달 -->
-    <div id="moq-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="event.target===this && InventoryPage.closeMOQModal()">
-            <div class="modal-content" style="max-width: 700px;">
-                <h2>창고-SKU별 이관 MOQ 설정</h2>
-                <p style="color: var(--text-muted); margin-bottom: var(--space-lg); font-size: 0.85rem;">
-                    각 창고별, 상품별 이관 최소 수량(MOQ)을 설정합니다. 0은 제한 없음을 의미합니다.
-                </p>
-                <div style="display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: var(--space-sm); align-items: end; margin-bottom: var(--space-lg);">
+    <!-- 이관 계획 추가 모달 — 창고 선택 → 여러 SKU 한번에 입력 -->
+    <div id="transfer-modal" style="display: none;">
+        <div class="modal-backdrop" onclick="event.target===this && InventoryPage.closeTransferModal()">
+            <div class="modal-content" style="max-width: 720px;">
+                <h2 id="transfer-modal-title">이관 계획 추가</h2>
+                <input type="hidden" id="transfer-edit-id" value="">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-md); margin-bottom: var(--space-lg);">
                     <div class="form-group">
-                        <label class="form-label">창고</label>
-                        <select class="form-select" id="moq-ffc-select"></select>
+                        <label class="form-label">도착 창고</label>
+                        <select class="form-select" id="transfer-ffc" onchange="InventoryPage.onTransferFfcChange()">
+                        </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">품목</label>
-                        <select class="form-select" id="moq-product-select"></select>
+                        <label class="form-label">이관 예정일</label>
+                        <input type="date" class="form-input" id="transfer-date">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">MOQ (캔)</label>
-                        <input type="number" class="form-input" id="moq-value" min="0" value="0">
-                    </div>
-                    <button class="btn btn--primary" onclick="InventoryPage.saveMOQ()" style="margin-bottom: 2px;">저장</button>
                 </div>
-                <div class="data-table-wrapper" style="max-height: 300px; overflow-y: auto;">
-                    <table class="data-table" id="moq-list-table">
-                        <thead><tr><th>창고</th><th>품목</th><th class="text-right">이관 MOQ</th></tr></thead>
-                        <tbody>
+
+                <p style="font-size:0.82rem; font-weight:600; color:var(--text-secondary); margin-bottom: var(--space-sm);">SKU별 이관 수량</p>
+                <div class="data-table-wrapper" style="max-height: 300px; overflow-y: auto; margin-bottom: var(--space-lg);">
+                    <table class="data-table" id="transfer-sku-table">
+                        <thead>
                             <tr>
-                                <td>온라인 FFC</td>
-                                <td class="mono">SN-001</td>
-                                <td class="text-right mono" style="font-weight:600;">2,400</td>
+                                <th>품목코드</th>
+                                <th>품목명</th>
+                                <th class="text-right">도착지 현재고</th>
+                                <th class="text-right">HUB 가용</th>
+                                <th class="text-right">이관 수량</th>
                             </tr>
-                            <tr>
-                                <td>오프라인 FFC</td>
-                                <td class="mono">SN-002</td>
-                                <td class="text-right mono" style="font-weight:600;">4,800</td>
-                            </tr>
-                            <tr>
-                                <td>쿠팡 FFC</td>
-                                <td class="mono">SN-004</td>
-                                <td class="text-right mono" style="font-weight:600;">2,400</td>
-                            </tr>
+                        </thead>
+                        <tbody id="transfer-sku-body">
                         </tbody>
                     </table>
                 </div>
+
                 <div class="modal-actions">
-                    <button class="btn btn--secondary" onclick="InventoryPage.closeMOQModal()">닫기</button>
+                    <button class="btn btn--secondary" onclick="InventoryPage.closeTransferModal()">취소</button>
+                    <button class="btn btn--primary" onclick="InventoryPage.saveTransfer()">저장</button>
                 </div>
             </div>
         </div>
@@ -312,153 +203,412 @@
     <script src="/static/js/app.js"></script>
     <script>
         const InventoryPage = {
-            summaryData: [],
-            ffcs: [],
-            products: [],
+
+            // 샘플 데이터: 창고별, 품목별 실제 데이터
+            sampleFfcs: [
+                { id: 'hub', name: '용인 메인창고' },
+                { id: 'online', name: '온라인 FFC' },
+                { id: 'offline', name: '오프라인 FFC' },
+                { id: 'buyout', name: '바이아웃 채널' },
+                { id: 'coupang', name: '쿠팡 FFC' },
+            ],
+            sampleProducts: [
+                { code: 'SN-001', name: '산양분유 1단계', unitPrice: 22500 },
+                { code: 'SN-002', name: '산양분유 2단계', unitPrice: 21000 },
+                { code: 'SN-003', name: '산양분유 3단계', unitPrice: 22500 },
+                { code: 'SN-004', name: '산양분유 4단계', unitPrice: 20000 },
+            ],
+            // 창고별 × 품목별 실제 현재고 (없으면 해당 창고에 해당 품목 없음)
+            sampleInventory: [
+                { ffcId: 'hub', productCode: 'SN-001', qty: 42500, updated: '2026-06-19 09:15:42' },
+                { ffcId: 'hub', productCode: 'SN-002', qty: 28000, updated: '2026-06-19 09:15:42' },
+                { ffcId: 'hub', productCode: 'SN-003', qty: 22000, updated: '2026-06-19 09:15:42' },
+                { ffcId: 'hub', productCode: 'SN-004', qty: 18500, updated: '2026-06-19 09:15:42' },
+                { ffcId: 'online', productCode: 'SN-001', qty: 18200, updated: '2026-06-19 08:30:15' },
+                { ffcId: 'online', productCode: 'SN-003', qty: 8750, updated: '2026-06-19 08:30:15' },
+                { ffcId: 'offline', productCode: 'SN-002', qty: 12400, updated: '2026-06-18 17:45:08' },
+                { ffcId: 'buyout', productCode: 'SN-001', qty: 15300, updated: '2026-06-18 16:20:33' },
+                { ffcId: 'coupang', productCode: 'SN-001', qty: 5400, updated: '2026-06-19 07:55:20' },
+                { ffcId: 'coupang', productCode: 'SN-004', qty: 2300, updated: '2026-06-19 07:55:20' },
+            ],
+            sampleTransfers: [
+                { id: 1, ffcId: 'coupang', productCode: 'SN-004', currentStock: 2300, weeklyAvg: 820, weeksLeft: 2.8, transferQty: 4800, transferDate: '2026-06-23', hubAvail: 18500 },
+                { id: 2, ffcId: 'online', productCode: 'SN-003', currentStock: 8750, weeklyAvg: 2500, weeksLeft: 3.5, transferQty: 7500, transferDate: '2026-06-25', hubAvail: 22000 },
+                { id: 3, ffcId: 'offline', productCode: 'SN-002', currentStock: 12400, weeklyAvg: 3200, weeksLeft: 3.9, transferQty: 9600, transferDate: '2026-06-27', hubAvail: 28000 },
+                { id: 4, ffcId: 'buyout', productCode: 'SN-001', currentStock: 15300, weeklyAvg: 4100, weeksLeft: 3.7, transferQty: 12300, transferDate: '2026-06-26', hubAvail: 42500 },
+            ],
+            nextTransferId: 5,
+
+            init() {
+                this.routePage();
+                this.buildFilters();
+                this.renderInventoryTable();
+                this.renderTransferTable();
+                this.updateKPIs();
+            },
+
+            routePage() {
+                const path = window.location.pathname;
+                const isTransfer = path === '/inventory/transfer';
+                
+                document.getElementById('nav-inventory-sub').classList.toggle('active', !isTransfer);
+                document.getElementById('nav-transfer-sub').classList.toggle('active', isTransfer);
+                
+                if (isTransfer) {
+                    document.getElementById('inventory-kpi').style.display = 'none';
+                    document.getElementById('inventory-detail-section').style.display = 'none';
+                    document.getElementById('transfer-plan-section').style.display = 'block';
+                    document.getElementById('transfer-plan-section').classList.remove('section-gap');
+                    document.getElementById('main-page-title').textContent = '이관 계획';
+                    document.getElementById('main-page-subtitle').textContent = '물류센터 간 재고 이관 시뮬레이션 및 관리';
+                } else {
+                    document.getElementById('inventory-kpi').style.display = 'grid';
+                    document.getElementById('inventory-detail-section').style.display = 'block';
+                    document.getElementById('transfer-plan-section').style.display = 'none';
+                    document.getElementById('main-page-title').textContent = '현재고 상세';
+                    document.getElementById('main-page-subtitle').textContent = '창고별 현재고 보유량 관리';
+                }
+            },
+
+            getProduct(code) {
+                return this.sampleProducts.find(p => p.code === code);
+            },
+            getFfc(id) {
+                return this.sampleFfcs.find(f => f.id === id);
+            },
+
+            buildFilters() {
+                const filterGroup = document.getElementById('ffc-checkbox-filter');
+                // 실제 데이터에 존재하는 창고만 필터로 표시
+                const ffcIds = [...new Set(this.sampleInventory.map(i => i.ffcId))];
+                let html = '<label><input type="checkbox" value="all" checked onchange="InventoryPage.onFilterAll(this)"> 전체</label>';
+                ffcIds.forEach(id => {
+                    const ffc = this.getFfc(id);
+                    html += `<label><input type="checkbox" value="${id}" checked onchange="InventoryPage.onFilterChange()"> ${ffc ? ffc.name : id}</label>`;
+                });
+                filterGroup.innerHTML = html;
+            },
+
+            renderInventoryTable() {
+                const tbody = document.querySelector('#inventory-detail-table tbody');
+                const checked = this.getCheckedFfcs();
+
+                const rows = this.sampleInventory
+                    .filter(inv => checked.includes(inv.ffcId))
+                    .map(inv => {
+                        const ffc = this.getFfc(inv.ffcId);
+                        const prod = this.getProduct(inv.productCode);
+                        const value = prod ? inv.qty * prod.unitPrice : 0;
+                        const isLow = inv.qty < 5000;
+                        return `
+                            <tr data-ffc-id="${inv.ffcId}">
+                                <td><span class="status-dot ${isLow ? 'status-dot--amber' : 'status-dot--green'}"></span>${ffc ? ffc.name : inv.ffcId}</td>
+                                <td class="mono">${inv.productCode}</td>
+                                <td>${prod ? prod.name : ''}</td>
+                                <td class="text-right mono" style="font-weight:600;">${Format.number(inv.qty)}</td>
+                                <td class="text-right mono">${Format.currency(value)}</td>
+                                <td style="color: var(--text-muted);">${inv.updated}</td>
+                            </tr>`;
+                    });
+
+                tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="6" class="empty-state">선택된 창고에 데이터가 없습니다.</td></tr>';
+            },
+
+            getCheckedFfcs() {
+                const filterGroup = document.getElementById('ffc-checkbox-filter');
+                return Array.from(filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"]):checked')).map(cb => cb.value);
+            },
+
+            onFilterAll(checkbox) {
+                const filterGroup = document.getElementById('ffc-checkbox-filter');
+                filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"])').forEach(cb => { cb.checked = checkbox.checked; });
+                this.renderInventoryTable();
+                this.updateKPIs();
+            },
+
+            onFilterChange() {
+                const filterGroup = document.getElementById('ffc-checkbox-filter');
+                const checkboxes = filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"])');
+                const allCb = filterGroup.querySelector('input[value="all"]');
+                allCb.checked = Array.from(checkboxes).every(cb => cb.checked);
+                this.renderInventoryTable();
+                this.updateKPIs();
+            },
+
+            updateKPIs() {
+                const checked = this.getCheckedFfcs();
+                const filtered = this.sampleInventory.filter(inv => checked.includes(inv.ffcId));
+                let totalQty = 0, totalValue = 0;
+                filtered.forEach(inv => {
+                    const prod = this.getProduct(inv.productCode);
+                    totalQty += inv.qty;
+                    totalValue += prod ? inv.qty * prod.unitPrice : 0;
+                });
+
+                document.getElementById('inv-total-qty').textContent = Format.number(totalQty);
+                document.getElementById('inv-total-value').textContent = Format.currency(totalValue);
+                document.getElementById('inv-ffc-count').textContent = [...new Set(filtered.map(i => i.ffcId))].length;
+                document.getElementById('inv-transfer-count').textContent = this.sampleTransfers.length;
+            },
+
+            renderTransferTable() {
+                const tbody = document.querySelector('#transfer-rec-table tbody');
+                if (!this.sampleTransfers.length) {
+                    tbody.innerHTML = '<tr><td colspan="10" class="empty-state">등록된 이관 계획이 없습니다.</td></tr>';
+                    return;
+                }
+
+                // 창고별로 그룹핑
+                const grouped = {};
+                this.sampleTransfers.forEach(t => {
+                    if (!grouped[t.ffcId]) grouped[t.ffcId] = [];
+                    grouped[t.ffcId].push(t);
+                });
+
+                let html = '';
+                Object.keys(grouped).forEach(ffcId => {
+                    const items = grouped[ffcId];
+                    const ffc = this.getFfc(ffcId);
+                    items.forEach((t, idx) => {
+                        const prod = this.getProduct(t.productCode);
+                        const urgency = t.weeksLeft < 3 ? 'badge--danger' : 'badge--warning';
+                        const dotClass = t.weeksLeft < 3 ? 'status-dot--red' : 'status-dot--amber';
+                        html += `
+                            <tr data-transfer-id="${t.id}">
+                                <td>${idx === 0 ? `<span class="status-dot ${dotClass}"></span>${ffc ? ffc.name : ffcId}` : ''}</td>
+                                <td class="mono">${t.productCode}</td>
+                                <td>${prod ? prod.name : ''}</td>
+                                <td class="text-right mono">${Format.number(t.currentStock)}</td>
+                                <td class="text-right mono">${Format.number(t.weeklyAvg)}</td>
+                                <td class="text-right"><span class="badge ${urgency}">${t.weeksLeft.toFixed(1)}주</span></td>
+                                <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">${Format.number(t.transferQty)}</td>
+                                <td>${t.transferDate}</td>
+                                <td class="text-right mono">${Format.number(t.hubAvail)}</td>
+                                <td>
+                                    <div class="transfer-row-actions">
+                                        <button class="btn btn--secondary btn--sm" onclick="InventoryPage.editTransfer(${t.id})">편집</button>
+                                        <button class="btn btn--danger btn--sm" onclick="InventoryPage.deleteTransfer(${t.id})">삭제</button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                    });
+                });
+                tbody.innerHTML = html;
+            },
+
+            // 이관 계획 추가 모달 — 창고 선택 후 SKU 테이블
+            showTransferModal(editId) {
+                const isEdit = !!editId;
+                document.getElementById('transfer-modal-title').textContent = isEdit ? '이관 계획 편집' : '이관 계획 추가';
+                document.getElementById('transfer-edit-id').value = editId || '';
+
+                // 창고 셀렉트 채우기 (HUB 제외)
+                const ffcSelect = document.getElementById('transfer-ffc');
+                ffcSelect.innerHTML = this.sampleFfcs
+                    .filter(f => f.id !== 'hub')
+                    .map(f => `<option value="${f.id}">${f.name}</option>`)
+                    .join('');
+
+                document.getElementById('transfer-date').value = Format.todayShort();
+
+                if (isEdit) {
+                    const t = this.sampleTransfers.find(t => t.id === editId);
+                    if (t) {
+                        ffcSelect.value = t.ffcId;
+                        document.getElementById('transfer-date').value = t.transferDate;
+                    }
+                }
+
+                this.onTransferFfcChange();
+                document.getElementById('transfer-modal').style.display = 'block';
+            },
+
+            onTransferFfcChange() {
+                const ffcId = document.getElementById('transfer-ffc').value;
+                const editId = parseInt(document.getElementById('transfer-edit-id').value) || null;
+                const skuBody = document.getElementById('transfer-sku-body');
+
+                // 모든 SKU를 표시하고, 해당 창고의 현재고 및 HUB 가용량 표시
+                skuBody.innerHTML = this.sampleProducts.map(prod => {
+                    const destInv = this.sampleInventory.find(i => i.ffcId === ffcId && i.productCode === prod.code);
+                    const hubInv = this.sampleInventory.find(i => i.ffcId === 'hub' && i.productCode === prod.code);
+                    const destQty = destInv ? destInv.qty : 0;
+                    const hubQty = hubInv ? hubInv.qty : 0;
+
+                    // 편집 모드면 기존 값 채우기
+                    let existingQty = 0;
+                    if (editId) {
+                        const t = this.sampleTransfers.find(t => t.id === editId && t.productCode === prod.code);
+                        if (t) existingQty = t.transferQty;
+                    }
+
+                    return `
+                        <tr>
+                            <td class="mono">${prod.code}</td>
+                            <td>${prod.name}</td>
+                            <td class="text-right mono">${Format.number(destQty)}</td>
+                            <td class="text-right mono">${Format.number(hubQty)}</td>
+                            <td class="text-right">
+                                <input type="number" class="form-input" value="${existingQty}" min="0" step="100"
+                                    data-product="${prod.code}" style="width:110px; text-align:right;">
+                            </td>
+                        </tr>`;
+                }).join('');
+            },
+
+            closeTransferModal() {
+                document.getElementById('transfer-modal').style.display = 'none';
+            },
+
+            saveTransfer() {
+                const ffcId = document.getElementById('transfer-ffc').value;
+                const date = document.getElementById('transfer-date').value;
+                const editId = parseInt(document.getElementById('transfer-edit-id').value) || null;
+                const inputs = document.querySelectorAll('#transfer-sku-body input[type="number"]');
+                let added = 0;
+
+                if (editId) {
+                    // 편집: 기존 항목 업데이트
+                    inputs.forEach(input => {
+                        const qty = parseInt(input.value) || 0;
+                        const productCode = input.dataset.product;
+                        if (qty > 0) {
+                            const existing = this.sampleTransfers.find(t => t.id === editId && t.productCode === productCode);
+                            if (existing) {
+                                existing.transferQty = qty;
+                                existing.transferDate = date;
+                            }
+                            added++;
+                        }
+                    });
+                    Toast.show(`이관 계획 수정 완료 (${added}건)`, 'success');
+                } else {
+                    // 추가: 입력된 SKU만 새 이관 계획으로 추가
+                    inputs.forEach(input => {
+                        const qty = parseInt(input.value) || 0;
+                        const productCode = input.dataset.product;
+                        if (qty > 0) {
+                            const destInv = this.sampleInventory.find(i => i.ffcId === ffcId && i.productCode === productCode);
+                            const hubInv = this.sampleInventory.find(i => i.ffcId === 'hub' && i.productCode === productCode);
+                            this.sampleTransfers.push({
+                                id: this.nextTransferId++,
+                                ffcId,
+                                productCode,
+                                currentStock: destInv ? destInv.qty : 0,
+                                weeklyAvg: Math.round((destInv ? destInv.qty : 0) / 4),
+                                weeksLeft: destInv ? parseFloat((destInv.qty / Math.max((destInv.qty / 4), 1)).toFixed(1)) : 0,
+                                transferQty: qty,
+                                transferDate: date,
+                                hubAvail: hubInv ? hubInv.qty : 0,
+                            });
+                            added++;
+                        }
+                    });
+                    if (!added) { Toast.show('최소 1개 SKU에 이관 수량을 입력하세요'); return; }
+                    Toast.show(`이관 계획 ${added}건 추가 완료`, 'success');
+                }
+
+                this.renderTransferTable();
+                this.updateKPIs();
+                this.closeTransferModal();
+            },
+
+            editTransfer(id) {
+                this.showTransferModal(id);
+            },
+
+            deleteTransfer(id) {
+                if (!confirm('이관 계획을 삭제하시겠습니까?')) return;
+                this.sampleTransfers = this.sampleTransfers.filter(t => t.id !== id);
+                this.renderTransferTable();
+                this.updateKPIs();
+                Toast.show('이관 계획 삭제 완료', 'success');
+            },
 
             async load() {
                 try {
                     const [summary, ffcs, products, recs] = await Promise.all([
                         API.get('/api/inventory/summary'),
-                        API.get('/api/ffc'),
+                        API.get('/api/warehouses'),
                         API.get('/api/products'),
-                        API.get('/api/inventory/transfer-recommendations'),
+                        // API.get('/api/inventory/transfer-recommendations'), // Removed old endpoint
                     ]);
-                    this.summaryData = summary;
-                    this.ffcs = ffcs;
-                    this.products = products;
-
-                    let totalQty = 0, totalValue = 0;
-                    summary.forEach(f => { totalQty += f.total_qty; totalValue += f.total_value; });
-                    document.getElementById('inv-total-qty').textContent = Format.number(totalQty);
-                    document.getElementById('inv-total-value').textContent = Format.currency(totalValue);
-                    document.getElementById('inv-ffc-count').textContent = ffcs.length;
-                    document.getElementById('inv-transfer-count').textContent = recs.length;
-
-                    const filterSelect = document.getElementById('ffc-filter');
-                    filterSelect.innerHTML = '<option value="">전체 창고</option>';
-                    ffcs.forEach(f => {
-                        filterSelect.innerHTML += `<option value="${f.id}">${f.ffc_name} (${f.ffc_code})</option>`;
-                    });
-
-                    this.renderInventoryTable();
-                    this.renderTransferRecs(recs);
-                } catch (err) {
-                    console.error(err);
+                    // Replace sample data with API data if available
+                    if (summary && summary.length) {
+                        this.sampleInventory = summary.map(s => ({
+                            ffcId: s.ffc_id || s.ffcId || s.warehouse_name,
+                            productCode: s.product_code || s.productCode,
+                            qty: s.current_can_qty || s.qty || 0,
+                            updated: s.updated_at || s.updated || Format.dateTime()
+                        }));
+                    }
+                    if (ffcs && ffcs.length) {
+                        this.sampleFfcs = ffcs.map(f => ({ id: f.id || f.ffc_id || f.warehouse_name, name: f.name || f.warehouse_name || f.ffc_name }));
+                    }
+                    if (products && products.length) {
+                        this.sampleProducts = products.map(p => ({
+                            code: p.product_code || p.code,
+                            name: p.product_name || p.name,
+                            unitPrice: p.unit_price || p.unitPrice || 0
+                        }));
+                    }
+                    this.init();
+                } catch(e) {
+                    // API not available — use sample data
+                }
+                // Load transfer plans from API
+                try {
+                    const transfers = await API.get('/api/transfer-plan');
+                    if (transfers && transfers.length) {
+                        this.sampleTransfers = transfers.map(t => ({
+                            id: t.id,
+                            ffcId: t.ffc_id || t.ffcId,
+                            productCode: t.product_code || t.productCode,
+                            currentStock: t.current_stock || 0,
+                            weeklyAvg: t.weekly_avg || 0,
+                            weeksLeft: t.weeks_left || 0,
+                            transferQty: t.transfer_qty || 0,
+                            transferDate: t.transfer_date || '',
+                            hubAvail: t.hub_avail || 0,
+                        }));
+                        this.renderTransferTable();
+                        this.updateKPIs();
+                    }
+                } catch(e) {
+                    // Keep sample transfers
                 }
             },
 
-            renderInventoryTable(filterFfcId) {
-                const tbody = document.querySelector('#inventory-detail-table tbody');
-                let rows = [];
-
-                this.summaryData.forEach(ffc => {
-                    if (filterFfcId && ffc.ffc_id !== parseInt(filterFfcId)) return;
-                    ffc.products.forEach(prod => {
-                        rows.push(`
-                            <tr>
-                                <td><span class="status-dot status-dot--green"></span>${ffc.ffc_name}</td>
-                                <td class="mono">${prod.product_code}</td>
-                                <td>${prod.product_name}</td>
-                                <td class="text-right mono" style="font-weight:600;">${Format.number(prod.total_qty)}</td>
-                                <td class="text-right mono">${Format.currency(prod.total_value)}</td>
-                                <td style="color: var(--text-muted);">${prod.batches.length > 0 ? prod.batches.length + '건 배치' : '-'}</td>
-                            </tr>
-                        `);
-                    });
-                });
-
-                if (rows.length) tbody.innerHTML = rows.join('');
-            },
-
-            renderTransferRecs(recs) {
-                const tbody = document.querySelector('#transfer-rec-table tbody');
-                if (!recs.length) return;
-                tbody.innerHTML = recs.map(r => {
-                    const urgency = r.weeks_remaining < 2 ? 'badge--danger' : 'badge--warning';
-                    return `
-                        <tr>
-                            <td><span class="status-dot ${r.weeks_remaining < 2 ? 'status-dot--red' : 'status-dot--amber'}"></span>${r.ffc_name}</td>
-                            <td class="mono">${r.product_code}</td>
-                            <td>${r.product_name}</td>
-                            <td class="text-right mono">${Format.number(r.current_stock)}</td>
-                            <td class="text-right mono">${Format.number(r.weekly_avg_outflow)}</td>
-                            <td class="text-right"><span class="badge ${urgency}">${r.weeks_remaining}주</span></td>
-                            <td class="text-right mono" style="font-weight:700; color: var(--accent-main);">${Format.number(r.suggested_qty)}</td>
-                            <td class="mono">${Format.number(r.transfer_moq)}</td>
-                            <td>${r.recommended_date}</td>
-                            <td class="text-right mono">${Format.number(r.hub_available)}</td>
-                        </tr>`;
-                }).join('');
-            },
-
-            showMOQModal() {
-                const modal = document.getElementById('moq-modal');
-                const ffcSelect = document.getElementById('moq-ffc-select');
-                const prodSelect = document.getElementById('moq-product-select');
-                ffcSelect.innerHTML = this.ffcs.map(f => `<option value="${f.id}">${f.ffc_name}</option>`).join('');
-                prodSelect.innerHTML = this.products.map(p => `<option value="${p.id}">${p.product_code} - ${p.product_name}</option>`).join('');
-                this.loadMOQList();
-                modal.style.display = 'block';
-            },
-
-            closeMOQModal() {
-                document.getElementById('moq-modal').style.display = 'none';
-            },
-
-            async loadMOQList() {
-                try {
-                    const moqs = await API.get('/api/ffc-product-moq');
-                    const tbody = document.querySelector('#moq-list-table tbody');
-                    if (!moqs.length) return;
-                    const ffcMap = Object.fromEntries(this.ffcs.map(f => [f.id, f.ffc_name]));
-                    const prodMap = Object.fromEntries(this.products.map(p => [p.id, p.product_code]));
-                    tbody.innerHTML = moqs.map(m => `
-                        <tr>
-                            <td>${ffcMap[m.ffc_id] || m.ffc_id}</td>
-                            <td class="mono">${prodMap[m.product_id] || m.product_id}</td>
-                            <td class="text-right mono" style="font-weight:600;">${Format.number(m.transfer_moq)}</td>
-                        </tr>
-                    `).join('');
-                } catch(e) {}
-            },
-
-            async saveMOQ() {
-                const ffc_id = parseInt(document.getElementById('moq-ffc-select').value);
-                const product_id = parseInt(document.getElementById('moq-product-select').value);
-                const transfer_moq = parseInt(document.getElementById('moq-value').value) || 0;
-                try {
-                    await API.post('/api/ffc-product-moq', { ffc_id, product_id, transfer_moq });
-                    Toast.show('이관 MOQ 저장 완료');
-                    this.loadMOQList();
-                } catch(e) {}
-            },
-
-            async uploadInventory(file) {
-                const formData = new FormData();
-                formData.append('file', file);
-                try {
-                    const result = await API.postFormData('/api/inventory/upload', formData);
-                    Toast.show(`${result.message} (입력: ${result.rows_inserted}, 수정: ${result.rows_updated})`);
-                    this.load();
-                } catch(e) {}
+            async uploadTransferExcel(file) {
+                Toast.show('이관 계획 엑셀 업로드: 파싱 후 테이블에 반영됩니다.');
+                // TODO: API 연동 시 실제 파싱 처리
             }
         };
 
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
-            InventoryPage.load().catch(() => {
-                // API not available, keep sample data
-            });
+            InventoryPage.init();
+            InventoryPage.load();
 
-            document.getElementById('inventory-upload').addEventListener('change', (e) => {
+            document.getElementById('inventory-upload').addEventListener('change', async (e) => {
                 const file = e.target.files[0];
-                if (file) InventoryPage.uploadInventory(file);
+                if (!file) return;
                 e.target.value = '';
+                const formData = new FormData();
+                formData.append('file', file);
+                try {
+                    const result = await API.postFormData('/api/inventory/upload', formData);
+                    Toast.show(`${result.message} (${result.rows_inserted}건 추가, ${result.rows_updated}건 수정)`, 'success');
+                    InventoryPage.load();
+                } catch(err) {
+                    // Error already shown by API handler
+                }
             });
 
-            document.getElementById('ffc-filter').addEventListener('change', (e) => {
-                InventoryPage.renderInventoryTable(e.target.value);
+            document.getElementById('transfer-upload').addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) InventoryPage.uploadTransferExcel(file);
+                e.target.value = '';
             });
         });
     </script>

@@ -20,22 +20,28 @@
             </div>
             <nav class="sidebar-nav">
                 <a href="/"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <a href="/inventory"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                <div class="nav-group">
+                    <a href="/inventory" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
+                    <div class="nav-sub">
+                        <a href="/inventory">현재고 상세</a>
+                        <a href="/inventory/transfer">이관 계획</a>
+                    </div>
+                </div>
                 <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>유통기한 관리</span></a>
                 <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
                 <a href="/matching"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고 관리</span></a>
                 <a href="/users" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>시스템 운영</span></a>
             </nav>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="sidebar-user-avatar">A</div>
-                    <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">Guest</span>
-                        <span class="user-role" id="sidebar-user-role"></span>
-                    </div>
+            <div class="sidebar-user-info">
+                <div class="user-avatar">U</div>
+                <div class="user-meta">
+                    <div class="user-name">로딩 중...</div>
+                    <div class="user-role">-</div>
                 </div>
+            </div>
+            <div class="sidebar-footer">
                 <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon">☾</span>
+                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
                     <span class="theme-toggle-text">Dark</span>
                 </button>
                 <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
@@ -44,29 +50,34 @@
 
         <main class="main-content">
             <div class="page-header">
-                <h1 class="page-title">시스템 운영</h1>
-                <p class="page-subtitle">데이터 양식, 창고, 사용자 및 백업 관리</p>
+                <div class="page-header-left">
+                    <h1 class="page-title">시스템 운영</h1>
+                    <p class="page-subtitle">데이터 양식, 창고, 사용자 및 백업 관리</p>
+                </div>
             </div>
 
             <!-- 데이터 양식 관리 -->
             <section class="card section-gap">
-                <div class="card-header">
+                <div class="card-header collapsible-header" id="template-header" onclick="toggleCollapsible('template-header')">
                     <h2 class="card-title">데이터 양식 관리</h2>
-                    <button class="btn btn--primary" onclick="downloadTemplate('all')">전체 양식 엑셀 다운로드</button>
+                    <div class="btn-group" onclick="event.stopPropagation();">
+                        <button class="btn btn--primary" onclick="downloadTemplate('all')">전체 양식 엑셀 다운로드</button>
+                    </div>
+                    <span class="collapse-icon">▼</span>
                 </div>
-                <div class="card-body">
+                <div class="card-body collapsible-body" id="template-body">
                     <p style="color: var(--text-muted); margin-bottom: var(--space-lg); font-size: 0.85rem;">
                         종류별 고정 양식을 개별 다운로드하거나, 전체를 한꺼번에 받을 수 있습니다.
                     </p>
                     <div class="template-grid">
                         <div class="template-card" onclick="downloadTemplate('product_master')">
-                            <span class="label">상품마스터</span>
+                            <span class="label">품목DB</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('ffc_master')">
-                            <span class="label">창고마스터</span>
+                            <span class="label">창고DB</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('logistics_cost')">
-                            <span class="label">물류비마스터</span>
+                            <span class="label">물류비DB</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('production')">
                             <span class="label">생산완료</span>
@@ -86,11 +97,14 @@
 
             <!-- 창고 관리 (ADMIN ONLY) -->
             <section class="card section-gap" id="warehouse-section">
-                <div class="card-header">
+                <div class="card-header collapsible-header" id="warehouse-header" onclick="toggleCollapsible('warehouse-header')">
                     <h2 class="card-title">창고 관리</h2>
-                    <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddWarehouseModal()">+ 창고 추가</button>
+                    <div class="btn-group" onclick="event.stopPropagation();">
+                        <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddWarehouseModal()">+ 창고 추가</button>
+                    </div>
+                    <span class="collapse-icon">▼</span>
                 </div>
-                <div class="card-body card-body--no-pad">
+                <div class="card-body collapsible-body card-body--no-pad" id="warehouse-body">
                     <div class="data-table-wrapper">
                         <table class="data-table" id="warehouse-table">
                             <thead>
@@ -181,14 +195,51 @@
                 </div>
             </section>
 
+            <!-- 품목 관리 -->
+            <section class="card section-gap">
+                <div class="card-header collapsible-header" id="product-header" onclick="toggleCollapsible('product-header')">
+                    <div style="display:flex; align-items:center; gap:var(--space-md); flex:1;">
+                        <h2 class="card-title">품목 관리</h2>
+                    </div>
+                    <div class="btn-group" onclick="event.stopPropagation();">
+                        <input type="file" id="product-upload" accept=".xlsx" style="display:none;">
+                        <button class="btn btn--secondary btn--sm" onclick="document.getElementById('product-upload').click()">엑셀 업로드</button>
+                        <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddProductModal()">+ 품목 추가</button>
+                    </div>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="card-body collapsible-body card-body--no-pad" id="product-body">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="product-table">
+                            <thead>
+                                <tr>
+                                    <th>품목코드</th>
+                                    <th>품목명</th>
+                                    <th class="text-right">캔/카툰</th>
+                                    <th>환율단위</th>
+                                    <th class="text-right">매입가</th>
+                                    <th>관리</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="empty-state">데이터를 불러오는 중...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <section class="content-grid content-grid--two section-gap">
                 <!-- User Management -->
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header collapsible-header" id="user-header" onclick="toggleCollapsible('user-header')">
                         <h2 class="card-title">사용자 관리</h2>
-                        <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddUserModal()">+ 계정 추가</button>
+                        <div class="btn-group" onclick="event.stopPropagation();">
+                            <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddUserModal()">+ 계정 추가</button>
+                        </div>
+                        <span class="collapse-icon">▼</span>
                     </div>
-                    <div class="card-body card-body--no-pad">
+                    <div class="card-body collapsible-body card-body--no-pad" id="user-body">
                         <div class="data-table-wrapper">
                             <table class="data-table" id="users-table">
                                 <thead>
@@ -226,11 +277,14 @@
 
                 <!-- Snapshot Management -->
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header collapsible-header" id="snapshot-header" onclick="toggleCollapsible('snapshot-header')">
                         <h2 class="card-title">DB 스냅샷 (백업) 이력</h2>
-                        <button class="btn btn--secondary btn--sm" onclick="AdminPage.triggerSnapshot()">수동 스냅샷 생성</button>
+                        <div class="btn-group" onclick="event.stopPropagation();">
+                            <button class="btn btn--secondary btn--sm" onclick="AdminPage.triggerSnapshot()">수동 스냅샷 생성</button>
+                        </div>
+                        <span class="collapse-icon">▼</span>
                     </div>
-                    <div class="card-body card-body--no-pad">
+                    <div class="card-body collapsible-body card-body--no-pad" id="snapshot-body">
                         <div class="data-table-wrapper">
                             <table class="data-table" id="snapshot-table">
                                 <thead>
@@ -264,6 +318,56 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 이관 MOQ 관리 -->
+            <section class="card section-gap">
+                <div class="card-header collapsible-header" id="moq-header" onclick="toggleCollapsible('moq-header')">
+                    <h2 class="card-title">창고-SKU별 이관 MOQ 설정</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="card-body collapsible-body" id="moq-body">
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-lg); font-size: 0.85rem;">
+                        각 창고별, 상품별 이관 최소 수량(MOQ)을 설정합니다. 0은 제한 없음을 의미합니다.
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 120px auto; gap: var(--space-sm); align-items: end; margin-bottom: var(--space-lg);">
+                        <div class="form-group">
+                            <label class="form-label">창고</label>
+                            <select class="form-select" id="moq-ffc-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">품목</label>
+                            <select class="form-select" id="moq-product-select"></select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">MOQ (캔)</label>
+                            <input type="number" class="form-input" id="moq-value" min="0" value="0">
+                        </div>
+                        <button class="btn btn--primary" onclick="AdminPage.saveMOQ()" style="margin-bottom: 2px;">저장</button>
+                    </div>
+                    <div class="data-table-wrapper" style="max-height: 300px; overflow-y: auto;">
+                        <table class="data-table" id="moq-list-table">
+                            <thead><tr><th>창고</th><th>품목</th><th class="text-right">이관 MOQ</th></tr></thead>
+                            <tbody>
+                                <tr>
+                                    <td>온라인 FFC</td>
+                                    <td class="mono">SN-001</td>
+                                    <td class="text-right mono" style="font-weight:600;">2,400</td>
+                                </tr>
+                                <tr>
+                                    <td>오프라인 FFC</td>
+                                    <td class="mono">SN-002</td>
+                                    <td class="text-right mono" style="font-weight:600;">4,800</td>
+                                </tr>
+                                <tr>
+                                    <td>쿠팡 FFC</td>
+                                    <td class="mono">SN-004</td>
+                                    <td class="text-right mono" style="font-weight:600;">2,400</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </section>
@@ -344,12 +448,52 @@
         </div>
     </div>
 
+    <!-- 품목 추가/수정 모달 -->
+    <div id="product-modal" style="display:none;">
+        <div class="modal-backdrop" onclick="event.target===this && AdminPage.closeProductModal()">
+            <div class="modal-content">
+                <h2 id="product-modal-title">품목 추가</h2>
+                <input type="hidden" id="prod-edit-id" value="">
+                <div class="form-group" style="margin-bottom:var(--space-md);">
+                    <label class="form-label">품목코드 *</label>
+                    <input type="text" id="prod-code" class="form-input" placeholder="예: SN-001">
+                </div>
+                <div class="form-group" style="margin-bottom:var(--space-md);">
+                    <label class="form-label">품목명 *</label>
+                    <input type="text" id="prod-name" class="form-input" placeholder="예: 산양분유 1단계">
+                </div>
+                <div class="form-group" style="margin-bottom:var(--space-md);">
+                    <label class="form-label">캔/카툰 (카툰당 입수량) *</label>
+                    <input type="number" id="prod-pcs" class="form-input" value="24" min="1">
+                </div>
+                <div class="form-group" style="margin-bottom:var(--space-md);">
+                    <label class="form-label">환율단위 *</label>
+                    <select id="prod-currency" class="form-select">
+                        <option value="USD">USD (미국 달러)</option>
+                        <option value="EUR">EUR (유로)</option>
+                        <option value="AUD">AUD (호주 달러)</option>
+                        <option value="NZD">NZD (뉴질랜드 달러)</option>
+                        <option value="GBP">GBP (영국 파운드)</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom:var(--space-lg);">
+                    <label class="form-label">매입가 (외화) *</label>
+                    <input type="number" id="prod-price" class="form-input" step="0.01" value="0" min="0">
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn--secondary" onclick="AdminPage.closeProductModal()">취소</button>
+                    <button class="btn btn--primary" onclick="AdminPage.saveProduct()">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div id="toast-container" class="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script>
         const AdminPage = {
             async load() {
-                await Promise.all([this.loadUsers(), this.loadSnapshots(), this.loadWarehouses()]);
+                await Promise.all([this.loadUsers(), this.loadSnapshots(), this.loadWarehouses(), this.loadMOQ(), this.loadProducts()]);
             },
 
             // ─── 창고 관리 ─────────────────────────────────
@@ -526,6 +670,144 @@
                 } catch(e) {
                     Toast.show('스냅샷 생성 실패 (관리자 권한 필요)');
                 }
+            },
+
+            // ─── 이관 MOQ 관리 ───────────────────────────────
+            async loadMOQ() {
+                try {
+                    const [ffcs, products] = await Promise.all([
+                        API.get('/api/ffc'),
+                        API.get('/api/products'),
+                    ]);
+                    // Populate selects
+                    const ffcSelect = document.getElementById('moq-ffc-select');
+                    const prodSelect = document.getElementById('moq-product-select');
+                    if (ffcSelect) {
+                        ffcSelect.innerHTML = ffcs.map(f => `<option value="${f.id}">${f.ffc_name}</option>`).join('');
+                    }
+                    if (prodSelect) {
+                        prodSelect.innerHTML = products.map(p => `<option value="${p.id}">${p.product_code} - ${p.product_name}</option>`).join('');
+                    }
+
+                    // Load existing MOQs
+                    const moqs = await API.get('/api/ffc-product-moq');
+                    const tbody = document.querySelector('#moq-list-table tbody');
+                    if (moqs && moqs.length && tbody) {
+                        const ffcMap = Object.fromEntries(ffcs.map(f => [f.id, f.ffc_name]));
+                        const prodMap = Object.fromEntries(products.map(p => [p.id, p.product_code]));
+                        tbody.innerHTML = moqs.map(m => `
+                            <tr>
+                                <td>${ffcMap[m.ffc_id] || m.ffc_id}</td>
+                                <td class="mono">${prodMap[m.product_id] || m.product_id}</td>
+                                <td class="text-right mono" style="font-weight:600;">${Format.number(m.transfer_moq)}</td>
+                            </tr>
+                        `).join('');
+                    }
+                } catch(e) { console.error(e); }
+            },
+
+            async saveMOQ() {
+                const ffc_id = parseInt(document.getElementById('moq-ffc-select').value);
+                const product_id = parseInt(document.getElementById('moq-product-select').value);
+                const transfer_moq = parseInt(document.getElementById('moq-value').value) || 0;
+                try {
+                    await API.post('/api/ffc-product-moq', { ffc_id, product_id, transfer_moq });
+                    Toast.show('이관 MOQ 저장 완료');
+                    this.loadMOQ();
+                } catch(e) {}
+            },
+
+            // ─── 품목 관리 ───────────────────────────────
+            async loadProducts() {
+                try {
+                    const products = await API.get('/api/products');
+                    const tbody = document.querySelector('#product-table tbody');
+                    if (!products.length) {
+                        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">등록된 품목이 없습니다</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = products.map(p => `
+                        <tr>
+                            <td class="mono">${p.product_code}</td>
+                            <td>${p.product_name}</td>
+                            <td class="text-right mono">${p.pack_qty_per_tu || '-'}</td>
+                            <td class="mono">${p.currency_unit || 'USD'}</td>
+                            <td class="text-right mono">${(p.purchase_price || 0).toFixed(2)}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <button class="btn btn--secondary btn--sm" onclick="AdminPage.editProduct(${p.id})">수정</button>
+                                    <button class="btn btn--danger btn--sm" onclick="AdminPage.deleteProduct(${p.id}, '${p.product_name}')">삭제</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                } catch(e) { console.error(e); }
+            },
+
+            showAddProductModal() {
+                document.getElementById('product-modal-title').textContent = '품목 추가';
+                document.getElementById('prod-edit-id').value = '';
+                document.getElementById('prod-code').value = '';
+                document.getElementById('prod-code').disabled = false;
+                document.getElementById('prod-name').value = '';
+                document.getElementById('prod-pcs').value = 24;
+                document.getElementById('prod-currency').value = 'USD';
+                document.getElementById('prod-price').value = 0;
+                document.getElementById('product-modal').style.display = 'block';
+            },
+
+            editProduct(id) {
+                const row = document.querySelector(`#product-table tbody tr:has(button[onclick*="editProduct(${id})"])`);
+                if (!row) return;
+                const cells = row.querySelectorAll('td');
+                document.getElementById('product-modal-title').textContent = '품목 수정';
+                document.getElementById('prod-edit-id').value = id;
+                document.getElementById('prod-code').value = cells[0].textContent.trim();
+                document.getElementById('prod-code').disabled = true;
+                document.getElementById('prod-name').value = cells[1].textContent.trim();
+                document.getElementById('prod-pcs').value = parseInt(cells[2].textContent) || 24;
+                document.getElementById('prod-currency').value = cells[3].textContent.trim() || 'USD';
+                document.getElementById('prod-price').value = parseFloat(cells[4].textContent) || 0;
+                document.getElementById('product-modal').style.display = 'block';
+            },
+
+            closeProductModal() {
+                document.getElementById('product-modal').style.display = 'none';
+            },
+
+            async saveProduct() {
+                const editId = document.getElementById('prod-edit-id').value;
+                const data = {
+                    product_code: document.getElementById('prod-code').value.trim(),
+                    product_name: document.getElementById('prod-name').value.trim(),
+                    pack_qty_per_tu: parseInt(document.getElementById('prod-pcs').value) || 24,
+                    currency_unit: document.getElementById('prod-currency').value || 'USD',
+                    purchase_price: parseFloat(document.getElementById('prod-price').value) || 0,
+                };
+                if (!data.product_code || !data.product_name) {
+                    Toast.show('품목코드와 품목명은 필수입니다');
+                    return;
+                }
+                try {
+                    if (editId) {
+                        await API.put(`/api/products/${editId}`, data);
+                        Toast.show('품목 수정 완료', 'success');
+                    } else {
+                        await API.post('/api/products', data);
+                        Toast.show('품목 등록 완료', 'success');
+                    }
+                    this.closeProductModal();
+                    this.loadProducts();
+                } catch(e) {}
+            },
+
+            async deleteProduct(id, name) {
+                if (!confirm(`품목 '${name}'을(를) 삭제하시겠습니까?`)) return;
+                try {
+                    await API.delete(`/api/products/${id}`);
+                    Toast.show('품목 삭제 완료', 'success');
+                    this.loadProducts();
+                } catch(e) {}
             }
         };
 
@@ -533,6 +815,22 @@
             Theme.init();
             AdminPage.load().catch(() => {
                 // API not available, keep sample data
+            });
+
+            // Product excel upload handler
+            document.getElementById('product-upload')?.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                e.target.value = '';
+                const formData = new FormData();
+                formData.append('file', file);
+                try {
+                    const result = await API.postFormData('/api/products/upload', formData);
+                    Toast.show(result.message || '품목 업로드 완료', 'success');
+                    AdminPage.loadProducts();
+                } catch(err) {
+                    Toast.show('업로드 실패: 양식을 확인해주세요', 'error');
+                }
             });
         });
     </script>

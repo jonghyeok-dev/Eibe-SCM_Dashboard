@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EIBE SCM | 입고 관리</title>
+    <title>EIBE SCM | ?�고 관�?/title>
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
     <div class="app-wrapper">
         <aside class="app-sidebar">
-            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="?�이?�바 ?�기/?�치�?>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
             </button>
             <div class="sidebar-brand">
@@ -17,170 +17,179 @@
                 <h1>EIBE SCM</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <a href="/inventory"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
-                <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>유통기한 관리</span></a>
-                <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
-                <a href="/matching" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고 관리</span></a>
-                <a href="/users"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>시스템 운영</span></a>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="sidebar-user-avatar">A</div>
-                    <div class="user-details">
-                        <span class="user-name" id="sidebar-user-name">Guest</span>
-                        <span class="user-role" id="sidebar-user-role"></span>
+                <a href="/"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>?�약</span></a>
+                <div class="nav-group">
+                    <a href="/inventory" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>?�재�??�황</span></a>
+                    <div class="nav-sub">
+                        <a href="/inventory">?�재�??�세</a>
+                        <a href="/inventory/transfer">?��? 계획</a>
                     </div>
                 </div>
+                <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>?�통기한 관�?/span></a>
+                <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
+                <a href="/matching" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>?�고 관�?/span></a>
+                <a href="/users"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>?�스???�영</span></a>
+            </nav>
+            <div class="sidebar-user-info">
+                <div class="user-avatar">U</div>
+                <div class="user-meta">
+                    <div class="user-name">로딩 �?..</div>
+                    <div class="user-role">-</div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
                 <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon">☾</span>
+                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
                     <span class="theme-toggle-text">Dark</span>
                 </button>
-                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
+                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그?�웃</button>
             </div>
         </aside>
 
         <main class="main-content">
             <div class="page-header">
-                <h1 class="page-title">입고 관리</h1>
-                <p class="page-subtitle">발주-생산-인보이스 매칭 및 데이터 수집</p>
+                <div class="page-header-left">
+                    <h1 class="page-title">?�고 관�?/h1>
+                    <p class="page-subtitle">발주-?�산-?�보?�스 매칭 �??�이???�집</p>
+                </div>
             </div>
 
-            <!-- 데이터 수집 -->
+            <!-- ?�이???�집 -->
             <section class="card section-gap">
-                <div class="card-header">
-                    <h2 class="card-title">데이터 수집</h2>
-                    <div class="btn-group">
-                        <button class="btn btn--primary" onclick="Matching.runAutoMatch()">자동 매칭 실행</button>
-                    </div>
+                <div class="card-header collapsible-header" id="upload-header" onclick="toggleCollapsible('upload-header')">
+                    <h2 class="card-title">?�이???�집</h2>
+                    <span class="collapse-icon">??/span>
                 </div>
-                <div class="card-body">
+                <div class="card-body collapsible-body" id="upload-body">
                     <p style="color: var(--text-muted); margin-bottom: var(--space-lg); font-size: 0.85rem;">
-                        아래 양식을 다운로드하여 데이터를 작성한 후 업로드하세요.
+                        ?�래 ?�식???�운로드?�여 ?�이?��? ?�성?????�로?�하?�요.
                     </p>
                     <div class="template-grid" style="margin-bottom: var(--space-xl);">
+                        <div class="template-card" onclick="downloadTemplate('order')">
+                            <span class="label">발주</span>
+                        </div>
                         <div class="template-card" onclick="downloadTemplate('production')">
-                            <span class="label">생산완료</span>
+                            <span class="label">?�산</span>
                         </div>
                         <div class="template-card" onclick="downloadTemplate('invoice')">
-                            <span class="label">매입인보이스</span>
+                            <span class="label">?�보?�스</span>
                         </div>
-                        <div class="template-card" onclick="downloadTemplate('expected_inbound')">
-                            <span class="label">입고예정</span>
-                        </div>
-                        <div class="template-card" onclick="downloadTemplate('current_inventory')">
-                            <span class="label">현재고스냅샷</span>
-                        </div>
-                    </div>
-                    <div class="upload-panel">
-                        <div>
-                            <h3 style="margin-bottom: 5px; font-size: 0.9rem;">엑셀 데이터 업로드</h3>
-                            <p style="font-size: 0.82rem; color: var(--text-muted);">작성한 양식 파일을 선택하여 업로드하세요.</p>
-                        </div>
-                        <div style="flex: 1;"></div>
-                        <input type="file" id="excel-upload" accept=".xlsx" style="display: none;">
-                        <button class="btn btn--primary" onclick="document.getElementById('excel-upload').click()">엑셀 업로드</button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 3탭 매칭 보드 -->
-            <section class="card section-gap" id="matching-tabs">
-                <div class="card-header">
-                    <h2 class="card-title">입고 매칭 보드</h2>
-                </div>
-                <div class="card-body">
-                    <div class="tab-nav">
-                        <button class="active" data-tab="order-qty" onclick="switchTab('matching-tabs', 'order-qty')">발주수량</button>
-                        <button data-tab="production" onclick="switchTab('matching-tabs', 'production')">생산완료수량</button>
-                        <button data-tab="invoice" onclick="switchTab('matching-tabs', 'invoice')">인보이스수량</button>
-                    </div>
-
-                    <!-- Tab: 발주수량 -->
-                    <div class="tab-content active" id="tab-order-qty">
-                        <div class="data-table-wrapper">
-                            <table class="data-table" id="order-qty-table">
-                                <thead>
-                                    <tr>
-                                        <th>품목코드</th>
-                                        <th>발주월</th>
-                                        <th>세일즈 오더 No.</th>
-                                        <th class="text-right">발주수량 (캔)</th>
-                                        <th>등록일</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="5" class="empty-state">데이터를 불러오는 중...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Tab: 생산완료수량 -->
-                    <div class="tab-content" id="tab-production">
-                        <div class="data-table-wrapper">
-                            <table class="data-table" id="production-table">
-                                <thead>
-                                    <tr>
-                                        <th>품목코드</th>
-                                        <th>세일즈 오더 No.</th>
-                                        <th>생산년월</th>
-                                        <th class="text-right">생산수량 (캔)</th>
-                                        <th class="text-center">매칭 상태</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="5" class="empty-state">데이터를 불러오는 중...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Tab: 인보이스수량 -->
-                    <div class="tab-content" id="tab-invoice">
-                        <div class="data-table-wrapper">
-                            <table class="data-table" id="invoice-table">
-                                <thead>
-                                    <tr>
-                                        <th>품목코드</th>
-                                        <th>세일즈 오더 No.</th>
-                                        <th>생산년월</th>
-                                        <th>인보이스 번호</th>
-                                        <th class="text-right">인보이스수량 (캔)</th>
-                                        <th class="text-center">매칭 상태</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr><td colspan="6" class="empty-state">데이터를 불러오는 중...</td></tr>
-                                </tbody>
-                            </table>
+                        <div class="template-card" onclick="downloadTemplate('inbound')">
+                            <span class="label">?�고</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- 매칭 이력 -->
-            <section class="card">
-                <div class="card-header">
-                    <h2 class="card-title">매칭 처리 이력</h2>
-                    <button class="btn btn--secondary btn--sm" onclick="Toast.show('매칭이력 내보내기 기능은 준비 중입니다.')">매칭이력 엑셀 다운로드</button>
+            <!-- 매칭 ?�션 �?-->
+            <div class="matching-action-bar" id="matching-action-bar">
+                <div class="selection-summary" id="selection-summary">
+                    �??�이블에??매칭????��???�택?�세??(2~3�??�이블에??�?1건씩)
                 </div>
-                <div class="card-body card-body--no-pad">
-                    <div class="data-table-wrapper">
-                        <table class="data-table" id="matching-history-table">
+                <button class="btn btn--primary" id="btn-create-match" onclick="Matching.createMatch()" disabled>?�택 ??�� 매칭</button>
+                <button class="btn btn--secondary" onclick="Matching.clearSelections()">?�택 초기??/button>
+            </div>
+
+            <!-- 3?�이�?매칭 보드 -->
+            <div class="matching-board-grid">
+                <!-- 발주 ?�널 -->
+                <div class="matching-panel">
+                    <div class="panel-header">
+                        <h3>발주</h3>
+                        <span class="panel-count" id="order-count">0�?/span>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table" id="order-qty-table">
                             <thead>
                                 <tr>
-                                    <th>생산년월</th>
-                                    <th>인보이스번호</th>
-                                    <th>품목</th>
-                                    <th class="text-right">생산수량</th>
-                                    <th class="text-right">인보이스수량</th>
-                                    <th class="text-right">불일치율</th>
-                                    <th>매칭일시</th>
+                                    <th style="width:32px;"></th>
+                                    <th>?�목코드</th>
+                                    <th>발주??/th>
+                                    <th class="text-right">?�량</th>
+                                    <th>?�태</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr><td colspan="7" class="empty-state">매칭 이력이 없습니다.</td></tr>
+                                <tr><td colspan="5" class="empty-state">?�이?��? 불러?�는 �?..</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ?�산 ?�널 -->
+                <div class="matching-panel">
+                    <div class="panel-header">
+                        <h3>?�산</h3>
+                        <span class="panel-count" id="production-count">0�?/span>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table" id="production-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:32px;"></th>
+                                    <th>?�목코드</th>
+                                    <th>구매코드</th>
+                                    <th>?�산코드</th>
+                                    <th class="text-right">?�량</th>
+                                    <th>?�태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="empty-state">?�이?��? 불러?�는 �?..</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ?�보?�스 ?�널 -->
+                <div class="matching-panel">
+                    <div class="panel-header">
+                        <h3>?�보?�스</h3>
+                        <span class="panel-count" id="invoice-count">0�?/span>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table" id="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:32px;"></th>
+                                    <th>?�보?�스번호</th>
+                                    <th>구매코드</th>
+                                    <th>?�목코드</th>
+                                    <th class="text-right">카툰??/th>
+                                    <th>?�태</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="empty-state">?�이?��? 불러?�는 �?..</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 매칭 ?�황 -->
+            <section class="card">
+                <div class="card-header collapsible-header" id="match-status-header" onclick="toggleCollapsible('match-status-header')">
+                    <h2 class="card-title">매칭 ?�황</h2>
+                    <span class="collapse-icon">??/span>
+                </div>
+                <div class="card-body card-body--no-pad collapsible-body" id="match-status-body">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="matching-status-table">
+                            <thead>
+                                <tr>
+                                    <th>발주ID</th>
+                                    <th>?�목코드</th>
+                                    <th>발주??/th>
+                                    <th class="text-right">발주?�량</th>
+                                    <th>???�산코드</th>
+                                    <th class="text-right">?�산?�량</th>
+                                    <th>???�보?�스번호</th>
+                                    <th class="text-right">카툰??/th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="8" class="empty-state">매칭 ?�이?��? 불러?�는 �?..</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -192,90 +201,182 @@
     <script src="/static/js/app.js"></script>
     <script>
         const Matching = {
-            products: {},
+            orders: [],
+            productions: [],
+            invoices: [],
+            selected: { order: null, production: null, invoice: null },
 
             async load() {
                 try {
-                    const products = await API.get('/api/products');
-                    this.products = Object.fromEntries(products.map(p => [p.id, p.product_code]));
                     await Promise.all([
-                        this.loadOrderQty(),
-                        this.loadProduction(),
-                        this.loadInvoice(),
+                        this.loadOrders(),
+                        this.loadProductions(),
+                        this.loadInvoices(),
+                        this.loadMatchingStatus(),
                     ]);
                 } catch(e) { console.error(e); }
             },
 
-            async loadOrderQty() {
+            async loadOrders() {
                 try {
-                    const data = await API.get('/api/inbound/order-qty');
+                    const data = await API.get('/api/orders');
+                    this.orders = data;
                     const tbody = document.querySelector('#order-qty-table tbody');
-                    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">등록된 발주수량이 없습니다.</td></tr>'; return; }
-                    tbody.innerHTML = data.map(d => `
-                        <tr>
-                            <td class="mono">${this.products[d.product_id] || d.product_id}</td>
+                    document.getElementById('order-count').textContent = `${data.length}�?;
+                    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">?�록??발주가 ?�습?�다.</td></tr>'; return; }
+                    tbody.innerHTML = data.map(d => {
+                        const matched = d.matched_productions?.length > 0;
+                        return `
+                        <tr onclick="Matching.selectRow('order', ${d.id}, this)" data-id="${d.id}" class="${matched ? 'matched-row' : ''}">
+                            <td><input type="checkbox" class="match-checkbox"></td>
+                            <td class="mono">${d.product_code}</td>
                             <td>${d.order_month}</td>
-                            <td class="mono">${d.sales_order_no}</td>
                             <td class="text-right mono" style="font-weight:600;">${Format.number(d.order_qty)}</td>
-                            <td style="color: var(--text-muted);">${d.created_at || '-'}</td>
-                        </tr>
-                    `).join('');
-                } catch(e) {}
+                            <td><span class="status-badge ${matched ? 'status-done' : 'status-pending'}">${matched ? '매칭?? : '미매�?}</span></td>
+                        </tr>`;
+                    }).join('');
+                } catch(e) { console.error(e); }
             },
 
-            async loadProduction() {
+            async loadProductions() {
                 try {
-                    const data = await API.get('/api/inbound/production');
+                    const data = await API.get('/api/productions');
+                    this.productions = data;
                     const tbody = document.querySelector('#production-table tbody');
-                    if (!data.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">등록된 생산완료 데이터가 없습니다.</td></tr>'; return; }
-                    tbody.innerHTML = data.map(d => `
-                        <tr>
-                            <td class="mono">${this.products[d.product_id] || d.product_id}</td>
-                            <td class="mono">${d.sales_order_no}</td>
-                            <td>${d.production_ym_no}</td>
+                    document.getElementById('production-count').textContent = `${data.length}�?;
+                    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">?�록???�산 ?�이?��? ?�습?�다.</td></tr>'; return; }
+                    tbody.innerHTML = data.map(d => {
+                        const matched = d.matched_order_id != null;
+                        return `
+                        <tr onclick="Matching.selectRow('production', ${d.id}, this)" data-id="${d.id}" class="${matched ? 'matched-row' : ''}">
+                            <td><input type="checkbox" class="match-checkbox"></td>
+                            <td class="mono">${d.product_code}</td>
+                            <td class="mono">${d.purchase_code}</td>
+                            <td class="mono">${d.production_code}</td>
                             <td class="text-right mono" style="font-weight:600;">${Format.number(d.production_qty)}</td>
-                            <td class="text-center"><span class="badge ${d.match_status === 'MATCHED' ? 'badge--green' : d.match_status === 'MANUAL' ? 'badge--warning' : 'badge--blue'}">${d.match_status === 'MATCHED' ? '매칭완료' : d.match_status === 'MANUAL' ? '수기매칭' : '대기중'}</span></td>
-                        </tr>
-                    `).join('');
-                } catch(e) {}
+                            <td><span class="status-badge ${matched ? 'status-done' : 'status-pending'}">${matched ? '매칭?? : '미매�?}</span></td>
+                        </tr>`;
+                    }).join('');
+                } catch(e) { console.error(e); }
             },
 
-            async loadInvoice() {
+            async loadInvoices() {
                 try {
-                    const data = await API.get('/api/inbound/invoice');
+                    const data = await API.get('/api/invoices');
+                    this.invoices = data;
                     const tbody = document.querySelector('#invoice-table tbody');
-                    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">등록된 인보이스 데이터가 없습니다.</td></tr>'; return; }
+                    document.getElementById('invoice-count').textContent = `${data.length}�?;
+                    if (!data.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">?�록???�보?�스 ?�이?��? ?�습?�다.</td></tr>'; return; }
+                    tbody.innerHTML = data.map(d => {
+                        const matched = d.matched_production_id != null;
+                        return `
+                        <tr onclick="Matching.selectRow('invoice', ${d.id}, this)" data-id="${d.id}" class="${matched ? 'matched-row' : ''}">
+                            <td><input type="checkbox" class="match-checkbox"></td>
+                            <td class="mono">${d.invoice_no}</td>
+                            <td class="mono">${d.purchase_code || '-'}</td>
+                            <td class="mono">${d.product_code || '-'}</td>
+                            <td class="text-right mono" style="font-weight:600;">${d.carton_qty || '-'}</td>
+                            <td><span class="status-badge ${matched ? 'status-done' : 'status-pending'}">${matched ? '매칭?? : '미매�?}</span></td>
+                        </tr>`;
+                    }).join('');
+                } catch(e) { console.error(e); }
+            },
+
+            async loadMatchingStatus() {
+                try {
+                    const data = await API.get('/api/matching/status');
+                    const tbody = document.querySelector('#matching-status-table tbody');
+                    if (!data || !data.length) {
+                        tbody.innerHTML = '<tr><td colspan="8" class="empty-state">매칭???�이?��? ?�습?�다.</td></tr>';
+                        return;
+                    }
                     tbody.innerHTML = data.map(d => `
                         <tr>
-                            <td class="mono">${this.products[d.product_id] || d.product_id}</td>
-                            <td class="mono">${d.sales_order_no}</td>
-                            <td>${d.production_ym_no}</td>
-                            <td class="mono">${d.invoice_no}</td>
-                            <td class="text-right mono" style="font-weight:600;">${Format.number(d.invoice_qty)}</td>
-                            <td class="text-center"><span class="badge ${d.match_status === 'MATCHED' ? 'badge--green' : d.match_status === 'MANUAL' ? 'badge--warning' : 'badge--blue'}">${d.match_status === 'MATCHED' ? '매칭완료' : d.match_status === 'MANUAL' ? '수기매칭' : '대기중'}</span></td>
+                            <td class="mono">${d.order_id || '-'}</td>
+                            <td class="mono">${d.product_code || '-'}</td>
+                            <td>${d.order_month || '-'}</td>
+                            <td class="text-right mono">${d.order_qty ? Format.number(d.order_qty) : '-'}</td>
+                            <td class="mono" style="color:var(--accent-main);">${d.production_code || '-'}</td>
+                            <td class="text-right mono">${d.production_qty ? Format.number(d.production_qty) : '-'}</td>
+                            <td class="mono" style="color:var(--accent-amber);">${d.invoice_no || '-'}</td>
+                            <td class="text-right mono">${d.carton_qty || '-'}</td>
                         </tr>
                     `).join('');
-                } catch(e) {}
+                } catch(e) { console.error(e); }
             },
 
-            async runAutoMatch() {
+            selectRow(type, id, rowEl) {
+                const tableId = type === 'order' ? 'order-qty-table' : type === 'production' ? 'production-table' : 'invoice-table';
+                const table = document.getElementById(tableId);
+
+                if (this.selected[type] === id) {
+                    this.selected[type] = null;
+                    rowEl.classList.remove('selected-row');
+                    rowEl.querySelector('.match-checkbox').checked = false;
+                } else {
+                    table.querySelectorAll('tr.selected-row').forEach(r => {
+                        r.classList.remove('selected-row');
+                        const cb = r.querySelector('.match-checkbox');
+                        if (cb) cb.checked = false;
+                    });
+                    this.selected[type] = id;
+                    rowEl.classList.add('selected-row');
+                    rowEl.querySelector('.match-checkbox').checked = true;
+                }
+                this.updateActionBar();
+            },
+
+            updateActionBar() {
+                const count = [this.selected.order, this.selected.production, this.selected.invoice].filter(v => v !== null).length;
+                const summary = document.getElementById('selection-summary');
+                const btn = document.getElementById('btn-create-match');
+
+                if (count === 0) {
+                    summary.innerHTML = '�??�이블에??매칭????��???�택?�세??(2~3�??�이블에??�?1건씩)';
+                    btn.disabled = true;
+                } else if (count === 1) {
+                    summary.innerHTML = `<strong>${count}�?/strong> ?�택????최소 2�??�이블에???�택?�야 매칭?????�습?�다`;
+                    btn.disabled = true;
+                } else {
+                    summary.innerHTML = `<strong>${count}�?/strong> ?�택????매칭 가?�합?�다`;
+                    btn.disabled = false;
+                }
+            },
+
+            clearSelections() {
+                this.selected = { order: null, production: null, invoice: null };
+                document.querySelectorAll('.matching-panel tr.selected-row').forEach(r => {
+                    r.classList.remove('selected-row');
+                    const cb = r.querySelector('.match-checkbox');
+                    if (cb) cb.checked = false;
+                });
+                this.updateActionBar();
+            },
+
+            async createMatch() {
+                const count = [this.selected.order, this.selected.production, this.selected.invoice].filter(v => v !== null).length;
+                if (count < 2) { Toast.show('최소 2�??�이블에????��???�택?�세??); return; }
+
+                const matchData = {
+                    order_id: this.selected.order,
+                    production_id: this.selected.production,
+                    invoice_id: this.selected.invoice,
+                };
+
                 try {
-                    const result = await API.post('/api/inbound/auto-match', {});
-                    Toast.show(result.message, 'success');
+                    const result = await API.post('/api/matching/link', matchData);
+                    Toast.show(result.message || '매칭 ?�료', 'success');
+                    this.clearSelections();
                     this.load();
-                } catch(e) {}
-            }
+                } catch(e) {
+                    Toast.show('매칭 ?�패: ' + (e.message || '?�버 ?�류'), 'error');
+                }
+            },
         };
 
         document.addEventListener('DOMContentLoaded', () => {
             Theme.init();
             Matching.load();
-
-            document.getElementById('excel-upload').addEventListener('change', async (e) => {
-                const file = e.target.files[0];
-                if(!file) return;
-                Toast.show('파일 업로드 기능은 백엔드 파싱 API 연동 후 작동합니다.');
-            });
         });
     </script>
 </body>

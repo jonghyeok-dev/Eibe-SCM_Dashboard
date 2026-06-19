@@ -1,15 +1,24 @@
 """
 Pydantic 데이터 검증 명세 모듈
 - FastAPI 요청/응답 직렬화용 스키마
-- 명세서 CH 3 테이블 구조와 1:1 대응
+- 모든 '마스터' 용어를 'DB'로 교체
 """
 
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 시스템 관리 영역 스키마
+# 공통 응답
+# ═══════════════════════════════════════════════════════════════════════
+
+class MessageResponse(BaseModel):
+    message: str
+    detail: Optional[str] = None
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 시스템 관리
 # ═══════════════════════════════════════════════════════════════════════
 
 class UserAccountBase(BaseModel):
@@ -22,7 +31,6 @@ class UserAccountCreate(UserAccountBase):
 
 class UserAccountResponse(UserAccountBase):
     id: int
-
     class Config:
         from_attributes = True
 
@@ -40,419 +48,288 @@ class SystemSnapshotResponse(BaseModel):
     created_at: str
     created_by: Optional[int] = None
     is_auto: bool
-
     class Config:
         from_attributes = True
 
+
 # ═══════════════════════════════════════════════════════════════════════
-# 상품 마스터 스키마
+# 품목 DB
 # ═══════════════════════════════════════════════════════════════════════
 
+class ProductCreate(BaseModel):
+    product_code: str = Field(..., description="품목코드 (수정 불가)")
+    product_name: str = Field(..., description="품목명")
+    pack_qty_per_tu: Optional[int] = Field(default=24, ge=1, description="카툰당 입수량")
+    currency_unit: Optional[str] = Field(default="USD", description="환율단위")
+    purchase_price: Optional[float] = Field(default=0, ge=0, description="매입가")
 
-class ProductMasterBase(BaseModel):
-    product_code: str = Field(..., description="품목 코드 (예: SN-001)")
-    product_name: str = Field(..., description="브랜드 및 단계 포함 명칭")
-    pack_qty_per_tu: int = Field(..., ge=1, description="카툰당 입수량")
-    fixed_unit_price: float = Field(..., gt=0, description="연간 고정 외화 매입 단가")
-    hub_moq: int = Field(..., ge=1, description="허브 최소 발주 수량 (캔)")
+class ProductUpdate(BaseModel):
+    """품목 수정 — product_code는 변경 불가"""
+    product_name: Optional[str] = None
+    pack_qty_per_tu: Optional[int] = Field(default=None, ge=1)
+    currency_unit: Optional[str] = None
+    purchase_price: Optional[float] = Field(default=None, ge=0)
 
-
-class ProductMasterCreate(ProductMasterBase):
-    pass
-
-
-class ProductMasterResponse(ProductMasterBase):
+class ProductResponse(BaseModel):
     id: int
-
+    product_code: str
+    product_name: str
+    pack_qty_per_tu: int
+    currency_unit: str
+    purchase_price: float
     class Config:
         from_attributes = True
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 풀필먼트 마스터 스키마
+# 창고 DB
 # ═══════════════════════════════════════════════════════════════════════
 
-
-class FFCMasterBase(BaseModel):
-    ffc_code: str = Field(..., description="거점 코드")
-    ffc_name: str = Field(..., description="거점 채널명")
-    ffc_type: str = Field(..., pattern="^(ONLINE|OFFLINE|BUYOUT)$")
+class WarehouseCreate(BaseModel):
+    warehouse_name: str = Field(..., description="창고명 (수정 불가)")
+    warehouse_type: str = Field(default="ONLINE", pattern="^(ONLINE|OFFLINE|BUYOUT)$")
     allowed_expiry_days: int = Field(default=90, ge=0)
-    ffc_moq: int = Field(default=0, ge=0)
-    avg_transport_cost: float = Field(default=0, ge=0, description="평균 용차비용 (원)")
+    moq: int = Field(default=0, ge=0)
 
+class WarehouseUpdate(BaseModel):
+    """창고 수정 — warehouse_name은 변경 불가"""
+    warehouse_type: Optional[str] = Field(default=None, pattern="^(ONLINE|OFFLINE|BUYOUT)$")
+    allowed_expiry_days: Optional[int] = Field(default=None, ge=0)
+    moq: Optional[int] = Field(default=None, ge=0)
 
-class FFCMasterCreate(FFCMasterBase):
-    pass
-
-
-class FFCMasterResponse(FFCMasterBase):
+class WarehouseResponse(BaseModel):
     id: int
-
+    warehouse_name: str
+    warehouse_type: str
+    allowed_expiry_days: int
+    moq: int
     class Config:
         from_attributes = True
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 물류비 마스터 스키마
+# 물류비 DB
 # ═══════════════════════════════════════════════════════════════════════
 
+class LogisticsCostCreate(BaseModel):
+    departure_wh_id: int
+    arrival_wh_id: int
+    cost_per_tu: int = Field(..., ge=0)
 
-class LogisticsCostBase(BaseModel):
-    departure_ffc_id: int
-    arrival_ffc_id: int
-    cost_per_tu: int = Field(..., ge=0, description="카툰당 이관 물류 비용")
-
-
-class LogisticsCostCreate(LogisticsCostBase):
-    pass
-
-
-class LogisticsCostResponse(LogisticsCostBase):
+class LogisticsCostResponse(BaseModel):
+    departure_wh_id: int
+    arrival_wh_id: int
+    cost_per_tu: int
+    departure_name: Optional[str] = None
+    arrival_name: Optional[str] = None
     class Config:
         from_attributes = True
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 입고 리스트 스키마
+# 창고-품목 MOQ
 # ═══════════════════════════════════════════════════════════════════════
 
-
-class InboundListBase(BaseModel):
-    production_ym_code: str
-    order_code: str
-    invoice_no: str
-    bl_no: str
+class WarehouseProductMOQCreate(BaseModel):
+    warehouse_id: int
     product_id: int
-    tu_qty: int = Field(..., ge=0)
-    actual_can_qty: int = Field(..., ge=0)
-    manufactured_date: str = Field(..., description="제조년월 (YYYY-MM)")
-    expiry_date: str = Field(..., description="유통기한 (YYYY-MM-DD)")
-    shipping_date: Optional[str] = None
-    arrival_date: Optional[str] = None
-    actual_inbound_date: Optional[str] = None
-    payment_due_date: Optional[str] = None
-    exchange_rate: float = Field(..., gt=0)
-    total_inventory_value: Optional[int] = None
+    transfer_moq: int = Field(default=0, ge=0)
 
-
-class InboundListCreate(InboundListBase):
-    pass
-
-
-class InboundListResponse(InboundListBase):
-    inbound_id: int
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 입고 예정 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class ExpectedInboundBase(BaseModel):
-    product_id: int
-    inbound_ref_no: str
-    expected_qty: int = Field(..., ge=0)
-    eta_date: str = Field(..., description="입고 예정일 (YYYY-MM-DD)")
-    status: str = Field(..., pattern="^(IN_TRANSIT|CUSTOMS)$")
-
-
-class ExpectedInboundCreate(ExpectedInboundBase):
-    pass
-
-
-class ExpectedInboundResponse(ExpectedInboundBase):
-    expected_id: int
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 현재고 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class CurrentInventoryBase(BaseModel):
-    ffc_id: int
-    inbound_id: int
-    current_can_qty: int = Field(default=0, ge=0)
-
-
-class CurrentInventoryCreate(CurrentInventoryBase):
-    pass
-
-
-class CurrentInventoryResponse(CurrentInventoryBase):
-    inventory_id: int
-    last_updated: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 출고 이력 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class OutflowHistoryBase(BaseModel):
-    ffc_id: int
-    product_id: int
-    base_date: str = Field(..., description="주차 기준일 (YYYY-MM-DD)")
-    beginning_inventory: int = Field(..., ge=0)
-    ending_inventory: int = Field(..., ge=0)
-    simple_outflow_qty: int
-    outflow_type: str = Field(default="SALES", pattern="^(SALES|LOSS|TRANSFER)$")
-
-
-class OutflowHistoryCreate(OutflowHistoryBase):
-    pass
-
-
-class OutflowHistoryResponse(OutflowHistoryBase):
-    outflow_id: int
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 이관 계획 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class TransferPlanBase(BaseModel):
-    product_id: int
-    departure_ffc_id: int
-    arrival_ffc_id: int
-    target_tu_qty: int = Field(..., ge=0)
-    target_can_qty: int = Field(..., ge=0)
-    estimated_logistics_cost: Optional[int] = None
-    transfer_status: str = Field(
-        default="PLANNED", pattern="^(PLANNED|IN_TRANSIT|DONE)$"
-    )
-
-
-class TransferPlanCreate(TransferPlanBase):
-    pass
-
-
-class TransferPlanResponse(TransferPlanBase):
-    transfer_id: int
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 매칭 히스토리 로그 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class MatchingHistoryLogBase(BaseModel):
-    production_ym_code: str
-    matched_invoice_no: str
-    product_id: int
-    production_qty: int = Field(..., ge=0)
-    invoice_qty: int = Field(..., ge=0)
-    discrepancy_rate: Optional[float] = None
-    date_gap_days: Optional[int] = None
-
-
-class MatchingHistoryLogCreate(MatchingHistoryLogBase):
-    pass
-
-
-class MatchingHistoryLogResponse(MatchingHistoryLogBase):
-    log_id: int
-    matched_at: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 월별 발주 계획 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class MonthlyOrderPlanBase(BaseModel):
-    target_month: str = Field(..., description="발주 대상 연월 (YYYY-MM)")
-    product_id: int
-    system_suggested_qty: int = Field(..., ge=0)
-    user_modified_qty: int = Field(..., ge=0)
-
-
-class MonthlyOrderPlanCreate(MonthlyOrderPlanBase):
-    pass
-
-
-class MonthlyOrderPlanUpdate(BaseModel):
-    user_modified_qty: int = Field(..., ge=0, description="실무자 수정 최종 수량")
-
-
-class MonthlyOrderPlanResponse(MonthlyOrderPlanBase):
-    plan_id: int
-    updated_at: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 공통 응답 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class MessageResponse(BaseModel):
-    message: str
-    detail: Optional[str] = None
-
-
-class FileUploadResponse(BaseModel):
-    message: str
-    filename: str
-    rows_processed: int
-    rows_inserted: int
-    rows_updated: int = 0
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 창고-상품별 이관 MOQ 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class FFCProductMOQBase(BaseModel):
-    ffc_id: int
-    product_id: int
-    transfer_moq: int = Field(default=0, ge=0, description="SKU별 이관 최소 수량 (캔)")
-
-
-class FFCProductMOQCreate(FFCProductMOQBase):
-    pass
-
-
-class FFCProductMOQResponse(FFCProductMOQBase):
+class WarehouseProductMOQResponse(BaseModel):
     id: int
-
+    warehouse_id: int
+    product_id: int
+    transfer_moq: int
+    warehouse_name: Optional[str] = None
+    product_name: Optional[str] = None
     class Config:
         from_attributes = True
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 발주 계획 일괄 저장 스키마
+# 발주 DB
 # ═══════════════════════════════════════════════════════════════════════
 
-
-class OrderPlanBulkItem(BaseModel):
-    product_id: int
-    target_month: str = Field(..., description="YYYY-MM")
-    user_modified_qty: int = Field(..., ge=0)
-    version: int = Field(default=1)
-
-
-class OrderPlanBulkSave(BaseModel):
-    plans: list[OrderPlanBulkItem]
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 판매 실적 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class SalesHistoryBase(BaseModel):
-    ffc_id: int
-    product_id: int
-    base_date: str = Field(..., description="주차 기준일 (YYYY-MM-DD)")
-    sales_qty: int = Field(..., ge=0, description="실제 판매 수량 (캔)")
-
-
-class SalesHistoryCreate(SalesHistoryBase):
-    pass
-
-
-class SalesHistoryResponse(SalesHistoryBase):
-    sales_id: int
-    created_at: Optional[str] = None
-
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
-# 입고 관리 3분리 스키마
-# ═══════════════════════════════════════════════════════════════════════
-
-
-class OrderQuantityBase(BaseModel):
-    product_id: int
+class OrderCreate(BaseModel):
     order_month: str = Field(..., description="발주월 (YYYY-MM)")
-    sales_order_no: str = Field(..., description="세일즈 오더 No.")
-    order_qty: int = Field(..., ge=0, description="발주 수량 (캔)")
+    product_code: str
+    order_qty: int = Field(..., ge=0)
 
-
-class OrderQuantityCreate(OrderQuantityBase):
-    pass
-
-
-class OrderQuantityResponse(OrderQuantityBase):
+class OrderResponse(BaseModel):
     id: int
+    order_month: str
+    product_code: str
+    order_qty: int
     created_at: Optional[str] = None
-
+    product_name: Optional[str] = None
     class Config:
         from_attributes = True
 
 
-class ProductionCompleteBase(BaseModel):
-    product_id: int
-    sales_order_no: str
-    production_ym_no: str = Field(..., description="생산년월 넘버")
-    production_qty: int = Field(..., ge=0, description="생산 수량 (캔)")
+# ═══════════════════════════════════════════════════════════════════════
+# 생산 DB
+# ═══════════════════════════════════════════════════════════════════════
 
+class ProductionCreate(BaseModel):
+    purchase_code: str
+    production_code: str
+    order_month: Optional[str] = None
+    production_qty: int = Field(..., ge=0)
+    product_code: str
+    matched_order_id: Optional[int] = None
 
-class ProductionCompleteCreate(ProductionCompleteBase):
-    pass
-
-
-class ProductionCompleteResponse(ProductionCompleteBase):
+class ProductionResponse(BaseModel):
     id: int
-    match_status: str = "PENDING"
+    purchase_code: str
+    production_code: str
+    order_month: Optional[str] = None
+    production_qty: int
+    product_code: str
     matched_order_id: Optional[int] = None
     created_at: Optional[str] = None
-
+    product_name: Optional[str] = None
     class Config:
         from_attributes = True
 
 
-class InvoiceQuantityBase(BaseModel):
-    product_id: int
-    sales_order_no: str
-    production_ym_no: str
+# ═══════════════════════════════════════════════════════════════════════
+# 인보이스 DB
+# ═══════════════════════════════════════════════════════════════════════
+
+class InvoiceCreate(BaseModel):
     invoice_no: str
-    invoice_qty: int = Field(..., ge=0, description="인보이스 수량 (캔)")
-
-
-class InvoiceQuantityCreate(InvoiceQuantityBase):
-    pass
-
-
-class InvoiceQuantityResponse(InvoiceQuantityBase):
-    id: int
-    match_status: str = "PENDING"
+    mapping_value: Optional[str] = None
+    purchase_code: Optional[str] = None
+    production_code: Optional[str] = None
+    carton_qty: Optional[int] = None
+    unit_price: Optional[float] = None
+    total_price: Optional[float] = None
+    product_name: Optional[str] = None
+    product_code: Optional[str] = None
+    eta: Optional[str] = None
+    payment_date: Optional[str] = None
+    invoice_date: Optional[str] = None
+    exchange_rate: Optional[float] = None
+    payment_amount_krw: Optional[int] = None
     matched_production_id: Optional[int] = None
-    created_at: Optional[str] = None
 
+class InvoiceResponse(InvoiceCreate):
+    id: int
+    created_at: Optional[str] = None
     class Config:
         from_attributes = True
 
 
-class PendingMatchesResponse(BaseModel):
-    pending_count: int
-    pending_production: int = 0
-    pending_invoice: int = 0
+# ═══════════════════════════════════════════════════════════════════════
+# 입고 DB
+# ═══════════════════════════════════════════════════════════════════════
+
+class InboundCreate(BaseModel):
+    invoice_no: Optional[str] = None
+    bl_no: Optional[str] = None
+    shipping_date: Optional[str] = None
+    korea_arrival_date: Optional[str] = None
+    manufacture_date: Optional[str] = None
+    expiry_date: Optional[str] = None
+    carton_qty: Optional[int] = None
+    can_qty: Optional[int] = None
+    product_code: Optional[str] = None
+    status: str = Field(default="생산국출발")
+
+class InboundResponse(InboundCreate):
+    id: int
+    created_at: Optional[str] = None
+    class Config:
+        from_attributes = True
 
 
+# ═══════════════════════════════════════════════════════════════════════
+# 현재고 스냅샷
+# ═══════════════════════════════════════════════════════════════════════
+
+class InventorySnapshotCreate(BaseModel):
+    snapshot_date: str
+    warehouse_id: Optional[int] = None
+    warehouse_name: Optional[str] = None
+    product_name: Optional[str] = None
+    product_code: Optional[str] = None
+    expiry_date: Optional[str] = None
+    qty_cans: int = Field(default=0, ge=0)
+
+class InventorySnapshotResponse(InventorySnapshotCreate):
+    id: int
+    class Config:
+        from_attributes = True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 이관 계획
+# ═══════════════════════════════════════════════════════════════════════
+
+class TransferPlanCreate(BaseModel):
+    product_id: int
+    departure_wh_id: int
+    arrival_wh_id: int
+    target_tu_qty: int = Field(default=0, ge=0)
+    target_can_qty: int = Field(default=0, ge=0)
+    estimated_logistics_cost: Optional[int] = None
+    transfer_date: Optional[str] = None
+
+class TransferPlanResponse(BaseModel):
+    transfer_id: int
+    product_id: int
+    departure_wh_id: int
+    arrival_wh_id: int
+    target_tu_qty: int
+    target_can_qty: int
+    estimated_logistics_cost: Optional[int] = None
+    transfer_date: Optional[str] = None
+    transfer_status: str
+    product_name: Optional[str] = None
+    departure_name: Optional[str] = None
+    arrival_name: Optional[str] = None
+    class Config:
+        from_attributes = True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 발주 계획 (시뮬레이션)
+# ═══════════════════════════════════════════════════════════════════════
+
+class OrderPlanCreate(BaseModel):
+    target_month: str
+    product_id: int
+    user_modified_qty: int = Field(default=0, ge=0)
+
+class OrderPlanBulkSave(BaseModel):
+    plans: List[OrderPlanCreate]
+
+class OrderPlanResponse(BaseModel):
+    plan_id: int
+    target_month: str
+    product_id: int
+    system_suggested_qty: int
+    user_modified_qty: int
+    version: int
+    updated_at: Optional[str] = None
+    product_code: Optional[str] = None
+    product_name: Optional[str] = None
+    class Config:
+        from_attributes = True
+
+
+# ═══════════════════════════════════════════════════════════════════════
+# 매칭 요청
+# ═══════════════════════════════════════════════════════════════════════
+
+class MatchRequest(BaseModel):
+    """3단 매칭 요청"""
+    order_id: Optional[int] = None
+    production_id: Optional[int] = None
+    invoice_id: Optional[int] = None
+
+class MatchResponse(BaseModel):
+    message: str
+    matched_order_id: Optional[int] = None
+    matched_production_id: Optional[int] = None
+    matched_invoice_id: Optional[int] = None

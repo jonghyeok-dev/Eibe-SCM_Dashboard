@@ -3,6 +3,7 @@
 - 기능별 개별 다운로드 + 전체 일괄 다운로드
 - 고정 양식 헤더 + 입력 가이드 예시 행
 - 현재고 엑셀 파싱
+- '마스터' → 'DB' 워딩 교체
 """
 
 import os
@@ -33,7 +34,6 @@ def _apply_sheet_style(ws, columns, example_row=None):
         cell.fill = HEADER_FILL
         cell.alignment = Alignment(horizontal="center", vertical="center")
         cell.border = THIN_BORDER
-        # 컬럼 너비 자동 조정 (한글 고려)
         width = max(len(col_name) * 2.2, 14)
         ws.column_dimensions[get_column_letter(col_idx)].width = width
 
@@ -49,76 +49,84 @@ def _apply_sheet_style(ws, columns, example_row=None):
     ws.freeze_panes = "A2"
 
 
-# ── 양식 정의 ──────────────────────────────────────────────────
+# ── 양식 정의 (DB 구조 반영) ────────────────────────────────────
 TEMPLATE_DEFS = {
-    "product_master": {
-        "sheet_name": "상품마스터",
-        "columns": ["품목코드", "품목명", "카툰당입수량", "연간고정단가(외화)", "허브MOQ(캔)"],
-        "example": ["SN-001", "슈누프로1단계 800g", 12, 8.50, 3600],
-        "filename": "상품마스터_양식.xlsx",
+    "product_db": {
+        "sheet_name": "품목DB",
+        "columns": ["품목코드", "품목명", "카툰당입수량", "환율단위(USD/EUR/AUD/NZD)", "매입가(외화)"],
+        "example": ["SN-001", "슈누프로1단계 800g", 12, "EUR", 8.50],
+        "filename": "품목DB_양식.xlsx",
     },
-    "ffc_master": {
-        "sheet_name": "창고마스터",
-        "columns": ["창고코드", "창고명", "창고타입(ONLINE/OFFLINE/BUYOUT)", "허용유통기한일수", "기본이관MOQ(캔)"],
-        "example": ["HUB", "용인 메인창고", "OFFLINE", 180, 0],
-        "filename": "창고마스터_양식.xlsx",
+    "warehouse_db": {
+        "sheet_name": "창고DB",
+        "columns": ["창고명", "창고타입(ONLINE/OFFLINE/BUYOUT)", "허용유통기한일수", "이관MOQ(캔)"],
+        "example": ["용인 메인창고", "OFFLINE", 180, 0],
+        "filename": "창고DB_양식.xlsx",
     },
     "logistics_cost": {
-        "sheet_name": "물류비마스터",
-        "columns": ["출발창고코드", "도착창고코드", "카툰당물류비(원)"],
-        "example": ["HUB", "FFC_COUPANG", 3500],
-        "filename": "물류비마스터_양식.xlsx",
+        "sheet_name": "물류비DB",
+        "columns": ["출발창고ID", "도착창고ID", "카툰당물류비(원)"],
+        "example": [1, 2, 3500],
+        "filename": "물류비DB_양식.xlsx",
+    },
+    "order": {
+        "sheet_name": "발주",
+        "columns": ["발주월(YYYY-MM)", "품목코드", "발주수량(캔)"],
+        "example": ["2026-06", "SN-001", 36000],
+        "filename": "발주_양식.xlsx",
     },
     "production": {
-        "sheet_name": "생산완료",
-        "columns": ["생산년월코드", "발주코드", "품목코드", "생산완료수량(캔)", "제조년월(YYYY-MM)", "유통기한(YYYY-MM-DD)"],
-        "example": ["2026-05", "ORD-2026-001", "SN-001", 36000, "2026-05", "2028-05-15"],
-        "filename": "생산완료_양식.xlsx",
+        "sheet_name": "생산",
+        "columns": ["구매코드", "생산코드", "발주월(YYYY-MM)", "생산수량(캔)", "품목코드"],
+        "example": ["PO-2026-001", "PRD-2026-05", "2026-05", 36000, "SN-001"],
+        "filename": "생산_양식.xlsx",
     },
     "invoice": {
-        "sheet_name": "매입인보이스",
+        "sheet_name": "인보이스",
         "columns": [
-            "인보이스번호", "선하증권(BL)번호", "품목코드", "카툰수(TU)", "낱개수량(Can)",
-            "선적일(YYYY-MM-DD)", "한국도착일(YYYY-MM-DD)", "결제기일(YYYY-MM-DD)", "결제환율"
+            "인보이스번호", "매핑값", "구매코드", "생산코드", "카툰수",
+            "단가", "총단가", "품목명", "품목코드", "ETA(YYYY-MM-DD)",
+            "결제일(YYYY-MM-DD)", "인보이스발행일(YYYY-MM-DD)", "결제환율", "결제금액(원화)"
         ],
-        "example": ["INV-2026-001", "BL-2026-001", "SN-001", 300, 3600, "2026-03-01", "2026-04-15", "2026-05-15", 1350.5],
-        "filename": "매입인보이스_양식.xlsx",
+        "example": ["INV-2026-001", "MAP-001", "PO-2026-001", "PRD-2026-05", 300,
+                     8.50, 2550.0, "슈누프로1단계", "SN-001", "2026-08-15",
+                     "2026-09-15", "2026-07-01", 1350.5, 3442275],
+        "filename": "인보이스_양식.xlsx",
     },
-    "expected_inbound": {
-        "sheet_name": "입고예정",
-        "columns": ["참조번호(BL등)", "품목코드", "입고예정수량(캔)", "국내도착예정일(YYYY-MM-DD)", "상태(IN_TRANSIT/CUSTOMS)"],
-        "example": ["BL-2026-002", "SN-001", 7200, "2026-08-20", "IN_TRANSIT"],
-        "filename": "입고예정_양식.xlsx",
+    "inbound": {
+        "sheet_name": "입고",
+        "columns": [
+            "인보이스번호", "BL번호", "선적일(YYYY-MM-DD)", "한국도착일(YYYY-MM-DD)",
+            "제조일자(YYYY-MM-DD)", "유통기한(YYYY-MM-DD)", "카툰수", "캔수", "품목코드",
+            "상태(생산국출발/해상운송중/한국도착/통관중/입고일선정중/입고완료)"
+        ],
+        "example": ["INV-2026-001", "BL-2026-001", "2026-03-01", "2026-04-15",
+                     "2026-02-15", "2028-02-15", 300, 3600, "SN-001", "해상운송중"],
+        "filename": "입고_양식.xlsx",
     },
-    "current_inventory": {
+    "inventory_snapshot": {
         "sheet_name": "현재고스냅샷",
-        "columns": ["창고코드", "품목코드", "현재고수량(캔)", "유통기한(YYYY-MM-DD)"],
-        "example": ["HUB", "SN-001", 12000, "2028-05-15"],
+        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "유통기한(YYYY-MM-DD)", "수량(캔)"],
+        "example": ["2026-06-19", "용인 메인창고", "슈누프로1단계", "SN-001", "2028-05-15", 12000],
         "filename": "현재고스냅샷_양식.xlsx",
     },
 }
 
 # 지원 타입 이름과 한글 표시명
 TEMPLATE_LABELS = {
-    "product_master": "상품마스터",
-    "ffc_master": "창고마스터",
-    "logistics_cost": "물류비마스터",
-    "production": "생산완료",
-    "invoice": "매입인보이스",
-    "expected_inbound": "입고예정",
-    "current_inventory": "현재고스냅샷",
+    "product_db": "품목DB",
+    "warehouse_db": "창고DB",
+    "logistics_cost": "물류비DB",
+    "order": "발주",
+    "production": "생산",
+    "invoice": "인보이스",
+    "inbound": "입고",
+    "inventory_snapshot": "현재고스냅샷",
 }
 
 
 def generate_template(template_type: str = "all") -> BytesIO:
-    """
-    고정 엑셀 양식 템플릿 생성
-
-    Args:
-        template_type: 'all' 또는 TEMPLATE_DEFS 키 중 하나
-    Returns:
-        BytesIO 스트림
-    """
+    """고정 엑셀 양식 템플릿 생성"""
     output = BytesIO()
 
     if template_type == "all":
@@ -152,9 +160,7 @@ def get_template_filename(template_type: str) -> str:
 
 
 def parse_excel_file(file_path: str) -> dict:
-    """
-    업로드된 엑셀 파일을 읽어 각 시트별 DataFrame을 dict로 반환
-    """
+    """업로드된 엑셀 파일을 읽어 각 시트별 DataFrame을 dict로 반환"""
     try:
         dfs = pd.read_excel(file_path, sheet_name=None, engine="openpyxl")
         return dfs
@@ -170,44 +176,44 @@ def validate_dataframe(df: pd.DataFrame, expected_columns: list) -> bool:
     return all(col in df.columns for col in expected_columns)
 
 
-def parse_inventory_excel(file_path: str) -> list:
-    """
-    현재고 엑셀 파싱 전용 로직
-    '현재고스냅샷' 시트에서 데이터를 추출합니다.
-
-    Returns:
-        list of dict: [{'ffc_code': ..., 'product_code': ..., 'qty': ..., 'expiry': ...}, ...]
-    """
+def parse_inventory_excel(file_bytes: bytes) -> list:
+    """현재고 스냅샷 엑셀 파싱"""
     try:
-        dfs = pd.read_excel(file_path, sheet_name=None, engine="openpyxl")
+        dfs = pd.read_excel(BytesIO(file_bytes), sheet_name=None, engine="openpyxl")
     except Exception as e:
         raise ValueError(f"엑셀 파일 파싱 실패: {e}")
 
     sheet_name = "현재고스냅샷"
     if sheet_name not in dfs:
-        raise ValueError(f"'{sheet_name}' 시트를 찾을 수 없습니다. 양식을 확인해주세요.")
+        # fallback: 첫 번째 시트 사용
+        sheet_name = list(dfs.keys())[0]
 
     df = dfs[sheet_name]
-    expected = TEMPLATE_DEFS["current_inventory"]["columns"]
-
-    # 헤더에서 예시 행(italic) 제거 - 첫 번째 데이터 행이 예시 행일 수 있음
-    if len(df) > 0:
-        first_row = df.iloc[0]
-        example = TEMPLATE_DEFS["current_inventory"]["example"]
-        if all(str(first_row.iloc[i]) == str(example[i]) for i in range(min(len(first_row), len(example)))):
-            df = df.iloc[1:].reset_index(drop=True)
 
     if df.empty:
         return []
+
+    # 예시 행 제거
+    tdef = TEMPLATE_DEFS.get("inventory_snapshot")
+    if tdef and len(df) > 0:
+        example = tdef["example"]
+        first_row = df.iloc[0]
+        try:
+            if all(str(first_row.iloc[i]) == str(example[i]) for i in range(min(len(first_row), len(example)))):
+                df = df.iloc[1:].reset_index(drop=True)
+        except (IndexError, TypeError):
+            pass
 
     results = []
     for _, row in df.iterrows():
         try:
             item = {
-                "ffc_code": str(row.iloc[0]).strip(),
-                "product_code": str(row.iloc[1]).strip(),
-                "qty": int(row.iloc[2]),
-                "expiry_date": str(row.iloc[3]).strip() if pd.notna(row.iloc[3]) else None,
+                "snapshot_date": str(row.iloc[0]).strip() if pd.notna(row.iloc[0]) else None,
+                "warehouse_name": str(row.iloc[1]).strip() if pd.notna(row.iloc[1]) else None,
+                "product_name": str(row.iloc[2]).strip() if pd.notna(row.iloc[2]) else None,
+                "product_code": str(row.iloc[3]).strip() if pd.notna(row.iloc[3]) else None,
+                "expiry_date": str(row.iloc[4]).strip() if pd.notna(row.iloc[4]) else None,
+                "qty_cans": int(row.iloc[5]) if pd.notna(row.iloc[5]) else 0,
             }
             results.append(item)
         except (ValueError, IndexError):
@@ -217,17 +223,9 @@ def parse_inventory_excel(file_path: str) -> list:
 
 
 def generate_order_plan_export(plan_data: list) -> BytesIO:
-    """
-    발주 계획 엑셀 내보내기
-
-    Args:
-        plan_data: list of dict with keys: target_month, product_code, product_name,
-                   system_suggested_qty, user_modified_qty
-    Returns:
-        BytesIO 스트림
-    """
+    """발주 계획 엑셀 내보내기"""
     output = BytesIO()
-    columns = ["대상연월", "품목코드", "품목명", "시스템제안수량", "실무자확정수량", "차이"]
+    columns = ["발주월", "품목코드", "품목명", "시스템제안수량", "실무자확정수량", "차이"]
 
     with pd.ExcelWriter(output, engine="openpyxl") as writer:
         if plan_data:

@@ -1,13 +1,11 @@
 import os
 import shutil
-from datetime import datetime
+import sqlite3
+from datetime import datetime, timedelta
 from apscheduler.schedulers.background import BackgroundScheduler
-from app.database import SessionLocal
+from app.database import SessionLocal, BASE_DIR, DB_PATH, BACKUP_DIR
 from app.models import SystemSnapshot
 
-DATA_DIR = "data"
-DB_PATH = os.path.join(DATA_DIR, "local_erp.db")
-BACKUP_DIR = os.path.join(DATA_DIR, "backups")
 
 def create_snapshot(user_id: int = None, is_auto: bool = True):
     """
@@ -15,13 +13,21 @@ def create_snapshot(user_id: int = None, is_auto: bool = True):
     SYSTEM_SNAPSHOT 테이블에 이력을 기록합니다.
     """
     os.makedirs(BACKUP_DIR, exist_ok=True)
-    
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     prefix = "auto" if is_auto else f"manual_user_{user_id}"
     snapshot_filename = f"snapshot_{prefix}_{timestamp}.db"
     snapshot_path = os.path.join(BACKUP_DIR, snapshot_filename)
-    
-    # DB 파일 복사 (WAL 모드 주의: 가능하면 체크포인트 후 복사가 좋으나, SQLite 로컬 환경이므로 바로 복사)
+
+    # WAL 체크포인트 후 복사 (데이터 무결성 보장)
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
+        conn.close()
+    except Exception as e:
+        print(f"Warning: WAL checkpoint failed: {e}")
+
+    # DB 파일 복사
     try:
         shutil.copy2(DB_PATH, snapshot_path)
     except FileNotFoundError:
@@ -30,6 +36,9 @@ def create_snapshot(user_id: int = None, is_auto: bool = True):
     except Exception as e:
         print(f"Error creating snapshot: {e}")
         return None
+
+    # 오래된 백업 정리 (30일 초과 또는 240개 초과 시 삭제)
+    _rotate_backups()
 
     # 스냅샷 테이블에 기록
     db = SessionLocal()
@@ -50,6 +59,47 @@ def create_snapshot(user_id: int = None, is_auto: bool = True):
         return None
     finally:
         db.close()
+
+
+def _rotate_backups(max_age_days: int = 30, max_files: int = 240):
+    """오래된 스냅샷 백업 파일 정리"""
+    try:
+        backup_files = sorted(
+            [
+                os.path.join(BACKUP_DIR, f)
+                for f in os.listdir(BACKUP_DIR)
+                if f.startswith("snapshot_") and f.endswith(".db")
+            ],
+            key=os.path.getmtime,
+        )
+    except FileNotFoundError:
+        return
+
+    # 30일 초과 파일 삭제
+    cutoff = datetime.now() - timedelta(days=max_age_days)
+    for filepath in backup_files:
+        try:
+            mtime = datetime.fromtimestamp(os.path.getmtime(filepath))
+            if mtime < cutoff:
+                os.remove(filepath)
+        except Exception:
+            pass
+
+    # 최대 개수 초과 시 오래된 것부터 삭제
+    try:
+        remaining = sorted(
+            [
+                os.path.join(BACKUP_DIR, f)
+                for f in os.listdir(BACKUP_DIR)
+                if f.startswith("snapshot_") and f.endswith(".db")
+            ],
+            key=os.path.getmtime,
+        )
+        while len(remaining) > max_files:
+            os.remove(remaining.pop(0))
+    except Exception:
+        pass
+
 
 def _auto_snapshot_job():
     print(f"[{datetime.now()}] Running scheduled auto snapshot...")
