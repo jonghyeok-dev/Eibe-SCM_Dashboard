@@ -79,13 +79,12 @@
                 </div>
             </section>
 
-            <section class="card">
-                <div class="card-header">
+            <section class="card section-gap">
+                <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-sm);">
                     <h2 class="card-title">FEFO 기반 유통기한 임박 및 폐기 예상</h2>
-                    <button class="btn btn--secondary btn--sm" onclick="ExpiryPage.load()">새로고침</button>
-                </div>
-                <div class="card-body" style="padding-bottom: 0;">
-                    <div class="checkbox-filter-group" id="product-filter">
+                    <div class="filter-group" style="margin-top: var(--space-md); padding: var(--space-sm); background-color: var(--surface-hover); border-radius: 8px; width: 100%;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">조회 필터</div>
+                        <div class="checkbox-group" id="product-filter" style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
                         <label><input type="checkbox" value="all" checked onchange="ExpiryPage.onFilterAll(this)"> 전체</label>
                         <label><input type="checkbox" value="SN-001" checked onchange="ExpiryPage.onFilterChange()"> SN-001</label>
                         <label><input type="checkbox" value="SN-002" checked onchange="ExpiryPage.onFilterChange()"> SN-002</label>
@@ -99,14 +98,13 @@
                             <thead>
                                 <tr>
                                     <th>창고</th>
-                                    <th>품목코드</th>
                                     <th>품명</th>
-                                    <th>배치</th>
-                                    <th class="text-right">수량 (캔)</th>
                                     <th>유통기한</th>
-                                    <th class="text-right">잔여일수</th>
-                                    <th class="text-center">상태</th>
-                                    <th class="text-right">폐기예상금액</th>
+                                    <th class="text-right">수량 (캔)</th>
+                                    <th class="text-right">판매가능일</th>
+                                    <th class="text-center">소진예상일</th>
+                                    <th class="text-right">추가 필요 판매량 (캔수)</th>
+                                    <th class="text-right">폐기 예상금액</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -243,20 +241,24 @@
                 }
 
                 tbody.innerHTML = filtered.map(d => {
-                    const s = this.getStatusBadge(d.remaining_days);
                     const valueColor = d.disposal_value > 0 
                         ? (d.remaining_days <= 30 ? 'var(--accent-red)' : 'var(--accent-amber)') 
                         : 'var(--text-muted)';
+                        
+                    const expectedDepletion = d.depletion_date || '-';
+                    const depletionHtml = expectedDepletion === '-' 
+                        ? `<span style="color:var(--text-muted)">소진 불가</span>`
+                        : expectedDepletion;
+
                     return `
                         <tr data-product="${d.product_code}">
-                            <td><span class="status-dot ${s.dotCls}"></span>${d.warehouse}</td>
-                            <td class="mono">${d.product_code}</td>
+                            <td>${d.warehouse_name || d.warehouse}</td>
                             <td>${d.product_name}</td>
-                            <td class="mono">${d.batch || '-'}</td>
-                            <td class="text-right mono" style="font-weight:600;">${Format.number(d.qty)}</td>
                             <td>${d.expiry_date}</td>
-                            <td class="text-right"><span class="badge ${s.cls}">${d.remaining_days}일</span></td>
-                            <td class="text-center"><span class="badge ${s.cls}">${s.label}</span></td>
+                            <td class="text-right mono" style="font-weight:600;">${Format.number(d.qty_cans || d.qty)}</td>
+                            <td class="text-right"><span class="badge badge--green">${d.sellable_days || 0}일</span></td>
+                            <td class="text-center">${depletionHtml}</td>
+                            <td class="text-right mono">${Format.number(d.additional_sales_required || 0)}</td>
                             <td class="text-right mono" style="font-weight:600; color: ${valueColor};">${Format.currency(d.disposal_value)}</td>
                         </tr>`;
                 }).join('');

@@ -3,10 +3,22 @@
  * Clean corporate design, no AI emojis
  */
 
+const Loader = {
+    show() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.add('active');
+    },
+    hide() {
+        const loader = document.getElementById('global-loader');
+        if (loader) loader.classList.remove('active');
+    }
+};
+
 const API = {
     BASE: '',
     getToken() { return localStorage.getItem('scm_token'); },
     async request(endpoint, options = {}) {
+        Loader.show();
         const token = this.getToken();
         const headers = { ...options.headers };
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -32,6 +44,8 @@ const API = {
                 Toast.show(error.message, 'error');
             }
             throw error;
+        } finally {
+            Loader.hide();
         }
     },
     async get(endpoint) { return this.request(endpoint); },
@@ -50,6 +64,7 @@ const API = {
         });
     },
     async postFormData(endpoint, formData) {
+        Loader.show();
         const token = this.getToken();
         const headers = {};
         if (token) headers['Authorization'] = `Bearer ${token}`;
@@ -71,6 +86,8 @@ const API = {
         } catch (error) {
             Toast.show(error.message, 'error');
             throw error;
+        } finally {
+            Loader.hide();
         }
     },
     async delete(endpoint) {
@@ -264,6 +281,33 @@ const Sidebar = {
         if (!sidebar) return;
         const collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
         if (collapsed) sidebar.classList.add('collapsed');
+
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-group').forEach(group => {
+            const parentLink = group.querySelector('.nav-parent');
+            const subLinks = group.querySelectorAll('.nav-sub a');
+            
+            let isActive = false;
+            subLinks.forEach(link => {
+                // Exact match or active logic
+                if (link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                    isActive = true;
+                }
+            });
+
+            if (isActive) {
+                group.classList.add('expanded');
+                if (parentLink) parentLink.classList.add('active');
+            }
+
+            if (parentLink) {
+                parentLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    group.classList.toggle('expanded');
+                });
+            }
+        });
     },
     toggle() {
         const sidebar = document.querySelector('.app-sidebar');
@@ -413,9 +457,52 @@ async function loadSidebarUser() {
     }
 }
 
+const TableSort = {
+    init() {
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.classList.add('sortable');
+            // Remove existing listeners by cloning (if any) to prevent duplicates
+            const newTh = th.cloneNode(true);
+            th.parentNode.replaceChild(newTh, th);
+            newTh.addEventListener('click', () => this.sort(newTh));
+        });
+    },
+    sort(th) {
+        const table = th.closest('table');
+        const tbody = table.querySelector('tbody');
+        if (!tbody) return;
+        const colIndex = Array.from(th.parentNode.children).indexOf(th);
+        const type = th.dataset.sort;
+        let isAsc = th.classList.contains('sort-asc');
+        
+        table.querySelectorAll('th').forEach(h => {
+            h.classList.remove('sort-asc', 'sort-desc');
+        });
+        
+        isAsc = !isAsc;
+        th.classList.add(isAsc ? 'sort-asc' : 'sort-desc');
+
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        rows.sort((a, b) => {
+            const aText = a.children[colIndex]?.textContent.trim() || '';
+            const bText = b.children[colIndex]?.textContent.trim() || '';
+            
+            if (type === 'number') {
+                const aNum = parseFloat(aText.replace(/[^0-9.-]+/g,"")) || 0;
+                const bNum = parseFloat(bText.replace(/[^0-9.-]+/g,"")) || 0;
+                return isAsc ? aNum - bNum : bNum - aNum;
+            }
+            return isAsc ? aText.localeCompare(bText) : bText.localeCompare(aText);
+        });
+        
+        tbody.append(...rows);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     Theme.init();
     Toast.init();
+    TableSort.init();
     injectTodayDate();
     if (typeof Chart !== 'undefined') ChartDefaults.init();
     // Auth check (skip for login page)

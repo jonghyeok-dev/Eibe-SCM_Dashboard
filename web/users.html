@@ -60,7 +60,7 @@
             <section class="card section-gap">
                 <div class="card-header collapsible-header" id="template-header" onclick="toggleCollapsible('template-header')">
                     <h2 class="card-title">데이터 양식 관리</h2>
-                    <div class="btn-group" onclick="event.stopPropagation();">
+                    <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
                         <button class="btn btn--primary" onclick="downloadTemplate('all')">전체 양식 엑셀 다운로드</button>
                     </div>
                     <span class="collapse-icon">▼</span>
@@ -99,7 +99,7 @@
             <section class="card section-gap" id="warehouse-section">
                 <div class="card-header collapsible-header" id="warehouse-header" onclick="toggleCollapsible('warehouse-header')">
                     <h2 class="card-title">창고 관리</h2>
-                    <div class="btn-group" onclick="event.stopPropagation();">
+                    <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
                         <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddWarehouseModal()">+ 창고 추가</button>
                     </div>
                     <span class="collapse-icon">▼</span>
@@ -201,7 +201,7 @@
                     <div style="display:flex; align-items:center; gap:var(--space-md); flex:1;">
                         <h2 class="card-title">품목 관리</h2>
                     </div>
-                    <div class="btn-group" onclick="event.stopPropagation();">
+                    <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
                         <input type="file" id="product-upload" accept=".xlsx" style="display:none;">
                         <button class="btn btn--secondary btn--sm" onclick="document.getElementById('product-upload').click()">엑셀 업로드</button>
                         <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddProductModal()">+ 품목 추가</button>
@@ -234,7 +234,7 @@
                 <div class="card">
                     <div class="card-header collapsible-header" id="user-header" onclick="toggleCollapsible('user-header')">
                         <h2 class="card-title">사용자 관리</h2>
-                        <div class="btn-group" onclick="event.stopPropagation();">
+                        <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
                             <button class="btn btn--primary btn--sm" onclick="AdminPage.showAddUserModal()">+ 계정 추가</button>
                         </div>
                         <span class="collapse-icon">▼</span>
@@ -279,7 +279,7 @@
                 <div class="card">
                     <div class="card-header collapsible-header" id="snapshot-header" onclick="toggleCollapsible('snapshot-header')">
                         <h2 class="card-title">DB 스냅샷 (백업) 이력</h2>
-                        <div class="btn-group" onclick="event.stopPropagation();">
+                        <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
                             <button class="btn btn--secondary btn--sm" onclick="AdminPage.triggerSnapshot()">수동 스냅샷 생성</button>
                         </div>
                         <span class="collapse-icon">▼</span>
@@ -287,18 +287,20 @@
                     <div class="card-body collapsible-body card-body--no-pad" id="snapshot-body">
                         <div class="data-table-wrapper">
                             <table class="data-table" id="snapshot-table">
-                                <thead>
-                                    <tr>
-                                        <th>생성일시</th>
-                                        <th>파일경로</th>
-                                        <th>유형</th>
-                                    </tr>
-                                </thead>
+                            <thead>
+                                <tr>
+                                    <th>일시</th>
+                                    <th>파일명</th>
+                                    <th>유형</th>
+                                    <th>기능</th>
+                                </tr>
+                            </thead>
                                 <tbody>
                                     <tr>
                                         <td>2026-06-18 00:00:00</td>
                                         <td style="font-size: 0.78rem; color: var(--text-muted);">local_erp_20260618_000000.db</td>
                                         <td><span class="badge badge--primary">자동</span></td>
+                                        <td><button class="btn btn--secondary btn--sm" onclick="AdminPage.restoreSnapshot('local_erp_20260618_000000.db')">복원</button></td>
                                     </tr>
                                     <tr>
                                         <td>2026-06-17 12:30:00</td>
@@ -620,6 +622,7 @@
                                 <td>${snap.created_at}</td>
                                 <td style="font-size: 0.78rem; color: var(--text-muted);">${snap.snapshot_path.split(/\\|\//).pop()}</td>
                                 <td>${snap.is_auto ? '<span class="badge badge--primary">자동</span>' : '<span class="badge badge--warning">수동</span>'}</td>
+                                <td><button class="btn btn--danger btn--sm" onclick="AdminPage.restoreSnapshot(${snap.id})">복원</button></td>
                             </tr>
                         `).join('');
                     }
@@ -669,6 +672,18 @@
                     this.loadSnapshots();
                 } catch(e) {
                     Toast.show('스냅샷 생성 실패 (관리자 권한 필요)');
+                }
+            },
+
+            async restoreSnapshot(snapId) {
+                if (!confirm(`이 스냅샷으로 데이터베이스를 덮어씁니다. 현재 데이터가 유실될 수 있습니다.\n\n정말로 복원하시겠습니까?`)) return;
+                try {
+                    Toast.show('스냅샷 복원 중...');
+                    const res = await API.post(`/api/snapshot/restore/${snapId}`);
+                    Toast.show(res.message || '복원 완료. 페이지를 새로고침합니다.');
+                    setTimeout(() => window.location.reload(), 1500);
+                } catch(e) {
+                    Toast.show('스냅샷 복원 실패');
                 }
             },
 

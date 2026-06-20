@@ -1,7 +1,7 @@
 /* EIBE SCM - Main CSS */
 /* Clean corporate design — EIBE brand green */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+KR:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 :root {
     /* Light Mode - Clean white base */
@@ -60,7 +60,7 @@
     --transition-sidebar: 280ms cubic-bezier(0.4, 0, 0.2, 1);
 
     /* Typography */
-    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-sans: 'Inter', 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
     /* Sidebar */
@@ -98,6 +98,40 @@
 /* ── Reset & Base ──────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 html { font-size: 14px; scroll-behavior: smooth; }
+/* Global Loader Overlay */
+#global-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--bg-glass);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--transition-base);
+    backdrop-filter: blur(4px);
+}
+#global-loader.active {
+    opacity: 1;
+    pointer-events: all;
+}
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border-default);
+    border-top: 4px solid var(--accent-main);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
 body {
     font-family: var(--font-sans);
     background: var(--bg-primary);
@@ -106,6 +140,11 @@ body {
     min-height: 100vh;
     transition: background-color var(--transition-base), color var(--transition-base);
 }
+/* ── Font Consistency — force on all interactive elements ───── */
+input, select, textarea, button, optgroup {
+    font-family: var(--font-sans);
+}
+table, th, td { font-family: var(--font-sans); }
 
 /* ── Layout ────────────────────────────────────────────────── */
 .app-wrapper { display: flex; flex-direction: row; min-height: 100vh; }
@@ -398,21 +437,53 @@ body {
 .chart-container { position: relative; width: 100%; height: 380px; padding: var(--space-md); }
 
 /* ── Data Table — with vertical separators ──────────────────── */
-.data-table-wrapper { overflow-x: auto; }
-.data-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.data-table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-family: var(--font-sans); }
 .data-table th {
-    padding: 10px var(--space-lg); text-align: left; font-weight: 600;
-    color: var(--text-secondary); background: var(--bg-secondary);
-    border-bottom: 2px solid var(--border-table);
+    background: var(--bg-secondary);
+    padding: var(--space-sm) var(--space-md);
+    text-align: left;
+    font-weight: 600;
+    color: var(--text-secondary);
+    border-bottom: 2px solid var(--border-default);
     border-right: 1px solid var(--border-table);
-    white-space: nowrap; font-size: 0.82rem;
+    white-space: nowrap;
+    font-size: 0.82rem;
+}
+.data-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+    padding-right: 24px;
+}
+.data-table th.sortable:hover {
+    background: var(--border-hover);
+}
+.data-table th.sortable::after {
+    content: '↕';
+    position: absolute;
+    right: 8px;
+    opacity: 0.3;
+}
+.data-table th.sort-asc::after {
+    content: '↑';
+    opacity: 1;
+    color: var(--accent-main);
+}
+.data-table th.sort-desc::after {
+    content: '↓';
+    opacity: 1;
+    color: var(--accent-main);
 }
 .data-table th:last-child { border-right: none; }
 .data-table td {
-    padding: 10px var(--space-lg); color: var(--text-primary);
+    padding: 10px var(--space-md); color: var(--text-primary);
     border-bottom: 1px solid var(--border-default);
     border-right: 1px solid var(--border-default);
     vertical-align: middle;
+    max-width: 240px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .data-table td:last-child { border-right: none; }
 .data-table tbody tr { transition: background var(--transition-fast); }
@@ -1092,9 +1163,12 @@ body {
 .nav-group { position: relative; }
 .nav-group .nav-parent { margin-bottom: 0; }
 .nav-group .nav-sub { 
-    display: flex; flex-direction: column; 
+    display: none; flex-direction: column; 
     padding-left: 2.6rem; 
     margin: 2px 0 4px;
+}
+.nav-group.expanded .nav-sub {
+    display: flex;
 }
 .nav-group .nav-sub a {
     padding: 6px 12px;

@@ -278,6 +278,7 @@ class MonthlyOrderPlan(Base):
 
     plan_id = Column(Integer, primary_key=True, autoincrement=True)
     target_month = Column(Text, nullable=False)
+    arrival_month = Column(Text, nullable=True)
     product_id = Column(Integer, ForeignKey("PRODUCT_DB.id"), nullable=False)
     system_suggested_qty = Column(Integer, nullable=False, default=0)
     user_modified_qty = Column(Integer, nullable=False, default=0)

@@ -57,24 +57,12 @@
                 </div>
             </div>
 
-            <!-- 발주 정보 배너: 6개월 뒤 도착이라는 걸 명확히 -->
-            <div class="order-info-banner section-gap" id="order-info-banner">
-                <div class="info-item">
-                    <span class="info-label">발주 기준월</span>
-                    <span class="info-value" id="order-base-month">2026년 6월</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">발주월</span>
-                    <span class="info-value highlight" id="order-target-month">2026년 12월 도착분</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">리드타임</span>
-                    <span class="info-value">6개월 (생산 + 해상운송 + 통관)</span>
-                </div>
-            </div>
+            <div class="grid-layout" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); align-items: start;">
+            <!-- ════ 좌측: 발주 수량 입력 + 이력 트렌드 ════ -->
+            <div style="display: flex; flex-direction: column; gap: var(--space-lg); min-width: 0;">
 
             <!-- 발주 수량 입력 -->
-            <section class="card section-gap">
+            <section class="card">
                 <div class="card-header">
                     <h2 class="card-title">발주 수량 입력</h2>
                     <div class="btn-group">
@@ -89,6 +77,7 @@
                             <label class="form-label" style="margin-bottom:4px;">발주월</label>
                             <input type="month" class="form-input" id="order-month-filter" onchange="OrderPlan.onMonthChange()">
                         </div>
+                        <input type="hidden" id="arrival-month-filter">
                         <button class="btn btn--secondary btn--sm" onclick="OrderPlan.loadSavedPlans()" style="align-self:flex-end;">조회</button>
                     </div>
                     <div class="data-table-wrapper">
@@ -109,7 +98,7 @@
                                     <td>산양분유 1단계</td>
                                     <td class="text-right mono" style="color: var(--accent-main);">24,000</td>
                                     <td class="text-right">
-                                        <input type="number" class="form-input order-qty-input" value="24000" min="0" step="2400" style="width: 130px; text-align: right;" onchange="OrderPlan.onQtyChange()">
+                                        <input type="number" class="form-input order-qty-input" value="24000" min="0" step="2400" style="width: 130px; text-align: right;" oninput="OrderPlan.onQtyChange()" onchange="OrderPlan.onQtyChange()">
                                     </td>
                                     <td class="text-right mono" style="color: var(--text-muted);">0</td>
                                 </tr>
@@ -118,7 +107,7 @@
                                     <td>산양분유 2단계</td>
                                     <td class="text-right mono" style="color: var(--accent-main);">18,000</td>
                                     <td class="text-right">
-                                        <input type="number" class="form-input order-qty-input" value="18000" min="0" step="2400" style="width: 130px; text-align: right;" onchange="OrderPlan.onQtyChange()">
+                                        <input type="number" class="form-input order-qty-input" value="18000" min="0" step="2400" style="width: 130px; text-align: right;" oninput="OrderPlan.onQtyChange()" onchange="OrderPlan.onQtyChange()">
                                     </td>
                                     <td class="text-right mono" style="color: var(--text-muted);">0</td>
                                 </tr>
@@ -127,7 +116,7 @@
                                     <td>산양분유 3단계</td>
                                     <td class="text-right mono" style="color: var(--accent-main);">12,000</td>
                                     <td class="text-right">
-                                        <input type="number" class="form-input order-qty-input" value="14400" min="0" step="2400" style="width: 130px; text-align: right;" onchange="OrderPlan.onQtyChange()">
+                                        <input type="number" class="form-input order-qty-input" value="14400" min="0" step="2400" style="width: 130px; text-align: right;" oninput="OrderPlan.onQtyChange()" onchange="OrderPlan.onQtyChange()">
                                     </td>
                                     <td class="text-right mono" style="color: var(--accent-green);">+2,400</td>
                                 </tr>
@@ -136,7 +125,7 @@
                                     <td>산양분유 4단계</td>
                                     <td class="text-right mono" style="color: var(--accent-main);">9,600</td>
                                     <td class="text-right">
-                                        <input type="number" class="form-input order-qty-input" value="9600" min="0" step="2400" style="width: 130px; text-align: right;" onchange="OrderPlan.onQtyChange()">
+                                        <input type="number" class="form-input order-qty-input" value="9600" min="0" step="2400" style="width: 130px; text-align: right;" oninput="OrderPlan.onQtyChange()" onchange="OrderPlan.onQtyChange()">
                                     </td>
                                     <td class="text-right mono" style="color: var(--text-muted);">0</td>
                                 </tr>
@@ -146,10 +135,31 @@
                 </div>
             </section>
 
-            <!-- 시뮬레이션 설정 -->
-            <section class="card section-gap">
+            <!-- 발주 이력 트렌드 -->
+            <section class="card">
+                <div class="card-header collapsible-header" id="trend-header" onclick="toggleCollapsible('trend-header')">
+                    <h2 class="card-title">발주 이력 트렌드</h2>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="card-body collapsible-body" id="trend-body">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="order-trend-table">
+                            <thead><tr><th>발주월</th><th>도착월</th><th>품목코드</th><th>품명</th><th class="text-right">시스템 제안</th><th class="text-right">확정 수량</th><th class="text-right">차이</th></tr></thead>
+                            <tbody><tr><td colspan="7" class="empty-state">발주 이력을 조회 중...</td></tr></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            </div> <!-- End Left Column -->
+
+            <!-- ════ 우측: 시뮬레이션 + 히트맵 + 차트 ════ -->
+            <div style="display: flex; flex-direction: column; gap: var(--space-lg); min-width: 0;">
+
+            <!-- 시뮬레이션 설정 (버튼 없이, 자동 반응형) -->
+            <section class="card">
                 <div class="card-header">
-                    <h2 class="card-title">시뮬레이션 설정</h2>
+                    <h2 class="card-title">시뮬레이션</h2>
                 </div>
                 <div class="card-body">
                     <div class="sim-controls">
@@ -168,13 +178,12 @@
                             <input type="range" id="weight-slider" min="0.5" max="2.0" step="0.05" value="1.0">
                             <span class="slider-value" id="weight-value">1.00x</span>
                         </div>
-                        <button class="btn btn--primary" onclick="OrderPlan.runSimulation()">시뮬레이션 실행</button>
                     </div>
                 </div>
             </section>
 
-            <!-- 재고일수 히트맵 (접기/열기) -->
-            <section class="card section-gap">
+            <!-- 재고일수 히트맵 -->
+            <section class="card">
                 <div class="card-header collapsible-header" id="heatmap-header" onclick="toggleCollapsible('heatmap-header')">
                     <div style="display:flex; align-items:center; gap:var(--space-md);">
                         <h2 class="card-title">재고일수 히트맵</h2>
@@ -187,7 +196,7 @@
                 </div>
                 <div class="card-body collapsible-body" id="heatmap-body">
                     <p style="color: var(--text-muted); margin-bottom: var(--space-md); font-size: 0.82rem;">
-                        적정 재고일수: 약 90일(3개월). <strong style="color: var(--accent-red);">빨강(&lt;6주)</strong> / <strong style="color: var(--accent-amber);">노랑(6~9주)</strong> / <strong style="color: var(--accent-green);">녹색(9~13주)</strong> / <strong>파랑(&gt;13주 = 과잉)</strong>
+                        적정 재고일수: 약 90일(3개월). <strong style="color: var(--accent-red);">빨강(0~1개월)</strong> / <strong style="color: var(--accent-amber);">노랑(1~2개월)</strong> / <strong style="color: var(--accent-green);">녹색(2~3개월)</strong> / <strong style="color: #1b64da;">파랑(3개월 이상, 과잉)</strong>
                     </p>
                     <div class="data-table-wrapper">
                         <table class="heatmap-table" id="heatmap-table">
@@ -198,24 +207,8 @@
                 </div>
             </section>
 
-            <!-- 발주 이력 트렌드 -->
-            <section class="card section-gap">
-                <div class="card-header collapsible-header" id="trend-header" onclick="toggleCollapsible('trend-header')">
-                    <h2 class="card-title">발주 이력 트렌드</h2>
-                    <span class="collapse-icon">▼</span>
-                </div>
-                <div class="card-body collapsible-body" id="trend-body">
-                    <div class="data-table-wrapper">
-                        <table class="data-table" id="order-trend-table">
-                            <thead><tr><th>발주월</th><th>품목코드</th><th>품명</th><th class="text-right">시스템 제안</th><th class="text-right">확정 수량</th><th class="text-right">차이</th></tr></thead>
-                            <tbody><tr><td colspan="6" class="empty-state">발주 이력을 조회 중...</td></tr></tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 6개월 시각화 (접기/열기) -->
-            <section class="card section-gap-lg">
+            <!-- 6개월 재고 추이 차트 -->
+            <section class="card">
                 <div class="card-header collapsible-header" id="chart-header" onclick="toggleCollapsible('chart-header')">
                     <h2 class="card-title" id="chart-title">전체 품목 합산 재고 추이 (24주)</h2>
                     <span class="collapse-icon">▼</span>
@@ -226,6 +219,9 @@
                     </div>
                 </div>
             </section>
+
+            </div> <!-- End Right Column -->
+            </div> <!-- End Grid -->
         </main>
     </div>
 
@@ -248,28 +244,19 @@
             ],
 
             init() {
-                // Set order info banner
                 const now = new Date();
-                const baseMonth = `${now.getFullYear()}년 ${now.getMonth() + 1}월`;
-                document.getElementById('order-base-month').textContent = baseMonth;
-
-                // Set default month filter to 6 months from now
                 const arrivalDate = new Date(now);
                 arrivalDate.setMonth(arrivalDate.getMonth() + 6);
-                const defaultMonth = `${arrivalDate.getFullYear()}-${String(arrivalDate.getMonth() + 1).padStart(2, '0')}`;
+                const defaultArrivalMonth = `${arrivalDate.getFullYear()}-${String(arrivalDate.getMonth() + 1).padStart(2, '0')}`;
+                
                 const monthFilter = document.getElementById('order-month-filter');
-                if (monthFilter) monthFilter.value = defaultMonth;
+                if (monthFilter) monthFilter.value = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
-                this.updateBannerFromFilter();
+                const arrMonthFilter = document.getElementById('arrival-month-filter');
+                if (arrMonthFilter) arrMonthFilter.value = defaultArrivalMonth;
             },
 
-            updateBannerFromFilter() {
-                const monthFilter = document.getElementById('order-month-filter');
-                if (!monthFilter || !monthFilter.value) return;
-                const [y, m] = monthFilter.value.split('-').map(Number);
-                const targetMonth = `${y}년 ${m}월 도착분`;
-                document.getElementById('order-target-month').textContent = targetMonth;
-            },
+
 
             getOrderQtys() {
                 const qtys = {};
@@ -325,7 +312,6 @@
             },
 
             onMonthChange() {
-                this.updateBannerFromFilter();
                 this.loadSavedPlans();
             },
 
@@ -361,12 +347,13 @@
                 const rows = document.querySelectorAll('#order-input-table tbody tr[data-product-id]');
                 if (!rows.length) return;
                 const plans = [];
-                const targetMonth = document.getElementById('order-month-filter')?.value || this.getTargetMonth();
+                const targetMonth = document.getElementById('order-month-filter')?.value || `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}`;
+                const arrivalMonth = document.getElementById('arrival-month-filter')?.value || this.getTargetMonth();
                 rows.forEach(row => {
                     const product_id = parseInt(row.dataset.productId);
                     const input = row.querySelector('.order-qty-input');
                     const user_modified_qty = parseInt(input?.value) || 0;
-                    plans.push({ target_month: targetMonth, product_id, user_modified_qty });
+                    plans.push({ target_month: targetMonth, arrival_month: arrivalMonth, product_id, user_modified_qty });
                 });
                 try {
                     await API.post('/api/order-plan/bulk-save', { plans });
@@ -447,12 +434,13 @@
                     const data = await API.get('/api/order-plan');
                     const tbody = document.querySelector('#order-trend-table tbody');
                     if (!data || !data.length) {
-                        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">저장된 발주 이력이 없습니다</td></tr>';
+                        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">저장된 발주 이력이 없습니다</td></tr>';
                         return;
                     }
                     tbody.innerHTML = data.map(d => `
                         <tr>
                             <td class="mono">${d.target_month}</td>
+                            <td class="mono">${d.arrival_month || '-'}</td>
                             <td class="mono">${d.product_code || ''}</td>
                             <td>${d.product_name || ''}</td>
                             <td class="text-right mono">${Format.number(d.system_suggested_qty || 0)}</td>
@@ -608,12 +596,15 @@
                         // 재고일수 = 기말재고 / 주간출고 (주 단위)
                         const invWeeks = weekData.ending_stock / weekData.weekly_demand;
 
-                        // 적정 재고일수 기준: 13주(3개월)
-                        // <6주: 위험(빨강), 6~9주: 주의(노랑), 9~13주: 양호(녹색), >13주: 과잉(파랑)
+                        // 적정 재고일수: 12주(3개월)
+                        // 0~4주(1개월 이하): 빨강
+                        // 4~8주(1~2개월): 노랑
+                        // 8~12주(2~3개월): 녹색 (적정)
+                        // 12주 이상(3개월 이상): 파랑 (과잉)
                         let riskClass = 'risk-safe'; // 파랑 (과잉)
-                        if (invWeeks < 6) riskClass = 'risk-high';      // 빨강
-                        else if (invWeeks < 9) riskClass = 'risk-mid';   // 노랑
-                        else if (invWeeks < 13) riskClass = 'risk-low';  // 녹색
+                        if (invWeeks <= 4) riskClass = 'risk-high';      // 빨강
+                        else if (invWeeks <= 8) riskClass = 'risk-mid';   // 노랑
+                        else if (invWeeks <= 12) riskClass = 'risk-low';  // 녹색
 
                         if (this.heatmapUnit === 'monthly') {
                             const invMonths = invWeeks / 4.33;
@@ -644,7 +635,7 @@
                             <td class="text-right">
                                 <input type="number" class="form-input order-qty-input" value="${savedValue}" 
                                        min="0" step="${stepVal}" style="width: 130px; text-align: right;"
-                                       onchange="OrderPlan.onQtyChange()">
+                                       oninput="OrderPlan.onQtyChange()" onchange="OrderPlan.onQtyChange()">
                             </td>
                             <td class="text-right mono" style="color: var(--text-muted);">0</td>
                         </tr>`;
@@ -661,8 +652,6 @@
             const sliderVal = document.getElementById('weight-value');
             slider.addEventListener('input', (e) => {
                 sliderVal.textContent = parseFloat(e.target.value).toFixed(2) + 'x';
-            });
-            slider.addEventListener('change', () => {
                 OrderPlan.runSimulation();
             });
 
