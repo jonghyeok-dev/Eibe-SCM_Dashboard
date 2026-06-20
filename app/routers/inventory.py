@@ -490,7 +490,16 @@ def get_order_plan_simulation(
         )
 
     products = db.query(ProductDB).all()
-    snapshots = db.query(InventorySnapshot).all()
+    
+    # 최신 스냅샷 날짜 기준 필터링 (뻥튀기 버그 수정)
+    latest_date_row = db.query(func.max(InventorySnapshot.snapshot_date)).first()
+    latest_date = latest_date_row[0] if latest_date_row and latest_date_row[0] else None
+    
+    if latest_date:
+        snapshots = db.query(InventorySnapshot).filter(InventorySnapshot.snapshot_date == latest_date).all()
+    else:
+        snapshots = []
+        
     outflows = db.query(OutflowHistory).all()
 
     result = []
@@ -502,12 +511,15 @@ def get_order_plan_simulation(
             if s.product_code == product.product_code
         )
 
-        # 출고 데이터
-        product_outflows = sorted(
-            [o for o in outflows if o.product_id == product.id],
-            key=lambda x: x.base_date,
-        )
-        outflow_values = [o.simple_outflow_qty for o in product_outflows]
+        # 출고 데이터 (날짜별 그룹핑 합산 버그 수정)
+        product_outflows = [o for o in outflows if o.product_id == product.id]
+        outflow_by_date = {}
+        for o in product_outflows:
+            outflow_by_date[o.base_date] = outflow_by_date.get(o.base_date, 0) + o.simple_outflow_qty
+            
+        sorted_outflow_dates = sorted(outflow_by_date.keys())
+        outflow_values = [outflow_by_date[d] for d in sorted_outflow_dates]
+        
         smoothing = calc_weekly_smoothing_constant(outflow_values) if outflow_values else 0
 
         # 판매 기반 감모 버퍼
@@ -555,7 +567,9 @@ def get_order_plan_simulation(
         suggested_qty = 0
         if simulation and simulation[-1]["ending_stock"] < smoothing * 6:
             shortage = smoothing * 6 - simulation[-1]["ending_stock"]
-            suggested_qty = calc_order_suggestion(shortage, 0)
+            # MOQ 적용 (ProductDB.pack_qty_per_tu 활용)
+            moq = product.pack_qty_per_tu if product.pack_qty_per_tu > 0 else 24
+            suggested_qty = calc_order_suggestion(shortage, moq)
 
         today = date.today()
         target_month = (today + timedelta(weeks=24)).strftime("%Y-%m")
