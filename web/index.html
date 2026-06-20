@@ -7,8 +7,16 @@
     <title>EIBE SCM | 요약</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script>
+        if (!localStorage.getItem('scm_token') && window.location.pathname !== '/login') {
+            window.location.replace('/login');
+        }
+    </script>
 </head>
 <body>
+    <div id="global-loader">
+        <div class="spinner"></div>
+    </div>
     <div class="app-wrapper" id="dashboard-page">
         <aside class="app-sidebar">
             <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">

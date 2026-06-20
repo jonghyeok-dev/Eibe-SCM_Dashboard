@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EIBE SCM | 현재고 현황</title>
     <link rel="stylesheet" href="/static/css/style.css">
+    <script>
+        if (!localStorage.getItem('scm_token') && window.location.pathname !== '/login') {
+            window.location.replace('/login');
+        }
+    </script>
 </head>
 <body>
     <div class="app-wrapper">
@@ -100,12 +105,12 @@
                         <table class="data-table" id="inventory-detail-table">
                             <thead>
                                 <tr>
-                                    <th>창고</th>
-                                    <th>품목코드</th>
-                                    <th>품목명</th>
-                                    <th class="text-right">현재고 (캔)</th>
-                                    <th class="text-right">자산 금액</th>
-                                    <th>업데이트 일시</th>
+                                    <th data-sort="string">창고</th>
+                                    <th data-sort="string">품목코드</th>
+                                    <th data-sort="string">품목명</th>
+                                    <th data-sort="number" class="text-right">현재고 (캔)</th>
+                                    <th data-sort="number" class="text-right">자산 금액</th>
+                                    <th data-sort="string">업데이트 일시</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -298,11 +303,11 @@
                     .map(inv => {
                         const ffc = this.getFfc(inv.ffcId);
                         const prod = this.getProduct(inv.productCode);
-                        const value = prod ? inv.qty * prod.unitPrice : 0;
+                        const value = inv.totalValueKrw || 0;
                         const isLow = inv.qty < 5000;
                         return `
                             <tr data-ffc-id="${inv.ffcId}">
-                                <td><span class="status-dot ${isLow ? 'status-dot--amber' : 'status-dot--green'}"></span>${ffc ? ffc.name : inv.ffcId}</td>
+                                <td>${ffc ? ffc.name : inv.ffcId}</td>
                                 <td class="mono">${inv.productCode}</td>
                                 <td>${prod ? prod.name : ''}</td>
                                 <td class="text-right mono" style="font-weight:600;">${Format.number(inv.qty)}</td>
@@ -342,7 +347,7 @@
                 filtered.forEach(inv => {
                     const prod = this.getProduct(inv.productCode);
                     totalQty += inv.qty;
-                    totalValue += prod ? inv.qty * prod.unitPrice : 0;
+                    totalValue += inv.totalValueKrw || 0;
                 });
 
                 document.getElementById('inv-total-qty').textContent = Format.number(totalQty);
@@ -535,12 +540,23 @@
                     ]);
                     // Replace sample data with API data if available
                     if (summary && summary.length) {
-                        this.sampleInventory = summary.map(s => ({
-                            ffcId: s.ffc_id || s.ffcId || s.warehouse_name,
-                            productCode: s.product_code || s.productCode,
-                            qty: s.current_can_qty || s.qty || 0,
-                            updated: s.updated_at || s.updated || Format.dateTime()
-                        }));
+                        const newInventory = [];
+                        summary.forEach(wh => {
+                            if (wh.products) {
+                                wh.products.forEach(p => {
+                                    newInventory.push({
+                                        ffcId: wh.warehouse_id || wh.warehouse_name,
+                                        productCode: p.product_code || p.product_name,
+                                        qty: p.total_qty || 0,
+                                        totalValueKrw: p.total_value_krw || 0,
+                                        updated: Format.dateTime()
+                                    });
+                                });
+                            }
+                        });
+                        if (newInventory.length > 0) {
+                            this.sampleInventory = newInventory;
+                        }
                     }
                     if (ffcs && ffcs.length) {
                         this.sampleFfcs = ffcs.map(f => ({ id: f.id || f.ffc_id || f.warehouse_name, name: f.name || f.warehouse_name || f.ffc_name }));

@@ -160,6 +160,7 @@ class OrderResponse(BaseModel):
     order_month: str
     product_code: str
     order_qty: int
+    matched_production_id: Optional[int] = None
     created_at: Optional[str] = None
     product_name: Optional[str] = None
     class Config:
@@ -298,6 +299,7 @@ class TransferPlanResponse(BaseModel):
 
 class OrderPlanCreate(BaseModel):
     target_month: str
+    arrival_month: Optional[str] = None
     product_id: int
     user_modified_qty: int = Field(default=0, ge=0)
 
@@ -307,6 +309,7 @@ class OrderPlanBulkSave(BaseModel):
 class OrderPlanResponse(BaseModel):
     plan_id: int
     target_month: str
+    arrival_month: Optional[str] = None
     product_id: int
     system_suggested_qty: int
     user_modified_qty: int
