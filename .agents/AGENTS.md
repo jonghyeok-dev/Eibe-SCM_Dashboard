@@ -184,3 +184,11 @@ web/
 ### 7.7. 시뮬레이션 로직 TypeError 방어 (Null Safety)
 - **증상:** 발주 시뮬레이션 중 `pack_qty_per_tu` 필드가 `None`일 때 TypeError 발생.
 - **원인 및 조치:** `if (product.pack_qty_per_tu and product.pack_qty_per_tu > 0)`로 Null 가드 강화.
+
+### 7.8. 날짜 파싱 Null Safety 강화 (문자열 처리)
+- **증상:** `expiry_date` 등의 날짜 데이터를 파싱할 때 띄어쓰기가 포함되어 있거나 포맷이 일치하지 않아 런타임 에러 발생.
+- **원인 및 조치:** `snap.expiry_date.split(" ")[0]` 처리를 추가하여 시간 문자열이 포함되었을 경우에도 안전하게 날짜(Date) 부분만 분리해 내도록 방어 로직 강화.
+
+### 7.9. 엑셀 파싱(parse_excel_file) 시그니처 및 인자 오류 해결
+- **증상:** 입고 파이프라인 등에서 엑셀 업로드 시 파일 파싱 과정에서 파라미터 불일치로 인한 오류 발생.
+- **원인 및 조치:** `parse_excel_file()` 함수가 `file_bytes` 데이터와 `template_type`을 명확히 전달받도록 함수 시그니처를 수정, 템플릿 검증 및 파싱 로직의 결함을 해결.

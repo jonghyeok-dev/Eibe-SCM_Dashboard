@@ -100,8 +100,8 @@ TEMPLATE_DEFS = {
     },
     "inventory_snapshot": {
         "sheet_name": "현재고스냅샷",
-        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "유통기한(YYYY-MM-DD)", "수량(캔)", "업데이트일시(YYYY-MM-DD HH:MM:SS)"],
-        "example": ["2026-06-19", "용인 메인창고", "슈누프로1단계", "SN-001", "2028-05-15", 12000, "2026-06-19 15:30:00"],
+        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "유통기한(YYYY-MM-DD)", "수량(캔)"],
+        "example": ["2026-06-19", "용인 메인창고", "슈누프로1단계", "SN-001", "2028-05-15", 12000],
         "filename": "현재고스냅샷_양식.xlsx",
     },
 }
@@ -152,14 +152,72 @@ def get_template_filename(template_type: str) -> str:
     return "SCM_양식.xlsx"
 
 
-def parse_excel_file(file_path: str) -> dict:
-    """업로드된 엑셀 파일을 읽어 각 시트별 DataFrame을 dict로 반환"""
+def parse_excel_file(file_bytes: bytes, template_type: str = None) -> list:
+    """업로드된 엑셀 파일을 읽어 지정된 시트의 데이터를 dict 리스트로 반환"""
     try:
-        dfs = pd.read_excel(file_path, sheet_name=None, engine="openpyxl")
-        return dfs
+        dfs = pd.read_excel(BytesIO(file_bytes), sheet_name=None, engine="openpyxl")
+        
+        sheet_name = list(dfs.keys())[0]
+        if template_type and template_type in TEMPLATE_DEFS:
+            expected_sheet = TEMPLATE_DEFS[template_type]["sheet_name"]
+            if expected_sheet in dfs:
+                sheet_name = expected_sheet
+                
+        df = dfs[sheet_name]
+        if df.empty:
+            return []
+            
+        # 두 번째 행이 예시 행이면 제거
+        if len(df) > 0 and template_type in TEMPLATE_DEFS:
+            example = TEMPLATE_DEFS[template_type].get("example")
+            if example:
+                first_row = df.iloc[0]
+                try:
+                    if all(str(first_row.iloc[i]) == str(example[i]) for i in range(min(len(first_row), len(example)))):
+                        df = df.iloc[1:].reset_index(drop=True)
+                except (IndexError, TypeError):
+                    pass
+                    
+        # Replace NaN with None
+        df = df.where(pd.notnull(df), None)
+        
+        # 맵핑 설정
+        field_mapping = {
+            "order": {
+                "발주월(YYYY-MM)": "order_month", "품목코드": "product_code", "발주수량(캔)": "order_qty"
+            },
+            "production": {
+                "구매코드": "purchase_code", "생산코드": "production_code", 
+                "발주월(YYYY-MM)": "order_month", "생산수량(캔)": "production_qty", "품목코드": "product_code"
+            },
+            "inbound": {
+                "인보이스번호": "invoice_no", "BL번호": "bl_no", "매핑값": "mapping_value", 
+                "구매코드": "purchase_code", "생산코드": "production_code",
+                "선적일(YYYY-MM-DD)": "shipping_date", "한국도착일(YYYY-MM-DD)": "korea_arrival_date", 
+                "ETA(YYYY-MM-DD)": "eta", "제조일자(YYYY-MM-DD)": "manufacture_date", 
+                "유통기한(YYYY-MM-DD)": "expiry_date", "카툰수": "carton_qty", "캔수": "can_qty",
+                "단가(외화)": "unit_price", "총단가(외화)": "total_price", 
+                "결제일(YYYY-MM-DD)": "payment_date", "인보이스발행일(YYYY-MM-DD)": "invoice_date",
+                "결제환율": "exchange_rate", "결제금액(원화)": "payment_amount_krw", "품목코드": "product_code",
+                "상태(생산국출발/해상운송중/한국도착/통관중/입고일선정중/입고완료)": "status"
+            }
+        }
+        
+        mapping = field_mapping.get(template_type, {})
+        results = []
+        for _, row in df.iterrows():
+            item = {}
+            for kr_col, en_col in mapping.items():
+                if kr_col in df.columns:
+                    val = row[kr_col]
+                    item[en_col] = val if pd.notna(val) else None
+            if item:
+                results.append(item)
+                
+        return results
     except Exception as e:
         print(f"Excel parsing error: {e}")
-        raise ValueError("엑셀 파일을 파싱하는 데 실패했습니다. 양식을 확인해주세요.")
+        raise ValueError(f"엑셀 파일을 파싱하는 데 실패했습니다: {e}")
 
 
 def validate_dataframe(df: pd.DataFrame, expected_columns: list) -> bool:
@@ -207,7 +265,7 @@ def parse_inventory_excel(file_bytes: bytes) -> list:
                 "product_code": str(row.iloc[3]).strip() if pd.notna(row.iloc[3]) else None,
                 "expiry_date": str(row.iloc[4]).strip() if pd.notna(row.iloc[4]) else None,
                 "qty_cans": int(row.iloc[5]) if pd.notna(row.iloc[5]) else 0,
-                "updated_at": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else None,
+                
             }
             results.append(item)
         except (ValueError, IndexError):

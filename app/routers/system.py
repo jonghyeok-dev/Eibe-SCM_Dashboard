@@ -65,13 +65,13 @@ def restore_snapshot(
     if not snapshot:
         raise HTTPException(status_code=404, detail="스냅샷을 찾을 수 없습니다.")
     
-    if not os.path.exists(snapshot.file_path):
+    if not os.path.exists(snapshot.snapshot_path):
         raise HTTPException(status_code=404, detail="스냅샷 파일이 물리적으로 존재하지 않습니다.")
     
     try:
         from app.database import engine
         engine.dispose()
-        shutil.copy2(snapshot.file_path, DB_PATH)
+        shutil.copy2(snapshot.snapshot_path, DB_PATH)
         wal_path = DB_PATH + "-wal"
         shm_path = DB_PATH + "-shm"
         if os.path.exists(wal_path):

@@ -19,17 +19,26 @@
                     <path d="M15 18l-6-6 6-6"/>
                 </svg>
             </button>
-            <div class="sidebar-brand">
-                <img src="/static/img/eibelogo.png" alt="EIBE" class="sidebar-logo-img">
-                <h1>EIBE SCM</h1>
+            <div class="sidebar-brand" style="justify-content: center;">
+                <h1 style="font-size: 1.1rem; letter-spacing: -0.5px;">EIBE SCM System</h1>
             </div>
             <nav class="sidebar-nav">
-                <a href="/" class="nav-item"><i class="ti ti-dashboard"></i>대시보드</a>
-                <a href="/inventory" class="nav-item active"><i class="ti ti-box"></i>현재고</a>
-                <a href="/expiry" class="nav-item"><i class="ti ti-calendar-time"></i>유통기한</a>
-                <a href="/order_plan" class="nav-item"><i class="ti ti-report-analytics"></i>발주</a>
-                <a href="/matching" class="nav-item"><i class="ti ti-truck-return"></i>입고</a>
-                <a href="/users" class="nav-item"><i class="ti ti-settings"></i>설정</a>
+                <a href="/" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
+                <a href="/inventory" class="nav-item active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고</span></a>
+                <a href="/expiry" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>폐기</span></a>
+                <a href="/order-plan" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주</span></a>
+                <a href="/matching" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고</span></a>
+                <div class="nav-group">
+                    <a href="/users" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>설정</span></a>
+                    <div class="nav-sub">
+                        <a href="/users#template-header">데이터 양식</a>
+                        <a href="/users#warehouse-header">창고 관리</a>
+                        <a href="/users#product-header">품목 관리</a>
+                        <a href="/users#user-header">사용자 관리</a>
+                        <a href="/users#snapshot-header">백업/스냅샷</a>
+                        <a href="/users#moq-header">이관 MOQ</a>
+                    </div>
+                </div>
             </nav>
             <div class="sidebar-user-info">
                 <div class="user-avatar">U</div>
@@ -51,8 +60,8 @@
         <main class="main-content">
             <div class="page-header">
                 <div class="page-header-left">
-                    <h1 class="page-title" id="main-page-title">현재고 상세</h1>
-                    <p class="page-subtitle" id="main-page-subtitle">창고별 현재고 보유량 및 관리</p>
+                    <h1 class="page-title" id="main-page-title">현재고</h1>
+                    <p class="page-subtitle" id="main-page-subtitle">창고별 재고 현황</p>
                 </div>
             </div>
 
@@ -84,7 +93,7 @@
                         <button class="btn btn--secondary btn--sm" onclick="downloadTemplate('inventory_snapshot')">양식 다운로드</button>
                         <input type="file" id="inventory-upload" accept=".xlsx" style="display: none;">
                         <button class="btn btn--primary btn--sm" onclick="document.getElementById('inventory-upload').click()">엑셀 업로드</button>
-                        <button class="btn btn--primary btn--sm" onclick="InventoryPage.showManageModal()">+ 재고 추가</button>
+                        <button class="btn btn--primary btn--sm" onclick="InventoryPage.addInlineRow()">+ 행 추가</button>
                         <button class="btn btn--secondary btn--sm" onclick="InventoryPage.load()">새로고침</button>
                     </div>
                 </div>
@@ -118,45 +127,7 @@
     </div>
 
     <!-- 재고 관리(추가/수정) 모달 -->
-    <div id="inv-manage-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="event.target===this && InventoryPage.closeManageModal()">
-            <div class="modal-content" style="max-width: 500px;">
-                <h2 id="inv-modal-title">재고 추가</h2>
-                <input type="hidden" id="inv-edit-id" value="">
-
-                <div class="form-group">
-                    <label class="form-label">스냅샷 일자</label>
-                    <input type="date" class="form-input" id="inv-date">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">창고</label>
-                    <select class="form-select" id="inv-ffc"></select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">품목</label>
-                    <select class="form-select" id="inv-product"></select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">유통기한</label>
-                    <input type="date" class="form-input" id="inv-expiry">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">수량 (캔)</label>
-                    <input type="number" class="form-input" id="inv-qty" min="0" value="0">
-                </div>
-                
-                <div class="form-group" id="inv-updated-group" style="display: none;">
-                    <label class="form-label" style="color: var(--accent-amber);">업데이트 일시 (관리자 전용)</label>
-                    <input type="text" class="form-input" id="inv-updated-at" placeholder="YYYY-MM-DD HH:MM:SS">
-                    <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">* 미입력 시 현재 시각으로 자동 저장됩니다.</p>
-                </div>
-
-                <div class="modal-actions" style="margin-top: 24px;">
-                    <button class="btn btn--secondary" onclick="InventoryPage.closeManageModal()">취소</button>
-                    <button class="btn btn--primary" onclick="InventoryPage.saveInventory()">저장</button>
-                </div>
-            </div>
-        </div>
+    
     </div>
 
     <div id="toast-container" class="toast-container"></div>
@@ -191,6 +162,57 @@
                 { ffcId: 'coupang', productCode: 'SN-001', qty: 5400, updated: '2026-06-19 07:55:20' },
                 { ffcId: 'coupang', productCode: 'SN-004', qty: 2300, updated: '2026-06-19 07:55:20' },
             ],
+            
+            addInlineRow() {
+                const tbody = document.querySelector('#inventory-detail-table tbody');
+                // Remove empty state if present
+                if (tbody.querySelector('.empty-state')) tbody.innerHTML = '';
+                
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><select id="inline-ffc" class="form-select"><option value="1">용인 메인창고</option><option value="2">온라인 FFC</option><option value="3">오프라인 FFC</option></select></td>
+                    <td><select id="inline-product" class="form-select"><option value="1">SN-001</option><option value="2">SN-002</option></select></td>
+                    <td>-</td>
+                    <td><input type="number" id="inline-qty" class="form-input" min="0" value="0" style="width:100px;"></td>
+                    <td>-</td>
+                    <td>자동 생성됨</td>
+                    <td>
+                        <button class="btn btn--primary btn--sm" onclick="InventoryPage.saveInlineRow(this)">저장</button>
+                        <button class="btn btn--secondary btn--sm" onclick="this.closest('tr').remove()">취소</button>
+                    </td>
+                `;
+                tbody.insertBefore(tr, tbody.firstChild);
+                
+                // Fetch dynamic options
+                API.get('/api/warehouses').then(res => {
+                    document.getElementById('inline-ffc').innerHTML = (res || []).map(w => `<option value="${w.id}">${w.warehouse_name || w.ffc_name || w.name}</option>`).join('');
+                }).catch(() => {});
+                API.get('/api/products').then(res => {
+                    document.getElementById('inline-product').innerHTML = (res || []).map(p => `<option value="${p.id}">${p.product_code || p.code}</option>`).join('');
+                }).catch(() => {});
+            },
+            async saveInlineRow(btn) {
+                const tr = btn.closest('tr');
+                const whId = tr.querySelector('#inline-ffc').value;
+                const prodId = tr.querySelector('#inline-product').value;
+                const qty = parseInt(tr.querySelector('#inline-qty').value);
+                
+                const today = new Date().toISOString().split('T')[0];
+                try {
+                    await API.post('/api/inventory-snapshot', {
+                        snapshot_date: today,
+                        warehouse_id: parseInt(whId),
+                        product_id: parseInt(prodId),
+                        qty_cans: qty,
+                        expiry_date: null
+                    });
+                    Toast.show('재고가 성공적으로 추가되었습니다.', 'success');
+                    this.loadData();
+                } catch(e) {
+                    console.error(e);
+                }
+            },
+
             init() {
                 this.buildFilters();
                 this.renderInventoryTable();
@@ -239,126 +261,50 @@
                                 <td style="color: var(--text-muted);">${inv.updated || '-'}</td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn--secondary btn--sm" onclick="InventoryPage.showManageModal(${inv.id})">수정</button>
-                                        <button class="btn btn--danger btn--sm" onclick="InventoryPage.deleteInventory(${inv.id})">삭제</button>
+                                        <button class="btn btn--secondary btn--sm" onclick="InventoryPage.deleteInventory(${inv.id})">삭제</button>
                                     </div>
                                 </td>
-                            </tr>`;
-                    });
-
-                tbody.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="8" class="empty-state">선택된 창고에 데이터가 없습니다.</td></tr>';
+                            </tr>
+                        `;
+                    }).join('');
+                
+                tbody.innerHTML = rows || '<tr><td colspan="8" class="empty-state">조건에 맞는 데이터가 없습니다.</td></tr>';
             },
 
             getCheckedFfcs() {
-                const filterGroup = document.getElementById('ffc-checkbox-filter');
-                return Array.from(filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"]):checked')).map(cb => cb.value);
+                const checkboxes = document.querySelectorAll('#ffc-checkbox-filter input[type="checkbox"]:not([value="all"])');
+                return Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
             },
-
-            onFilterAll(checkbox) {
-                const filterGroup = document.getElementById('ffc-checkbox-filter');
-                filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"])').forEach(cb => { cb.checked = checkbox.checked; });
+            onFilterAll(allCb) {
+                const checkboxes = document.querySelectorAll('#ffc-checkbox-filter input[type="checkbox"]:not([value="all"])');
+                checkboxes.forEach(cb => cb.checked = allCb.checked);
                 this.renderInventoryTable();
-                this.updateKPIs();
             },
-
             onFilterChange() {
-                const filterGroup = document.getElementById('ffc-checkbox-filter');
-                const checkboxes = filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"])');
-                const allCb = filterGroup.querySelector('input[value="all"]');
-                allCb.checked = Array.from(checkboxes).every(cb => cb.checked);
+                const allCb = document.querySelector('#ffc-checkbox-filter input[value="all"]');
+                const checkboxes = document.querySelectorAll('#ffc-checkbox-filter input[type="checkbox"]:not([value="all"])');
+                const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+                allCb.checked = allChecked;
                 this.renderInventoryTable();
-                this.updateKPIs();
             },
 
             updateKPIs() {
                 const checked = this.getCheckedFfcs();
-                const filtered = this.sampleInventory.filter(inv => checked.includes(inv.ffcId));
-                let totalQty = 0, totalValue = 0;
-                filtered.forEach(inv => {
-                    const prod = this.getProduct(inv.productCode);
-                    totalQty += inv.qty;
-                    totalValue += inv.totalValueKrw || 0;
+                let totalQty = 0;
+                let totalValue = 0;
+                const activeFfcs = new Set();
+                
+                this.sampleInventory.forEach(inv => {
+                    if (checked.includes(inv.ffcId) || checked.includes(inv.warehouse_id)) {
+                        totalQty += (inv.qty || 0);
+                        totalValue += (inv.totalValueKrw || 0);
+                        activeFfcs.add(inv.ffcId || inv.warehouse_id);
+                    }
                 });
-
+                
                 document.getElementById('inv-total-qty').textContent = Format.number(totalQty);
                 document.getElementById('inv-total-value').textContent = Format.currency(totalValue);
-                document.getElementById('inv-ffc-count').textContent = [...new Set(filtered.map(i => i.ffcId || i.warehouse_id))].length;
-            },
-
-            // 재고 CRUD 모달 로직
-            showManageModal(editId = null) {
-                const isEdit = !!editId;
-                document.getElementById('inv-modal-title').textContent = isEdit ? '재고 수정' : '재고 추가';
-                document.getElementById('inv-edit-id').value = editId || '';
-                
-                // Select boxes
-                document.getElementById('inv-ffc').innerHTML = this.sampleFfcs.map(f => `<option value="${f.id}">${f.name}</option>`).join('');
-                document.getElementById('inv-product').innerHTML = this.sampleProducts.map(p => `<option value="${p.code}">${p.name}</option>`).join('');
-                
-                const role = window._currentUserRole;
-                const isAdmin = role === 'ADMIN' || role === 'OPERATOR';
-                const updatedGroup = document.getElementById('inv-updated-group');
-                
-                if (isEdit) {
-                    const inv = this.sampleInventory.find(i => i.id === editId);
-                    if (inv) {
-                        document.getElementById('inv-date').value = inv.snapshot_date || Format.todayShort();
-                        document.getElementById('inv-ffc').value = inv.warehouse_id || inv.ffcId;
-                        document.getElementById('inv-product').value = inv.productCode;
-                        document.getElementById('inv-expiry').value = inv.expiry_date || '';
-                        document.getElementById('inv-qty').value = inv.qty || 0;
-                        document.getElementById('inv-updated-at').value = inv.updated || '';
-                    }
-                    if (isAdmin) updatedGroup.style.display = 'block';
-                    else updatedGroup.style.display = 'none';
-                } else {
-                    document.getElementById('inv-date').value = Format.todayShort();
-                    document.getElementById('inv-expiry').value = '';
-                    document.getElementById('inv-qty').value = 0;
-                    document.getElementById('inv-updated-at').value = '';
-                    updatedGroup.style.display = 'none'; // 숨김 (자동 생성)
-                }
-                
-                document.getElementById('inv-manage-modal').style.display = 'block';
-            },
-
-            closeManageModal() {
-                document.getElementById('inv-manage-modal').style.display = 'none';
-            },
-
-            async saveInventory() {
-                const editId = parseInt(document.getElementById('inv-edit-id').value) || null;
-                const ffcId = parseInt(document.getElementById('inv-ffc').value);
-                const prodCode = document.getElementById('inv-product').value;
-                const qty = parseInt(document.getElementById('inv-qty').value) || 0;
-                
-                const ffc = this.getFfc(ffcId);
-                const prod = this.getProduct(prodCode);
-                
-                const payload = {
-                    snapshot_date: document.getElementById('inv-date').value || Format.todayShort(),
-                    warehouse_id: ffcId,
-                    warehouse_name: ffc ? ffc.name : null,
-                    product_code: prodCode,
-                    product_name: prod ? prod.name : null,
-                    expiry_date: document.getElementById('inv-expiry').value || null,
-                    qty_cans: qty,
-                    updated_at: document.getElementById('inv-updated-at').value || null,
-                };
-                
-                try {
-                    if (editId) {
-                        await API.put(`/api/inventory-snapshot/${editId}`, payload);
-                        Toast.show('재고 수정 완료', 'success');
-                    } else {
-                        await API.post('/api/inventory-snapshot', payload);
-                        Toast.show('재고 추가 완료', 'success');
-                    }
-                    this.closeManageModal();
-                    await this.load();
-                } catch(e) {
-                    console.error(e);
-                }
+                document.getElementById('inv-ffc-count').textContent = activeFfcs.size;
             },
 
             async deleteInventory(id) {
@@ -429,7 +375,6 @@
         };
 
         document.addEventListener('DOMContentLoaded', () => {
-            Theme.init();
             InventoryPage.init();
             InventoryPage.load();
 

@@ -1383,3 +1383,35 @@ position: sticky; top: 0; z-index: 10; }
         left: 0;
     }
 }
+
+/* Modern Sidebar Toggle UX */
+.sidebar-toggle-modern {
+    position: absolute;
+    top: 36px;
+    right: -14px;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: 50%;
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 200;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.2s, color 0.2s;
+}
+.sidebar-toggle-modern:hover {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+.app-sidebar.collapsed .sidebar-toggle-modern {
+    transform: rotate(180deg);
+}
+/* Ensure sidebar is relative so absolute positioning works */
+.app-sidebar {
+    position: sticky;
+    top: 0;
+}

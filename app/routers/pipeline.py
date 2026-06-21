@@ -53,7 +53,6 @@ def get_orders(
                 order_month=o.order_month,
                 product_code=o.product_code,
                 order_qty=o.order_qty,
-                matched_production_id=o.matched_production_id,
                 created_at=o.created_at,
                 product_name=prod.product_name if prod else None,
             )

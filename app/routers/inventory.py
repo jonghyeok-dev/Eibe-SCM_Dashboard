@@ -192,16 +192,14 @@ def get_inventory_summary(db: Session = Depends(get_db)):
             
         inbound = db.query(InboundDB).filter(InboundDB.product_code == p_code, InboundDB.expiry_date == exp_date).first()
         price = 0
-        if inbound and inbound.invoice_no:
-            invoice = db.query(InvoiceDB).filter(InvoiceDB.invoice_no == inbound.invoice_no).first()
-            if invoice and invoice.payment_amount_krw:
-                qty = inbound.can_qty
-                if not qty and inbound.carton_qty:
-                    prod = db.query(ProductDB).filter(ProductDB.product_code == p_code).first()
-                    if prod:
-                        qty = inbound.carton_qty * prod.pack_qty_per_tu
-                if qty and qty > 0:
-                    price = int(invoice.payment_amount_krw / qty)
+        if inbound and inbound.payment_amount_krw:
+            qty = inbound.can_qty
+            if not qty and inbound.carton_qty:
+                prod = db.query(ProductDB).filter(ProductDB.product_code == p_code).first()
+                if prod:
+                    qty = inbound.carton_qty * prod.pack_qty_per_tu
+            if qty and qty > 0:
+                price = int(inbound.payment_amount_krw / qty)
         
         if not price:
             prod = db.query(ProductDB).filter(ProductDB.product_code == p_code).first()
@@ -252,7 +250,8 @@ def get_inventory_summary(db: Session = Depends(get_db)):
         remaining_days = None
         if snap.expiry_date and _FORECASTING_AVAILABLE:
             try:
-                remaining_days = calc_remaining_expiry_days(snap.expiry_date)
+                exp_date_only = snap.expiry_date.split(" ")[0]
+                remaining_days = calc_remaining_expiry_days(exp_date_only)
             except Exception:
                 pass
 
@@ -296,16 +295,14 @@ def get_expiry_summary(db: Session = Depends(get_db)):
             
         inbound = db.query(InboundDB).filter(InboundDB.product_code == p_code, InboundDB.expiry_date == exp_date).first()
         price = 0
-        if inbound and inbound.invoice_no:
-            invoice = db.query(InvoiceDB).filter(InvoiceDB.invoice_no == inbound.invoice_no).first()
-            if invoice and invoice.payment_amount_krw:
-                qty = inbound.can_qty
-                if not qty and inbound.carton_qty:
-                    prod = db.query(ProductDB).filter(ProductDB.product_code == p_code).first()
-                    if prod:
-                        qty = inbound.carton_qty * prod.pack_qty_per_tu
-                if qty and qty > 0:
-                    price = int(invoice.payment_amount_krw / qty)
+        if inbound and inbound.payment_amount_krw:
+            qty = inbound.can_qty
+            if not qty and inbound.carton_qty:
+                prod = db.query(ProductDB).filter(ProductDB.product_code == p_code).first()
+                if prod:
+                    qty = inbound.carton_qty * prod.pack_qty_per_tu
+            if qty and qty > 0:
+                price = int(inbound.payment_amount_krw / qty)
         
         if not price:
             prod = db.query(ProductDB).filter(ProductDB.product_code == p_code).first()

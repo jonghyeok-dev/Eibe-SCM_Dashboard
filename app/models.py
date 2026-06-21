@@ -10,9 +10,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 from app.database import Base
 
+VALID_INBOUND_STATUSES = ["생산국출발", "해상운송중", "한국도착", "통관중", "입고일선정중", "입고완료"]
 
 # ═══════════════════════════════════════════════════════════════════════
-# 시스템 관리
 # ═══════════════════════════════════════════════════════════════════════
 
 class UserAccount(Base):
@@ -235,9 +235,6 @@ class OutflowHistory(Base):
     )
 
     warehouse = relationship("WarehouseDB", back_populates="outflow_histories")
-    product = relationship("ProductDB", back_populates="outflow_histories")
-
-
     product = relationship("ProductDB", back_populates="outflow_histories")
 
 

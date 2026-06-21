@@ -160,7 +160,6 @@ class OrderResponse(BaseModel):
     order_month: str
     product_code: str
     order_qty: int
-    matched_production_id: Optional[int] = None
     created_at: Optional[str] = None
     product_name: Optional[str] = None
     class Config:
