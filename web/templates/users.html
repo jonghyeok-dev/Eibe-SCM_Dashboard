@@ -1,63 +1,35 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EIBE SCM | 시스템 운영</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="app-wrapper">
-        <aside class="app-sidebar">
-            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 18l-6-6 6-6"/>
-                </svg>
-            </button>
-            <div class="sidebar-brand">
-                <img src="/static/img/eibelogo.png" alt="EIBE" class="sidebar-logo-img">
-                <h1>EIBE SCM</h1>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <div class="nav-group">
-                    <a href="/inventory" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고 현황</span></a>
-                    <div class="nav-sub">
-                        <a href="/inventory">현재고 상세</a>
-                        <a href="/inventory/transfer">이관 계획</a>
-                    </div>
-                </div>
-                <a href="/expiry"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>유통기한 관리</span></a>
-                <a href="/order-plan"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주 계획</span></a>
-                <a href="/matching"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고 관리</span></a>
-                <a href="/users" class="active"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>시스템 운영</span></a>
-            </nav>
-            <div class="sidebar-user-info">
-                <div class="user-avatar">U</div>
-                <div class="user-meta">
-                    <div class="user-name">로딩 중...</div>
-                    <div class="user-role">-</div>
-                </div>
-            </div>
-            <div class="sidebar-footer">
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-                    <span class="theme-toggle-text">Dark</span>
-                </button>
-                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
-            </div>
-        </aside>
+{% extends "base.html" %}
 
-        <main class="main-content">
-            <div class="page-header">
+{% block content %}
+<div class="page-header">
                 <div class="page-header-left">
                     <h1 class="page-title">시스템 운영</h1>
                     <p class="page-subtitle">데이터 양식, 창고, 사용자 및 백업 관리</p>
-                </div>
+                
+
+<div class="settings-layout" style="display: flex; gap: var(--space-xl); align-items: flex-start;">
+    <!-- Settings Navigation -->
+    <div class="card settings-sidebar" style="width: 240px; flex-shrink: 0; position: sticky; top: 20px;">
+        <div class="card-header"><h3 class="card-title">운영 메뉴</h3></div>
+        <div class="card-body card-body--no-pad">
+            <ul class="settings-nav-list" style="list-style: none; padding: 0; margin: 0;">
+                <li class="settings-nav-item active" onclick="AdminPage.showTab('template', this)" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-default); font-weight: 500;">데이터 양식 관리</li>
+                <li class="settings-nav-item" onclick="AdminPage.showTab('warehouse', this)" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-default);">창고 관리</li>
+                <li class="settings-nav-item" onclick="AdminPage.showTab('product', this)" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-default);">품목 관리</li>
+                <li class="settings-nav-item" onclick="AdminPage.showTab('user', this)" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-default);">사용자 관리</li>
+                <li class="settings-nav-item" onclick="AdminPage.showTab('snapshot', this)" style="padding: 12px 16px; cursor: pointer; border-bottom: 1px solid var(--border-default);">백업/스냅샷</li>
+                <li class="settings-nav-item" onclick="AdminPage.showTab('moq', this)" style="padding: 12px 16px; cursor: pointer;">이관 MOQ 설정</li>
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Settings Content Wrapper -->
+    <div class="settings-content" style="flex: 1; min-width: 0;">
+</div>
             </div>
 
             <!-- 데이터 양식 관리 -->
-            <section class="card section-gap">
+            <section class="card settings-section">
                 <div class="card-header collapsible-header" id="template-header" onclick="toggleCollapsible('template-header')">
                     <h2 class="card-title">데이터 양식 관리</h2>
                     <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
@@ -96,7 +68,7 @@
             </section>
 
             <!-- 창고 관리 (ADMIN ONLY) -->
-            <section class="card section-gap" id="warehouse-section">
+            <section class="card settings-section" id="warehouse-section">
                 <div class="card-header collapsible-header" id="warehouse-header" onclick="toggleCollapsible('warehouse-header')">
                     <h2 class="card-title">창고 관리</h2>
                     <div class="btn-group" onclick="event.stopPropagation();" style="margin-left: auto; margin-right: 15px;">
@@ -196,7 +168,7 @@
             </section>
 
             <!-- 품목 관리 -->
-            <section class="card section-gap">
+            <section class="card settings-section">
                 <div class="card-header collapsible-header" id="product-header" onclick="toggleCollapsible('product-header')">
                     <div style="display:flex; align-items:center; gap:var(--space-md); flex:1;">
                         <h2 class="card-title">품목 관리</h2>
@@ -229,7 +201,7 @@
                 </div>
             </section>
 
-            <section class="content-grid content-grid--two section-gap">
+            <section class="content-grid content-grid--two settings-section">
                 <!-- User Management -->
                 <div class="card">
                     <div class="card-header collapsible-header" id="user-header" onclick="toggleCollapsible('user-header')">
@@ -325,7 +297,7 @@
             </section>
 
             <!-- 이관 MOQ 관리 -->
-            <section class="card section-gap">
+            <section class="card settings-section">
                 <div class="card-header collapsible-header" id="moq-header" onclick="toggleCollapsible('moq-header')">
                     <h2 class="card-title">창고-SKU별 이관 MOQ 설정</h2>
                     <span class="collapse-icon">▼</span>
@@ -373,129 +345,55 @@
                     </div>
                 </div>
             </section>
-        </main>
     </div>
+</div>
+{% endblock %}
 
-    <!-- 사용자 추가 모달 -->
-    <div id="add-user-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="event.target===this && AdminPage.closeAddUserModal()">
-            <div class="modal-content">
-                <h2>새 사용자 계정 추가</h2>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">아이디</label>
-                    <input type="text" id="new-username" class="form-input" placeholder="로그인 아이디">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">비밀번호</label>
-                    <input type="password" id="new-password" class="form-input" placeholder="비밀번호">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">이름</label>
-                    <input type="text" id="new-name" class="form-input" placeholder="표시 이름">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-lg);">
-                    <label class="form-label">역할</label>
-                    <select class="form-select" id="new-role">
-                        <option value="OPERATOR">OPERATOR (일반 사용자)</option>
-                        <option value="ADMIN">ADMIN (관리자)</option>
-                    </select>
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn--secondary" onclick="AdminPage.closeAddUserModal()">취소</button>
-                    <button class="btn btn--primary" onclick="AdminPage.createUser()">생성</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 창고 추가/수정 모달 -->
-    <div id="warehouse-modal" style="display: none;">
-        <div class="modal-backdrop" onclick="event.target===this && AdminPage.closeWarehouseModal()">
-            <div class="modal-content">
-                <h2 id="warehouse-modal-title">창고 추가</h2>
-                <input type="hidden" id="wh-edit-id" value="">
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">창고 코드</label>
-                    <input type="text" id="wh-code" class="form-input" placeholder="예: HUB, FFC_ON">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">창고 이름</label>
-                    <input type="text" id="wh-name" class="form-input" placeholder="예: 용인 메인창고">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">종류</label>
-                    <select class="form-select" id="wh-type">
-                        <option value="OFFLINE">OFFLINE (오프라인)</option>
-                        <option value="ONLINE">ONLINE (온라인)</option>
-                        <option value="BUYOUT">BUYOUT (바이아웃)</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">허용 잔여 유통기한 (일)</label>
-                    <input type="number" id="wh-expiry-days" class="form-input" value="90" min="0">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-md);">
-                    <label class="form-label">기본 이관 MOQ (캔)</label>
-                    <input type="number" id="wh-moq" class="form-input" value="0" min="0">
-                </div>
-                <div class="form-group" style="margin-bottom: var(--space-lg);">
-                    <label class="form-label">평균 용차비용 (원)</label>
-                    <input type="number" id="wh-transport-cost" class="form-input" value="0" min="0">
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn--secondary" onclick="AdminPage.closeWarehouseModal()">취소</button>
-                    <button class="btn btn--primary" onclick="AdminPage.saveWarehouse()">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 품목 추가/수정 모달 -->
-    <div id="product-modal" style="display:none;">
-        <div class="modal-backdrop" onclick="event.target===this && AdminPage.closeProductModal()">
-            <div class="modal-content">
-                <h2 id="product-modal-title">품목 추가</h2>
-                <input type="hidden" id="prod-edit-id" value="">
-                <div class="form-group" style="margin-bottom:var(--space-md);">
-                    <label class="form-label">품목코드 *</label>
-                    <input type="text" id="prod-code" class="form-input" placeholder="예: SN-001">
-                </div>
-                <div class="form-group" style="margin-bottom:var(--space-md);">
-                    <label class="form-label">품목명 *</label>
-                    <input type="text" id="prod-name" class="form-input" placeholder="예: 산양분유 1단계">
-                </div>
-                <div class="form-group" style="margin-bottom:var(--space-md);">
-                    <label class="form-label">캔/카툰 (카툰당 입수량) *</label>
-                    <input type="number" id="prod-pcs" class="form-input" value="24" min="1">
-                </div>
-                <div class="form-group" style="margin-bottom:var(--space-md);">
-                    <label class="form-label">환율단위 *</label>
-                    <select id="prod-currency" class="form-select">
-                        <option value="USD">USD (미국 달러)</option>
-                        <option value="EUR">EUR (유로)</option>
-                        <option value="AUD">AUD (호주 달러)</option>
-                        <option value="NZD">NZD (뉴질랜드 달러)</option>
-                        <option value="GBP">GBP (영국 파운드)</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom:var(--space-lg);">
-                    <label class="form-label">매입가 (외화) *</label>
-                    <input type="number" id="prod-price" class="form-input" step="0.01" value="0" min="0">
-                </div>
-                <div class="modal-actions">
-                    <button class="btn btn--secondary" onclick="AdminPage.closeProductModal()">취소</button>
-                    <button class="btn btn--primary" onclick="AdminPage.saveProduct()">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="toast-container" class="toast-container"></div>
+{% block scripts %}
+<div id="toast-container" class="toast-container"></div>
     <script src="/static/js/app.js"></script>
     <script>
         const AdminPage = {
+
+            showTab(tabId, el) {
+                // Update active nav
+                document.querySelectorAll('.settings-nav-item').forEach(li => {
+                    li.classList.remove('active');
+                    li.style.background = 'transparent';
+                    li.style.color = 'var(--text-main)';
+                    li.style.fontWeight = 'normal';
+                });
+                el.classList.add('active');
+                el.style.background = 'rgba(27, 100, 218, 0.08)';
+                el.style.color = 'var(--accent-main)';
+                el.style.fontWeight = '600';
+
+                // Update content sections
+                const sections = document.querySelectorAll('.settings-section');
+                sections.forEach(sec => sec.style.display = 'none');
+
+                if (tabId === 'template') {
+                    sections[0].style.display = 'block';
+                } else if (tabId === 'warehouse') {
+                    sections[1].style.display = 'block';
+                } else if (tabId === 'product') {
+                    sections[2].style.display = 'block';
+                } else if (tabId === 'user' || tabId === 'snapshot') {
+                    // It's a grid with two cards
+                    sections[3].style.display = 'grid';
+                } else if (tabId === 'moq') {
+                    sections[4].style.display = 'block';
+                }
+            },
+
             async load() {
                 await Promise.all([this.loadUsers(), this.loadSnapshots(), this.loadWarehouses(), this.loadMOQ(), this.loadProducts()]);
+                // Initial hide
+                setTimeout(() => {
+                    const firstTab = document.querySelector('.settings-nav-item');
+                    if (firstTab) AdminPage.showTab('template', firstTab);
+                }, 50);
+
             },
 
             // ─── 창고 관리 ─────────────────────────────────
@@ -849,5 +747,4 @@
             });
         });
     </script>
-</body>
-</html>
+{% endblock %}
