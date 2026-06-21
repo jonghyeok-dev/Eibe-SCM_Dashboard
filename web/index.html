@@ -191,19 +191,11 @@
                     ]);
 
                     // Compute KPIs from API data
-                    const productMap = {};
-                    if (products) products.forEach(p => { productMap[p.id || p.product_code] = p; });
-
-                    const totalStock = inventory.reduce((sum, inv) => sum + (inv.current_can_qty || 0), 0);
+                    const totalStock = inventory.reduce((sum, wh) => sum + (wh.total_qty || 0), 0);
                     document.getElementById('kpi-total-stock').textContent = Format.number(totalStock);
 
                     // Compute total asset value
-                    let totalValue = 0;
-                    inventory.forEach(inv => {
-                        const prod = productMap[inv.product_id] || productMap[inv.product_code];
-                        const unitPrice = prod ? (prod.purchase_price || prod.unit_price || 0) : 0;
-                        totalValue += (inv.current_can_qty || inv.qty || 0) * unitPrice;
-                    });
+                    const totalValue = inventory.reduce((sum, wh) => sum + (wh.total_value_krw || 0), 0);
                     document.getElementById('kpi-total-value').textContent = Format.currency(totalValue);
 
                     // Risk count: items with < 4 weeks of stock

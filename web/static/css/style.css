@@ -334,7 +334,7 @@ table, th, td { font-family: var(--font-sans); }
     font-weight: 700; font-size: 0.8rem;
 }
 .user-details { display: flex; flex-direction: column; overflow: hidden; transition: opacity var(--transition-sidebar); }
-.user-name { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
+.user-name { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); white-space: nowrap; }
 .user-role { font-size: 0.7rem; color: var(--text-muted); }
 
 .theme-toggle {
@@ -361,7 +361,7 @@ table, th, td { font-family: var(--font-sans); }
     background: var(--accent-main-bg);
     color: var(--accent-main);
     display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.82rem;
+    font-weight: 700; font-size: 0.88rem;
     flex-shrink: 0;
 }
 .sidebar-user-info .user-meta {
@@ -369,7 +369,7 @@ table, th, td { font-family: var(--font-sans); }
     min-width: 0;
 }
 .sidebar-user-info .user-name {
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 600;
     color: var(--text-primary);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -441,15 +441,15 @@ table, th, td { font-family: var(--font-sans); }
 .data-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; font-family: var(--font-sans); }
 .data-table th {
     background: var(--bg-secondary);
-    padding: var(--space-sm) var(--space-md);
+    padding: 12px var(--space-md);
     text-align: left;
     font-weight: 600;
     color: var(--text-secondary);
     border-bottom: 2px solid var(--border-default);
     border-right: 1px solid var(--border-table);
     white-space: nowrap;
-    font-size: 0.82rem;
-}
+    font-size: 0.88rem;
+position: sticky; top: 0; z-index: 10; }
 .data-table th.sortable {
     cursor: pointer;
     user-select: none;
@@ -477,7 +477,7 @@ table, th, td { font-family: var(--font-sans); }
 }
 .data-table th:last-child { border-right: none; }
 .data-table td {
-    padding: 10px var(--space-md); color: var(--text-primary);
+    padding: 12px var(--space-md); color: var(--text-primary);
     border-bottom: 1px solid var(--border-default);
     border-right: 1px solid var(--border-default);
     vertical-align: middle;
@@ -490,7 +490,7 @@ table, th, td { font-family: var(--font-sans); }
 .data-table tbody tr:hover { background: var(--bg-card-hover); }
 .data-table .text-right { text-align: right; }
 .data-table .text-center { text-align: center; }
-.data-table .mono { font-family: var(--font-mono); font-size: 0.82rem; }
+.data-table .mono { font-family: var(--font-mono); font-size: 0.88rem; }
 
 /* ── Elements ──────────────────────────────────────────────── */
 .badge {
@@ -575,7 +575,7 @@ table, th, td { font-family: var(--font-sans); }
     background: var(--accent-main-bg);
     border-color: var(--accent-main);
 }
-.template-card .label { font-size: 0.82rem; font-weight: 600; color: var(--text-primary); }
+.template-card .label { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
 
 /* ── Modal ──────────────────────────────────────────────────── */
 .modal-backdrop {
@@ -732,7 +732,7 @@ table, th, td { font-family: var(--font-sans); }
     letter-spacing: -0.02em;
 }
 .login-card .login-sub {
-    font-size: 0.82rem; color: var(--text-muted); text-align: center;
+    font-size: 0.88rem; color: var(--text-muted); text-align: center;
     margin-bottom: var(--space-2xl);
 }
 .login-card .login-logo {
@@ -745,7 +745,7 @@ table, th, td { font-family: var(--font-sans); }
 .login-error {
     background: var(--accent-red-bg); border: 1px solid rgba(229, 53, 53, 0.2);
     color: var(--accent-red); padding: 8px 12px;
-    border-radius: var(--radius-sm); font-size: 0.82rem; margin-bottom: var(--space-md);
+    border-radius: var(--radius-sm); font-size: 0.88rem; margin-bottom: var(--space-md);
     display: none;
 }
 
@@ -860,7 +860,7 @@ table, th, td { font-family: var(--font-sans); }
     position: absolute;
     right: 0;
     top: 4px;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     font-weight: 600;
     color: var(--text-secondary);
     background: var(--bg-secondary);
@@ -926,7 +926,7 @@ table, th, td { font-family: var(--font-sans); }
     position: sticky;
     top: 0;
     z-index: 2;
-}
+position: sticky; top: 0; z-index: 10; }
 .matching-panel .data-table td {
     padding: 6px var(--space-md);
     font-size: 0.78rem;
@@ -1172,7 +1172,7 @@ table, th, td { font-family: var(--font-sans); }
 }
 .nav-group .nav-sub a {
     padding: 6px 12px;
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
     border-radius: var(--radius-sm);
     transition: all 0.15s;
@@ -1204,4 +1204,72 @@ table, th, td { font-family: var(--font-sans); }
 }
 .matched-row:hover {
     opacity: 0.8;
+}
+
+/* ── Matching Page ────────────────────────────────────────── */
+.matching-action-bar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
+    background: var(--bg-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+.selection-summary {
+    flex: 1;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* ── Responsive Layout ─────────────────────────────────────── */
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    align-items: start;
+}
+.three-col-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--space-lg);
+    align-items: start;
+}
+
+@media (max-width: 1200px) {
+    .content-grid--three {
+        grid-template-columns: 1fr 1fr;
+    }
+    .three-col-layout {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .grid-layout {
+        grid-template-columns: 1fr;
+    }
+    .content-grid--two {
+        grid-template-columns: 1fr;
+    }
+    .three-col-layout {
+        grid-template-columns: 1fr;
+    }
+    .main-content {
+        padding: var(--space-lg);
+    }
+}
+
+@media (max-width: 768px) {
+    .app-sidebar {
+        position: fixed;
+        left: -100%;
+        transition: left var(--transition-sidebar);
+        z-index: 9999;
+    }
+    .app-sidebar.open {
+        left: 0;
+    }
 }

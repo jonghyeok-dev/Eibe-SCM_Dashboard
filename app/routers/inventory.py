@@ -318,7 +318,8 @@ def get_expiry_summary(db: Session = Depends(get_db)):
         if not snap.expiry_date:
             continue
         try:
-            expiry = date.fromisoformat(snap.expiry_date)
+            exp_str = snap.expiry_date.split(" ")[0]
+            expiry = date.fromisoformat(exp_str)
             remaining = (expiry - date.today()).days
         except Exception:
             continue
@@ -730,8 +731,8 @@ def create_sales(
     return {"id": db_sales.sales_id, "message": "판매 실적 등록 완료"}
 
 
-@router.get("/api/templates/{template_type}", tags=["데이터 수집"])
-def download_template(template_type: str):
+@router.get("/api/excel/template/{template_type}", tags=["파일 업로드"])
+def get_excel_template(template_type: str):
     """엑셀 양식 다운로드"""
     if not _EXCEL_PARSER_AVAILABLE:
         # 폴백: 기본 빈 엑셀 생성

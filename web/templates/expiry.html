@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+                <div class="page-header-left">
+                    <h1 class="page-title">유통기한 관리</h1>
+                    <p class="page-subtitle">FEFO 기반 유통기한 임박 및 폐기 리스크 관리</p>
+                </div>
+            </div>
+
+            <section class="kpi-grid section-gap">
+                <div class="kpi-card">
+                    <span class="kpi-label">유통기한 임박 품목</span>
+                    <div class="kpi-value" id="expiry-risk-count">7</div>
+                    <div class="kpi-sub">90일 이내 만료</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">폐기 예상 총액</span>
+                    <div class="kpi-value" id="expiry-risk-total">₩18,600,000</div>
+                    <div class="kpi-sub">판매 불가 예상 금액</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">위험 등급 품목</span>
+                    <div class="kpi-value" id="expiry-critical">2</div>
+                    <div class="kpi-sub">30일 이내 만료</div>
+                </div>
+                <div class="kpi-card">
+                    <span class="kpi-label">관리 대상 창고</span>
+                    <div class="kpi-value" id="expiry-ffc-count">3</div>
+                    <div class="kpi-sub">임박 재고 보유 창고</div>
+                </div>
+            </section>
+
+            <section class="card section-gap">
+                <div class="card-header" style="flex-direction: column; align-items: flex-start; gap: var(--space-sm);">
+                    <h2 class="card-title">FEFO 기반 유통기한 임박 및 폐기 예상</h2>
+                    <div class="filter-group" style="margin-top: var(--space-md); padding: var(--space-sm); background-color: var(--surface-hover); border-radius: 8px; width: 100%;">
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 8px;">조회 필터</div>
+                        <div class="checkbox-group" id="product-filter" style="display: flex; gap: var(--space-md); flex-wrap: wrap;">
+                        <label><input type="checkbox" value="all" checked onchange="ExpiryPage.onFilterAll(this)"> 전체</label>
+                        <label><input type="checkbox" value="SN-001" checked onchange="ExpiryPage.onFilterChange()"> SN-001</label>
+                        <label><input type="checkbox" value="SN-002" checked onchange="ExpiryPage.onFilterChange()"> SN-002</label>
+                        <label><input type="checkbox" value="SN-003" checked onchange="ExpiryPage.onFilterChange()"> SN-003</label>
+                        <label><input type="checkbox" value="SN-004" checked onchange="ExpiryPage.onFilterChange()"> SN-004</label>
+                    </div>
+                </div>
+                <div class="card-body card-body--no-pad">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="expiry-table">
+                            <thead>
+                                <tr>
+                                    <th>창고</th>
+                                    <th>품명</th>
+                                    <th>유통기한</th>
+                                    <th class="text-right">수량 (캔)</th>
+                                    <th class="text-right">판매가능일</th>
+                                    <th class="text-center">소진예상일</th>
+                                    <th class="text-right">추가 필요 판매량 (캔수)</th>
+                                    <th class="text-right">폐기 예상금액</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-product="SN-004">
+                                    <td><span class="status-dot status-dot--red"></span>쿠팡 FFC</td>
+                                    <td>SN-004 산양분유 4단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">1,200</td>
+                                    <td>2026-07-05</td>
+                                    <td class="text-right"><span class="badge badge--danger">17일</span></td>
+                                    <td class="text-right mono">820</td>
+                                    <td class="text-right"><span class="badge badge--danger">10일</span></td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-red);">380</td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-red);">₩7,600,000</td>
+                                </tr>
+                                <tr data-product="SN-003">
+                                    <td><span class="status-dot status-dot--red"></span>오프라인 FFC</td>
+                                    <td>SN-003 산양분유 3단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">800</td>
+                                    <td>2026-07-12</td>
+                                    <td class="text-right"><span class="badge badge--danger">24일</span></td>
+                                    <td class="text-right mono">550</td>
+                                    <td class="text-right"><span class="badge badge--danger">14일</span></td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-red);">250</td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-red);">₩5,625,000</td>
+                                </tr>
+                                <tr data-product="SN-001">
+                                    <td><span class="status-dot status-dot--amber"></span>용인 메인창고</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">3,500</td>
+                                    <td>2026-08-20</td>
+                                    <td class="text-right"><span class="badge badge--warning">63일</span></td>
+                                    <td class="text-right mono">3,150</td>
+                                    <td class="text-right"><span class="badge badge--warning">49일</span></td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-amber);">350</td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-amber);">₩7,875,000</td>
+                                </tr>
+                                <tr data-product="SN-002">
+                                    <td><span class="status-dot status-dot--amber"></span>온라인 FFC</td>
+                                    <td>SN-002 산양분유 2단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">2,100</td>
+                                    <td>2026-08-25</td>
+                                    <td class="text-right"><span class="badge badge--warning">68일</span></td>
+                                    <td class="text-right mono">1,950</td>
+                                    <td class="text-right"><span class="badge badge--warning">63일</span></td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-amber);">150</td>
+                                    <td class="text-right mono" style="font-weight:600; color: var(--accent-amber);">₩3,150,000</td>
+                                </tr>
+                                <tr data-product="SN-001">
+                                    <td><span class="status-dot status-dot--amber"></span>바이아웃 채널</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">1,800</td>
+                                    <td>2026-09-01</td>
+                                    <td class="text-right"><span class="badge badge--warning">75일</span></td>
+                                    <td class="text-right mono">1,800</td>
+                                    <td class="text-right"><span class="badge badge--green">75일</span></td>
+                                    <td class="text-right mono" style="color: var(--text-muted);">0</td>
+                                    <td class="text-right mono" style="color: var(--text-muted);">₩0</td>
+                                </tr>
+                                <tr data-product="SN-002">
+                                    <td><span class="status-dot status-dot--green"></span>용인 메인창고</td>
+                                    <td>SN-002 산양분유 2단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">5,200</td>
+                                    <td>2026-09-15</td>
+                                    <td class="text-right"><span class="badge badge--green">89일</span></td>
+                                    <td class="text-right mono">5,200</td>
+                                    <td class="text-right"><span class="badge badge--green">89일</span></td>
+                                    <td class="text-right mono" style="color: var(--text-muted);">0</td>
+                                    <td class="text-right mono" style="color: var(--text-muted);">₩0</td>
+                                </tr>
+                                <tr data-product="SN-001">
+                                    <td><span class="status-dot status-dot--green"></span>쿠팡 FFC</td>
+                                    <td>SN-001 산양분유 1단계</td>
+                                    <td class="text-right mono" style="font-weight:600;">4,600</td>
+                                    <td>2026-09-18</td>
+                                    <td class="text-right"><span class="badge badge--green">92일</span></td>
+                                    <td class="text-right mono">4,600</td>
+                                    <td class="text-right"><span class="badge badge--green">92일</span></td>
+                                    <td class="text-right mono" style="color: var(--text-muted);">0</td>
+                                    <td class="text-right mono" style="color: var(--text-muted);">₩0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+{% endblock %}
+
+{% block scripts %}
+<div id="toast-container" class="toast-container"></div>
+    <script src="/static/js/app.js"></script>
+    <script>
+        const ExpiryPage = {
+            allData: [],
+            sampleData: [
+                { warehouse: '쿠팡 FFC', product_code: 'SN-004', product_name: '산양분유 4단계', batch: 'B2025-0412', qty: 1200, expiry_date: '2026-07-05', remaining_days: 17, status: '위험', disposal_value: 7600000 },
+                { warehouse: '오프라인 FFC', product_code: 'SN-003', product_name: '산양분유 3단계', batch: 'B2025-0389', qty: 800, expiry_date: '2026-07-12', remaining_days: 24, status: '위험', disposal_value: 5625000 },
+                { warehouse: '용인 메인창고', product_code: 'SN-001', product_name: '산양분유 1단계', batch: 'B2025-0356', qty: 3500, expiry_date: '2026-08-20', remaining_days: 63, status: '주의', disposal_value: 7875000 },
+                { warehouse: '온라인 FFC', product_code: 'SN-002', product_name: '산양분유 2단계', batch: 'B2025-0378', qty: 2100, expiry_date: '2026-08-25', remaining_days: 68, status: '주의', disposal_value: 3150000 },
+                { warehouse: '바이아웃 채널', product_code: 'SN-001', product_name: '산양분유 1단계', batch: 'B2025-0401', qty: 1800, expiry_date: '2026-09-01', remaining_days: 75, status: '양호', disposal_value: 0 },
+                { warehouse: '용인 메인창고', product_code: 'SN-002', product_name: '산양분유 2단계', batch: 'B2025-0345', qty: 5200, expiry_date: '2026-09-15', remaining_days: 89, status: '양호', disposal_value: 0 },
+                { warehouse: '쿠팡 FFC', product_code: 'SN-001', product_name: '산양분유 1단계', batch: 'B2025-0399', qty: 4600, expiry_date: '2026-09-18', remaining_days: 92, status: '양호', disposal_value: 0 },
+            ],
+
+            async load() {
+                try {
+                    const data = await API.get('/api/expiry/summary');
+                    if (data && data.items && data.items.length) {
+                        this.allData = data.items;
+                    } else if (data && Array.isArray(data) && data.length) {
+                        this.allData = data;
+                    } else {
+                        this.allData = this.sampleData;
+                    }
+                } catch(e) {
+                    this.allData = this.sampleData;
+                }
+                this.renderTable();
+                this.updateKPIs();
+            },
+
+            getStatusBadge(days) {
+                if (days <= 30) return { cls: 'badge--danger', dotCls: 'status-dot--red', label: '위험' };
+                if (days <= 90) return { cls: 'badge--warning', dotCls: 'status-dot--amber', label: '주의' };
+                return { cls: 'badge--green', dotCls: 'status-dot--green', label: '양호' };
+            },
+
+            renderTable() {
+                const tbody = document.querySelector('#expiry-table tbody');
+                const checked = this.getCheckedProducts();
+                const filtered = this.allData.filter(d => checked.includes(d.product_code));
+
+                if (!filtered.length) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">표시할 데이터가 없습니다.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = filtered.map(d => {
+                    const valueColor = d.disposal_value > 0 
+                        ? (d.remaining_days <= 30 ? 'var(--accent-red)' : 'var(--accent-amber)') 
+                        : 'var(--text-muted)';
+                        
+                    const expectedDepletion = d.depletion_date || '-';
+                    const depletionHtml = expectedDepletion === '-' 
+                        ? `<span style="color:var(--text-muted)">소진 불가</span>`
+                        : expectedDepletion;
+
+                    return `
+                        <tr data-product="${d.product_code}">
+                            <td>${d.warehouse_name || d.warehouse}</td>
+                            <td>${d.product_name}</td>
+                            <td>${d.expiry_date}</td>
+                            <td class="text-right mono" style="font-weight:600;">${Format.number(d.qty_cans || d.qty)}</td>
+                            <td class="text-right"><span class="badge badge--green">${d.sellable_days || 0}일</span></td>
+                            <td class="text-center">${depletionHtml}</td>
+                            <td class="text-right mono">${Format.number(d.additional_sales_required || 0)}</td>
+                            <td class="text-right mono" style="font-weight:600; color: ${valueColor};">${Format.currency(d.disposal_value)}</td>
+                        </tr>`;
+                }).join('');
+            },
+
+            getCheckedProducts() {
+                const filterGroup = document.getElementById('product-filter');
+                return Array.from(filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"]):checked')).map(cb => cb.value);
+            },
+
+            updateKPIs() {
+                const checked = this.getCheckedProducts();
+                const filtered = this.allData.filter(d => checked.includes(d.product_code));
+                let riskCount = 0, totalDisposal = 0, criticalCount = 0;
+                const warehouses = new Set();
+                filtered.forEach(d => {
+                    if (d.remaining_days <= 90) riskCount++;
+                    if (d.remaining_days <= 30) criticalCount++;
+                    totalDisposal += d.disposal_value || 0;
+                    if (d.remaining_days <= 90) warehouses.add(d.warehouse);
+                });
+                document.getElementById('expiry-risk-count').textContent = riskCount;
+                document.getElementById('expiry-risk-total').textContent = Format.currency(totalDisposal);
+                document.getElementById('expiry-critical').textContent = criticalCount;
+                document.getElementById('expiry-ffc-count').textContent = warehouses.size;
+            },
+
+            onFilterAll(checkbox) {
+                const filterGroup = document.getElementById('product-filter');
+                const checkboxes = filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"])');
+                checkboxes.forEach(cb => { cb.checked = checkbox.checked; });
+                this.renderTable();
+                this.updateKPIs();
+            },
+
+            onFilterChange() {
+                const filterGroup = document.getElementById('product-filter');
+                const checkboxes = filterGroup.querySelectorAll('input[type="checkbox"]:not([value="all"])');
+                const allCheckbox = filterGroup.querySelector('input[value="all"]');
+                allCheckbox.checked = Array.from(checkboxes).every(cb => cb.checked);
+                this.renderTable();
+                this.updateKPIs();
+            },
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            ExpiryPage.load();
+        });
+    </script>
+{% endblock %}
