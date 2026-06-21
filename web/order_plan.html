@@ -9,54 +9,16 @@
 </head>
 <body>
     <div class="app-wrapper" id="order-plan-page">
-        <aside class="app-sidebar">
-            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 18l-6-6 6-6"/>
-                </svg>
-            </button>
-            <div class="sidebar-brand" style="justify-content: center;">
-                <h1 style="font-size: 1.1rem; letter-spacing: -0.5px;">EIBE SCM System</h1>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <a href="/inventory" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고</span></a>
-                <a href="/expiry" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>폐기</span></a>
-                <a href="/order-plan" class="nav-item active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주</span></a>
-                <a href="/matching" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고</span></a>
-                <div class="nav-group">
-                    <a href="/users" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>설정</span></a>
-                    <div class="nav-sub">
-                        <a href="/users#template-header">데이터 양식</a>
-                        <a href="/users#warehouse-header">창고 관리</a>
-                        <a href="/users#product-header">품목 관리</a>
-                        <a href="/users#user-header">사용자 관리</a>
-                        <a href="/users#snapshot-header">백업/스냅샷</a>
-                        <a href="/users#moq-header">이관 MOQ</a>
-                    </div>
-                </div>
-            </nav>
-            <div class="sidebar-user-info">
-                <div class="user-avatar">U</div>
-                <div class="user-meta">
-                    <div class="user-name">로딩 중...</div>
-                    <div class="user-role">-</div>
-                </div>
-            </div>
-            <div class="sidebar-footer">
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-                    <span class="theme-toggle-text">Dark</span>
-                </button>
-                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
-            </div>
-        </aside>
+        
 
         <main class="main-content">
             <div class="page-header">
                 <div class="page-header-left">
                     <h1 class="page-title" id="main-page-title">발주</h1>
                     <p class="page-subtitle" id="main-page-subtitle">데이터 기반 발주 제안</p>
+                </div>
+                <div class="filter-group" style="margin-top: 10px;">
+                    <select id="brand-filter" class="form-select" style="width: 200px;"></select>
                 </div>
             </div>
 
@@ -238,9 +200,15 @@
         let simChart = null;
 
         const OrderPlan = {
+            currentBrand: 'ALL',
             simData: [],
             weightFactor: 1.0,
             heatmapUnit: 'weekly',
+            
+            switchBrand(brand) {
+                this.currentBrand = brand;
+                this.load();
+            },
 
             // 샘플 데이터: 품목별 현재고, 주간출고, 발주제안
             sampleProducts: [
@@ -466,7 +434,11 @@
             async load() {
                 try {
                     const weight = parseFloat(document.getElementById('weight-slider').value);
-                    const data = await API.get(`/api/order-plan/simulation?weight_factor=${weight}`);
+                    let url = `/api/order-plan/simulation?weight_factor=${weight}`;
+                    if (this.currentBrand !== 'ALL') {
+                        url += `&brand_category=${this.currentBrand}`;
+                    }
+                    const data = await API.get(url);
                     if (data && data.length) {
                         this.simData = data;
                         this.renderHeatmap();
@@ -603,15 +575,15 @@
                         // 재고일수 = 기말재고 / 주간출고 (주 단위)
                         const invWeeks = weekData.ending_stock / weekData.weekly_demand;
 
-                        // 적정 재고일수: 12주(3개월)
-                        // 0~4주(1개월 이하): 빨강
-                        // 4~8주(1~2개월): 노랑
-                        // 8~12주(2~3개월): 녹색 (적정)
-                        // 12주 이상(3개월 이상): 파랑 (과잉)
+                        // 적정 재고일수 기준 (3개월 = 13주 적정):
+                        // < 6주: 빨강 (risk-high) / 위험
+                        // 6~9주: 노랑 (risk-mid) / 주의
+                        // 9~13주: 녹색 (risk-low) / 양호(적정)
+                        // > 13주: 파랑 (risk-safe) / 과잉
                         let riskClass = 'risk-safe'; // 파랑 (과잉)
-                        if (invWeeks <= 4) riskClass = 'risk-high';      // 빨강
-                        else if (invWeeks <= 8) riskClass = 'risk-mid';   // 노랑
-                        else if (invWeeks <= 12) riskClass = 'risk-low';  // 녹색
+                        if (invWeeks < 6) riskClass = 'risk-high';      // 빨강
+                        else if (invWeeks < 9) riskClass = 'risk-mid';   // 노랑
+                        else if (invWeeks <= 13) riskClass = 'risk-low';  // 녹색
 
                         if (this.heatmapUnit === 'monthly') {
                             const invMonths = invWeeks / 4.33;
@@ -651,9 +623,11 @@
             },
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            Theme.init();
+            Toast.init();
+            await BrandFilter.init('brand-filter', (val) => OrderPlan.switchBrand(val));
             OrderPlan.init();
-
             const slider = document.getElementById('weight-slider');
             const sliderVal = document.getElementById('weight-value');
             slider.addEventListener('input', (e) => {

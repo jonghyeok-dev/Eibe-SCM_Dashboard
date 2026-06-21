@@ -180,13 +180,26 @@ def delete_production(
 @router.get("/api/inbound", response_model=List[InboundResponse], tags=["입고 파이프라인"])
 def get_inbounds(
     status_filter: Optional[str] = Query(None, alias="status"),
+    brand_category: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
     """입고 리스트 조회 (상태 필터 지원)"""
     query = db.query(InboundDB)
     if status_filter:
         query = query.filter(InboundDB.status == status_filter)
-    return query.order_by(InboundDB.id.desc()).all()
+        
+    inbounds = query.order_by(InboundDB.id.desc()).all()
+    if brand_category:
+        # Filter in Python level to match ProductDB brand_category
+        products_dict = {p.product_code: p for p in db.query(ProductDB).all()}
+        filtered = []
+        for inv in inbounds:
+            prod = products_dict.get(inv.product_code)
+            if prod and prod.brand_category == brand_category:
+                filtered.append(inv)
+        return filtered
+        
+    return inbounds
 
 
 @router.post("/api/inbound", response_model=InboundResponse, tags=["입고 파이프라인"])
@@ -250,111 +263,8 @@ def delete_inbound(
     return MessageResponse(message="입고 삭제 완료")
 
 
-@router.post("/api/matching/link", response_model=MatchResponse, tags=["매칭"])
-def link_matching(
-    req: MatchRequest,
-    current_user: UserAccount = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """
-    3단 매칭 링크 처리
-    - order_id + production_id → 생산에 matched_order_id 설정
-    - production_id + invoice_id → 인보이스에 matched_production_id 설정
-    """
-    matched_order_id = None
-    matched_production_id = None
-    matched_inbound_id = None
-
-    # Stage 1: 발주 → 생산 연결
-    if req.order_id and req.production_id:
-        order = db.query(OrderDB).filter(OrderDB.id == req.order_id).first()
-        if not order:
-            raise HTTPException(status_code=404, detail="발주를 찾을 수 없습니다")
-        production = db.query(ProductionDB).filter(ProductionDB.id == req.production_id).first()
-        if not production:
-            raise HTTPException(status_code=404, detail="생산을 찾을 수 없습니다")
-        production.matched_order_id = req.order_id
-        matched_order_id = req.order_id
-        matched_production_id = req.production_id
-
-    # Stage 2: 생산 → 입고 연결
-    if req.production_id and req.inbound_id:
-        production = db.query(ProductionDB).filter(ProductionDB.id == req.production_id).first()
-        if not production:
-            raise HTTPException(status_code=404, detail="생산을 찾을 수 없습니다")
-        inbound = db.query(InboundDB).filter(InboundDB.id == req.inbound_id).first()
-        if not inbound:
-            raise HTTPException(status_code=404, detail="입고를 찾을 수 없습니다")
-        inbound.matched_production_id = req.production_id
-        matched_production_id = req.production_id
-        matched_inbound_id = req.inbound_id
-
-    db.commit()
-    return MatchResponse(
-        message="매칭이 완료되었습니다",
-        matched_order_id=matched_order_id,
-        matched_production_id=matched_production_id,
-        matched_inbound_id=matched_inbound_id,
-    )
-
-
-@router.get("/api/matching/status", tags=["매칭"])
-def get_matching_status(db: Session = Depends(get_db)):
-    """현재 매칭 상태 조회 — 매칭 이력 테이블용"""
-    productions = db.query(ProductionDB).all()
-    result = []
-    for prod in productions:
-        order = None
-        if prod.matched_order_id:
-            order = db.query(OrderDB).filter(OrderDB.id == prod.matched_order_id).first()
-            
-        inbounds = db.query(InboundDB).filter(InboundDB.matched_production_id == prod.id).all()
-        
-        if inbounds:
-            for inv in inbounds:
-                result.append({
-                    "order_id": order.id if order else None,
-                    "product_code": prod.product_code,
-                    "order_month": order.order_month if order else prod.order_month,
-                    "order_qty": order.order_qty if order else None,
-                    "production_code": prod.production_code,
-                    "production_qty": prod.production_qty,
-                    "invoice_no": inv.invoice_no,
-                    "inbound_status": inv.status,
-                    "carton_qty": inv.carton_qty,
-                })
-        else:
-            result.append({
-                "order_id": order.id if order else None,
-                "product_code": prod.product_code,
-                "order_month": order.order_month if order else prod.order_month,
-                "order_qty": order.order_qty if order else None,
-                "production_code": prod.production_code,
-                "production_qty": prod.production_qty,
-                "invoice_no": None,
-                "inbound_status": None,
-                "carton_qty": None,
-            })
-            
-    # 주문만 있고 생산 매칭 안된 건 추가
-    unmatched_orders = db.query(OrderDB).filter(
-        ~OrderDB.id.in_([p.matched_order_id for p in productions if p.matched_order_id])
-    ).all()
-    
-    for o in unmatched_orders:
-        result.append({
-            "order_id": o.id,
-            "product_code": o.product_code,
-            "order_month": o.order_month,
-            "order_qty": o.order_qty,
-            "production_code": None,
-            "production_qty": None,
-            "invoice_no": None,
-            "carton_qty": None,
-        })
-
-    result.sort(key=lambda x: str(x.get("order_month") or ""), reverse=True)
-    return result
+# @router.post("/api/matching/link", ...) 및 @router.get("/api/matching/status", ...) 는
+# 브랜드 중심 아키텍처 개편 및 입고 파이프라인 단순화에 따라 비활성화 됨.
 
 
 

@@ -276,7 +276,63 @@ const Theme = {
 };
 
 const Sidebar = {
+    render() {
+        const wrapper = document.querySelector('.app-wrapper');
+        if (!wrapper) return;
+        
+        // Prevent duplicate rendering
+        if (wrapper.querySelector('.app-sidebar')) return;
+
+        const sidebarHTML = `
+        <aside class="app-sidebar">
+            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 18l-6-6 6-6"/>
+                </svg>
+            </button>
+            <div class="sidebar-brand" style="justify-content: center;">
+                <h1 style="font-size: 1.1rem; letter-spacing: -0.5px;">EIBE SCM System</h1>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="/" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
+                <a href="/inventory" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고</span></a>
+                <a href="/expiry" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>기한</span></a>
+                <a href="/order-plan" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주</span></a>
+                <a href="/matching" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></svg></span><span>입고</span></a>
+                <div class="nav-group">
+                    <a href="/users" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>설정</span></a>
+                    <div class="nav-sub">
+                        <a href="/users#template-header">데이터 양식</a>
+                        <a href="/users#warehouse-header">창고 관리</a>
+                        <a href="/users#product-header">품목 관리</a>
+                        <a href="/users#user-header">사용자 관리</a>
+                        <a href="/users#snapshot-header">백업/스냅샷</a>
+                        <a href="/users#moq-header">이관 MOQ</a>
+                    </div>
+                </div>
+            </nav>
+            <div class="sidebar-user-info">
+                <div class="user-avatar" id="sidebar-user-avatar">U</div>
+                <div class="user-meta">
+                    <div class="user-name" id="sidebar-user-name">로딩 중...</div>
+                    <div class="user-role" id="sidebar-user-role">-</div>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
+                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
+                    <span class="theme-toggle-text">Dark</span>
+                </button>
+                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
+            </div>
+        </aside>
+        `;
+        
+        wrapper.insertAdjacentHTML('afterbegin', sidebarHTML);
+    },
+
     init() {
+        this.render();
         const sidebar = document.querySelector('.app-sidebar');
         if (!sidebar) return;
         const collapsed = localStorage.getItem('sidebar_collapsed') === 'true';
@@ -496,6 +552,31 @@ const TableSort = {
         });
         
         tbody.append(...rows);
+    }
+};
+
+const BrandFilter = {
+    async init(selectId, onChange) {
+        const selectElem = document.getElementById(selectId);
+        if (!selectElem) return;
+
+        try {
+            const products = await API.get('/api/products');
+            const brands = new Set();
+            products.forEach(p => {
+                if (p.brand_category) brands.add(p.brand_category);
+            });
+            
+            const brandList = Array.from(brands).sort();
+            selectElem.innerHTML = `<option value="ALL">전체 브랜드</option>` + 
+                                   brandList.map(b => `<option value="${b}">${b}</option>`).join('');
+            
+            selectElem.addEventListener('change', (e) => {
+                if (onChange) onChange(e.target.value);
+            });
+        } catch(e) {
+            console.error('Failed to load brands for filter', e);
+        }
     }
 };
 

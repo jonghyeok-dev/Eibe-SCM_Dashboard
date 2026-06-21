@@ -178,7 +178,10 @@ def update_inventory_snapshot(
     return db_snap
 
 @router.get("/api/inventory/summary", tags=["재고 관리"])
-def get_inventory_summary(db: Session = Depends(get_db)):
+def get_inventory_summary(
+    brand_category: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
     """전체 현재고 요약 (창고별, 품목별 집계 — InventorySnapshot 기반)"""
     
     # Helper to calculate actual unit price
@@ -221,9 +224,14 @@ def get_inventory_summary(db: Session = Depends(get_db)):
     )
 
     warehouses = {w.id: w for w in db.query(WarehouseDB).all()}
+    products_dict = {p.product_code: p for p in db.query(ProductDB).all()}
     summary_by_wh: dict = {}
 
     for snap in snapshots:
+        prod = products_dict.get(snap.product_code)
+        if brand_category and (not prod or prod.brand_category != brand_category):
+            continue
+            
         wh_key = snap.warehouse_id or 0
         wh = warehouses.get(snap.warehouse_id) if snap.warehouse_id else None
         wh_name = wh.warehouse_name if wh else (snap.warehouse_name or "미지정")
@@ -281,7 +289,10 @@ def get_inventory_summary(db: Session = Depends(get_db)):
 
 
 @router.get("/api/expiry/summary", tags=["유통기한 관리"])
-def get_expiry_summary(db: Session = Depends(get_db)):
+def get_expiry_summary(
+    brand_category: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
     """유통기한 임박 재고 요약 (InventorySnapshot + WarehouseDB.allowed_expiry_days)"""
     
     # Helper to calculate actual unit price
@@ -351,9 +362,14 @@ def get_expiry_summary(db: Session = Depends(get_db)):
         .all()
     )
     warehouses = {w.id: w for w in db.query(WarehouseDB).all()}
+    products_dict = {p.product_code: p for p in db.query(ProductDB).all()}
 
     items = []
     for snap in snapshots:
+        prod = products_dict.get(snap.product_code)
+        if brand_category and (not prod or prod.brand_category != brand_category):
+            continue
+            
         if not snap.expiry_date:
             continue
         try:
@@ -423,6 +439,7 @@ def get_expiry_summary(db: Session = Depends(get_db)):
 @router.get("/api/order-plan/simulation", tags=["발주 계획"])
 def get_order_plan_simulation(
     weight_factor: float = Query(default=1.0, ge=0.5, le=2.0),
+    brand_category: Optional[str] = Query(None),
     db: Session = Depends(get_db),
 ):
     """6개월(24주) 시뮬레이션 데이터 — 품목별"""
@@ -433,7 +450,9 @@ def get_order_plan_simulation(
         )
 
     products = db.query(ProductDB).all()
-    
+    if brand_category:
+        products = [p for p in products if p.brand_category == brand_category]
+        
     # 최신 스냅샷 날짜 기준 필터링 (뻥튀기 버그 수정)
     latest_date_row = db.query(func.max(InventorySnapshot.snapshot_date)).first()
     latest_date = latest_date_row[0] if latest_date_row and latest_date_row[0] else None

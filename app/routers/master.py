@@ -133,6 +133,8 @@ def upload_products(
             if existing:
                 if "product_name" in df.columns and pd.notna(row["product_name"]):
                     existing.product_name = str(row["product_name"]).strip()
+                if "brand_category" in df.columns and pd.notna(row.get("brand_category")):
+                    existing.brand_category = str(row["brand_category"]).strip()
                 if qty_col and pd.notna(row.get(qty_col)):
                     existing.pack_qty_per_tu = int(row[qty_col])
                 if "currency_unit" in df.columns and pd.notna(row.get("currency_unit")):
@@ -144,6 +146,11 @@ def upload_products(
                 new_product = ProductDB(
                     product_code=code,
                     product_name=str(row.get("product_name", "")).strip() if pd.notna(row.get("product_name")) else "",
+                    brand_category=(
+                        str(row["brand_category"]).strip()
+                        if "brand_category" in df.columns and pd.notna(row.get("brand_category"))
+                        else "FOOD"
+                    ),
                     pack_qty_per_tu=(
                         int(row.get(qty_col, 24)) if qty_col and pd.notna(row.get(qty_col)) else 24
                     ),

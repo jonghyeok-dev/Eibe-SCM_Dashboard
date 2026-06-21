@@ -5,365 +5,211 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EIBE SCM | 입고 관리</title>
     <link rel="stylesheet" href="/static/css/style.css">
-    <style>
-        .pipeline-actions {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .action-card {
-            flex: 1;
-            background: var(--surface-default);
-            border: 1px solid var(--border-default);
-            border-radius: var(--radius-md);
-            padding: 15px;
-            text-align: center;
-        }
-        .action-card h3 {
-            margin-bottom: 10px;
-            font-size: 1rem;
-            color: var(--text-primary);
-        }
-        .action-btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-    </style>
 </head>
 <body>
     <div class="app-wrapper">
-        <aside class="app-sidebar">
-            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 열기/닫기">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
-            </button>
-            <div class="sidebar-brand">
-                <img src="/static/img/eibelogo.png" alt="EIBE" class="sidebar-logo-img">
-                <h1>EIBE SCM</h1>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/" class="nav-item"><i class="ti ti-dashboard"></i>요약</a>
-                <div class="nav-group">
-                    <a href="/inventory" class="nav-parent"><i class="ti ti-box"></i>현재고</a>
-                    <div class="nav-sub">
-                        <a href="/inventory">현재고 상세</a>
-                        <a href="/inventory/transfer">이관 계획</a>
-                    </div>
-                </div>
-                <a href="/expiry" class="nav-item"><i class="ti ti-calendar-time"></i>폐기</a>
-                <a href="/order_plan" class="nav-item"><i class="ti ti-report-analytics"></i>발주</a>
-                <a href="/matching" class="nav-item active"><i class="ti ti-truck-return"></i>입고</a>
-                <div class="nav-group">
-                    <a href="/users" class="nav-parent"><i class="ti ti-settings"></i>설정</a>
-                    <div class="nav-sub">
-                        <a href="/users#template-header">데이터 양식</a>
-                        <a href="/users#warehouse-header">창고 관리</a>
-                        <a href="/users#product-header">품목 관리</a>
-                        <a href="/users#user-header">사용자 관리</a>
-                        <a href="/users#snapshot-header">백업/스냅샷</a>
-                        <a href="/users#moq-header">이관 MOQ</a>
-                    </div>
-                </div>
-            </nav>
-            <div class="sidebar-user-info">
-                <div class="user-avatar">U</div>
-                <div class="user-meta">
-                    <div class="user-name">로딩 중...</div>
-                    <div class="user-role">-</div>
-                </div>
-            </div>
-            <div class="sidebar-footer">
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-                    <span class="theme-toggle-text">Dark</span>
-                </button>
-                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
-            </div>
-        </aside>
+        
 
         <main class="main-content">
-            <div class="content-header">
-                <h1 class="page-title">입고 파이프라인 (발주 → 생산 → 입고)</h1>
-                <div class="header-actions">
-                    <span style="font-size: 0.9rem; color: var(--text-muted);">수동 및 엑셀 업로드를 지원합니다. 발주를 클릭하면 연결된 생산/입고 내역이 나타납니다.</span>
+            <div class="page-header">
+                <div class="page-header-left">
+                    <h1 class="page-title">입고 내역</h1>
+                    <p class="page-subtitle">단일 파이프라인으로 단순화된 입고(Invoice) 등록 및 조회</p>
+                </div>
+                
+                <div class="filter-group" style="margin-top: 10px;">
+                    <select id="brand-filter" class="form-select" style="width: 200px;"></select>
                 </div>
             </div>
 
-            <!-- 데이터 등록 액션 패널 -->
-            <div class="pipeline-actions">
-                <div class="action-card">
-                    <h3>1. 발주 (Order)</h3>
-                    <div class="action-btn-group">
-                        <input type="file" id="upload-order" style="display:none;" accept=".xlsx" onchange="MatchingPage.handleUpload('order', this)">
-                        <button class="btn btn--secondary btn--sm" onclick="document.getElementById('upload-order').click()">엑셀 업로드</button>
-                        <button class="btn btn--primary btn--sm" onclick="MatchingPage.showManualModal('order')">수동 입력</button>
-                    </div>
-                </div>
-                <div class="action-card">
-                    <h3>2. 생산 (Production)</h3>
-                    <div class="action-btn-group">
-                        <input type="file" id="upload-production" style="display:none;" accept=".xlsx" onchange="MatchingPage.handleUpload('production', this)">
-                        <button class="btn btn--secondary btn--sm" onclick="document.getElementById('upload-production').click()">엑셀 업로드</button>
-                        <button class="btn btn--primary btn--sm" onclick="MatchingPage.showManualModal('production')">수동 입력</button>
-                    </div>
-                </div>
-                <div class="action-card">
-                    <h3>3. 입고 (Inbound)</h3>
-                    <div class="action-btn-group">
-                        <input type="file" id="upload-inbound" style="display:none;" accept=".xlsx" onchange="MatchingPage.handleUpload('inbound', this)">
+            <div class="card section-gap">
+                <div class="card-header">
+                    <h2 class="card-title">입고 리스트</h2>
+                    <div class="btn-group" style="margin-left: auto;">
+                        <input type="file" id="upload-inbound" style="display:none;" accept=".xlsx" onchange="InboundPage.handleUpload(this)">
                         <button class="btn btn--secondary btn--sm" onclick="document.getElementById('upload-inbound').click()">엑셀 업로드</button>
-                        <button class="btn btn--primary btn--sm" onclick="MatchingPage.showManualModal('inbound')">수동 입력</button>
+                        <button class="btn btn--primary btn--sm" onclick="InboundPage.addInlineRow()">+ 수동 입력 (행 추가)</button>
                     </div>
                 </div>
-            </div>
-
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <!-- 단계 1: 발주 목록 -->
-                <div class="card">
-                    <div class="card-header"><h2 class="card-title">발주 목록 (PO)</h2></div>
-                    <div class="card-body card-body--no-pad">
-                        <table class="table" id="orders-table">
+                <div class="card-body card-body--no-pad">
+                    <div class="data-table-wrapper">
+                        <table class="data-table" id="inbound-table">
                             <thead>
                                 <tr>
-                                    <th>발주월</th>
+                                    <th>입고 번호</th>
                                     <th>품목코드</th>
-                                    <th class="text-right">수량</th>
-                                    <th>매칭 상태</th>
+                                    <th>상태</th>
+                                    <th class="text-right">외화 단가</th>
+                                    <th class="text-right">결제 금액(KRW)</th>
+                                    <th class="text-right">수량(Carton)</th>
+                                    <th>도착/출발일</th>
+                                    <th>관리</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
                         </table>
                     </div>
                 </div>
-
-                <!-- 단계 2: 연동된 생산 및 입고 내역 -->
-                <div class="card" id="detail-panel" style="display: none;">
-                    <div class="card-header" style="background-color: var(--surface-hover);">
-                        <h2 class="card-title" id="detail-title" style="color: var(--accent-main);">상세 매칭 내역</h2>
-                    </div>
-                    <div class="card-body">
-                        <div style="margin-bottom: 20px;">
-                            <h3 style="margin-bottom: 10px; border-bottom: 2px solid var(--border-default); padding-bottom: 5px;">생산 내역 (Production)</h3>
-                            <table class="table" id="production-detail-table">
-                                <thead>
-                                    <tr><th>생산코드</th><th class="text-right">수량</th><th>상태</th></tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                        <div>
-                            <h3 style="margin-bottom: 10px; border-bottom: 2px solid var(--border-default); padding-bottom: 5px;">입고 내역 (Inbound)</h3>
-                            <table class="table" id="inbound-detail-table">
-                                <thead>
-                                    <tr><th>인보이스 번호</th><th>상태</th><th class="text-right">카툰수</th><th class="text-right">결제금액</th></tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
             </div>
         </main>
     </div>
     
-    <!-- Pipeline Manual Input Modals -->
-    <div id="pipe-modal-order" style="display:none;">
-        <div class="modal-backdrop" onclick="event.target===this && MatchingPage.closeModal('order')">
-            <div class="modal-content" style="max-width: 400px;">
-                <h2>발주 수동 입력</h2>
-                <div class="form-group"><label class="form-label">발주월</label><input type="month" id="po-month" class="form-input"></div>
-                <div class="form-group"><label class="form-label">품목코드</label><input type="text" id="po-code" class="form-input"></div>
-                <div class="form-group"><label class="form-label">발주수량(캔)</label><input type="number" id="po-qty" class="form-input" min="0"></div>
-                <div class="modal-actions" style="margin-top:20px;">
-                    <button class="btn btn--secondary" onclick="MatchingPage.closeModal('order')">취소</button>
-                    <button class="btn btn--primary" onclick="MatchingPage.saveManual('order')">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="pipe-modal-production" style="display:none;">
-        <div class="modal-backdrop" onclick="event.target===this && MatchingPage.closeModal('production')">
-            <div class="modal-content" style="max-width: 400px;">
-                <h2>생산 수동 입력</h2>
-                <div class="form-group"><label class="form-label">품의번호(구매)</label><input type="text" id="pr-purchase" class="form-input"></div>
-                <div class="form-group"><label class="form-label">생산코드(제조)</label><input type="text" id="pr-code" class="form-input"></div>
-                <div class="form-group"><label class="form-label">발주수량(캔)</label><input type="number" id="pr-qty" class="form-input" min="0"></div>
-                <div class="form-group"><label class="form-label">매칭 발주코드</label><input type="text" id="pr-order" class="form-input" placeholder="옵션"></div>
-                <div class="modal-actions" style="margin-top:20px;">
-                    <button class="btn btn--secondary" onclick="MatchingPage.closeModal('production')">취소</button>
-                    <button class="btn btn--primary" onclick="MatchingPage.saveManual('production')">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="pipe-modal-inbound" style="display:none;">
-        <div class="modal-backdrop" onclick="event.target===this && MatchingPage.closeModal('inbound')">
-            <div class="modal-content" style="max-width: 400px; height:80vh; overflow-y:auto;">
-                <h2>입고 수동 입력</h2>
-                <div class="form-group"><label class="form-label">인보이스 번호</label><input type="text" id="in-inv" class="form-input"></div>
-                <div class="form-group"><label class="form-label">B/L 번호</label><input type="text" id="in-bl" class="form-input"></div>
-                <div class="form-group"><label class="form-label">품목코드</label><input type="text" id="in-prodcode" class="form-input"></div>
-                <div class="form-group"><label class="form-label">단가</label><input type="number" id="in-price" class="form-input" step="0.01"></div>
-                <div class="form-group"><label class="form-label">상태</label><input type="text" id="in-status" class="form-input" value="입고완료"></div>
-                <div class="form-group"><label class="form-label">매칭 생산코드</label><input type="text" id="in-match" class="form-input" placeholder="옵션"></div>
-                <div class="modal-actions" style="margin-top:20px;">
-                    <button class="btn btn--secondary" onclick="MatchingPage.closeModal('inbound')">취소</button>
-                    <button class="btn btn--primary" onclick="MatchingPage.saveManual('inbound')">저장</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div id="toast-container" class="toast-container"></div>
-    
     <script src="/static/js/app.js"></script>
     <script>
-        const MatchingPage = {
-            data: [],
+        const InboundPage = {
+            currentBrand: 'ALL',
+            productsDict: {},
             
-            
-            showManualModal(type) {
-                document.getElementById('pipe-modal-' + type).style.display = 'block';
+            async init() {
+
+                
+                try {
+                    const products = await API.get('/api/products');
+                    products.forEach(p => this.productsDict[p.product_code] = p);
+                } catch(e) {}
+
+                await this.load();
             },
-            closeModal(type) {
-                document.getElementById('pipe-modal-' + type).style.display = 'none';
+
+            switchBrand(brand) {
+                this.currentBrand = brand;
+                this.load();
             },
-            async handleUpload(type, inputElem) {
+
+            async load() {
+                try {
+                    let url = '/api/inbound';
+                    if (this.currentBrand !== 'ALL') {
+                        url += `?brand_category=${this.currentBrand}`;
+                    }
+                    const data = await API.get(url);
+                    this.render(data);
+                } catch(e) {
+                    console.error(e);
+                    this.render([]);
+                }
+            },
+
+            render(data) {
+                const tbody = document.querySelector('#inbound-table tbody');
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center" style="padding:20px; color:var(--text-muted)">입고 내역이 없습니다.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map(item => {
+                    const prod = this.productsDict[item.product_code];
+                    const brandBadge = prod ? `<span class="badge badge--blue" style="margin-right: 5px;">${prod.brand_category}</span>` : '';
+                    let statusBadge = '';
+                    if (item.status === '입고완료') statusBadge = '<span class="badge badge--primary">입고완료</span>';
+                    else if (item.status === '결제완료') statusBadge = '<span class="badge badge--green">결제완료</span>';
+                    else statusBadge = `<span class="badge badge--warning">${item.status || '-'}</span>`;
+
+                    return `
+                        <tr>
+                            <td class="mono">${item.invoice_no || '-'}</td>
+                            <td>${brandBadge}<span class="mono">${item.product_code}</span></td>
+                            <td>${statusBadge}</td>
+                            <td class="text-right mono">${Format.currency(item.unit_price || 0)}</td>
+                            <td class="text-right mono" style="font-weight: 500;">${Format.currency(item.payment_amount_krw || 0)} 원</td>
+                            <td class="text-right mono">${Format.number(item.carton_qty || 0)}</td>
+                            <td>${item.eta || item.shipping_date || '-'}</td>
+                            <td>
+                                <button class="btn btn--danger btn--sm" onclick="InboundPage.deleteInbound(${item.id}, '${item.invoice_no}')">삭제</button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            },
+
+            async handleUpload(inputElem) {
                 const file = inputElem.files[0];
                 if (!file) return;
                 inputElem.value = '';
                 const formData = new FormData();
                 formData.append('file', file);
                 try {
-                    let endpoint = type === 'order' ? '/api/orders/upload' : (type === 'production' ? '/api/productions/upload' : '/api/inbound/upload');
-                    const res = await API.postFormData(endpoint, formData);
-                    Toast.show(res.message, 'success');
+                    const res = await API.postFormData('/api/inbound/upload', formData);
+                    Toast.show(res.message || '업로드 완료', 'success');
                     this.load();
-                } catch(e) { console.error(e); }
-            },
-            async saveManual(type) {
-                try {
-                    if (type === 'order') {
-                        await API.post('/api/orders', {
-                            order_month: document.getElementById('po-month').value,
-                            product_code: document.getElementById('po-code').value,
-                            order_qty: parseInt(document.getElementById('po-qty').value)
-                        });
-                    } else if (type === 'production') {
-                        await API.post('/api/productions', {
-                            purchase_code: document.getElementById('pr-purchase').value,
-                            production_code: document.getElementById('pr-code').value,
-                            production_qty: parseInt(document.getElementById('pr-qty').value),
-                            matched_order_id: document.getElementById('pr-order').value ? parseInt(document.getElementById('pr-order').value) : null
-                        });
-                    } else if (type === 'inbound') {
-                        await API.post('/api/inbound', {
-                            invoice_no: document.getElementById('in-inv').value,
-                            bl_no: document.getElementById('in-bl').value,
-                            product_code: document.getElementById('in-prodcode').value,
-                            unit_price: parseFloat(document.getElementById('in-price').value),
-                            status: document.getElementById('in-status').value,
-                            matched_production_id: document.getElementById('in-match').value ? parseInt(document.getElementById('in-match').value) : null
-                        });
-                    }
-                    Toast.show('등록 완료', 'success');
-                    this.closeModal(type);
-                    this.load();
-                } catch(e) {
-                    console.error(e);
-                }
-            },
-
-            async load() {
-                try {
-                    this.data = await API.get('/api/matching/status');
-                } catch(e) {
-                    this.data = [];
-                }
-                this.renderOrders();
-            },
-
-            renderOrders() {
-                const tbody = document.querySelector('#orders-table tbody');
-                const ordersMap = new Map();
-                
-                this.data.forEach(d => {
-                    if(d.order_id) {
-                        if(!ordersMap.has(d.order_id)) {
-                            ordersMap.set(d.order_id, {
-                                id: d.order_id, month: d.order_month, code: d.product_code, qty: d.order_qty,
-                                has_prod: !!d.production_code, has_inv: !!d.invoice_no
-                            });
-                        } else {
-                            if(d.production_code) ordersMap.get(d.order_id).has_prod = true;
-                            if(d.invoice_no) ordersMap.get(d.order_id).has_inv = true;
-                        }
-                    }
-                });
-
-                if (ordersMap.size === 0) {
-                    tbody.innerHTML = '<tr><td colspan="4" class="text-center">발주 데이터가 없습니다.</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = Array.from(ordersMap.values()).map(o => `
-                    <tr style="cursor:pointer; transition: background 0.2s;" onclick="MatchingPage.showDetail(${o.id}, '${o.month}', '${o.code}')" onmouseover="this.style.background='var(--surface-hover)'" onmouseout="this.style.background='transparent'">
-                        <td>${o.month || '-'}</td>
-                        <td>${o.code || '-'}</td>
-                        <td class="text-right mono">${Format.number(o.qty)}</td>
-                        <td>
-                            ${o.has_inv ? '<span class="badge badge--green">입고 진행중</span>' : 
-                              (o.has_prod ? '<span class="badge badge--blue">생산 완료</span>' : '<span class="badge badge--warning">발주만 됨</span>')}
-                        </td>
-                    </tr>
-                `).join('');
-            },
-
-            async showDetail(orderId, month, code) {
-                document.getElementById('detail-panel').style.display = 'block';
-                document.getElementById('detail-title').textContent = `[${month}] ${code} 매칭 상세 내역`;
-                
-                const productions = this.data.filter(d => d.order_id === orderId && d.production_code);
-                const tbodyProd = document.querySelector('#production-detail-table tbody');
-                
-                const uniqueProds = [...new Map(productions.map(item => [item['production_code'], item])).values()];
-                
-                tbodyProd.innerHTML = uniqueProds.length ? uniqueProds.map(p => `
-                    <tr>
-                        <td>${p.production_code}</td>
-                        <td class="text-right mono">${Format.number(p.production_qty)}</td>
-                        <td><span class="badge badge--blue">매칭됨</span></td>
-                    </tr>
-                `).join('') : '<tr><td colspan="3" class="text-center">매칭된 생산 내역이 없습니다.</td></tr>';
-
-                try {
-                    const inboundsRes = await API.get('/api/inbound');
-                    const relatedInbounds = inboundsRes.filter(i => uniqueProds.some(up => up.production_code === i.production_code));
-                    
-                    const tbodyInv = document.querySelector('#inbound-detail-table tbody');
-                    tbodyInv.innerHTML = relatedInbounds.length ? relatedInbounds.map(i => `
-                        <tr>
-                            <td>${i.invoice_no || '-'}</td>
-                            <td><span class="badge badge--primary">${i.status || '-'}</span></td>
-                            <td class="text-right mono">${Format.number(i.carton_qty || 0)}</td>
-                            <td class="text-right mono">${Format.currency(i.payment_amount_krw || 0)}</td>
-                        </tr>
-                    `).join('') : '<tr><td colspan="4" class="text-center">매칭된 입고 내역이 없습니다.</td></tr>';
                 } catch(e) { 
-                    console.error('Inbound load failed:', e); 
+                    Toast.show('엑셀 업로드 실패', 'error');
                 }
+            },
+
+            addInlineRow() {
+                const tbody = document.querySelector('#inbound-table tbody');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" class="form-input inline-inv" placeholder="INV-2026-06" style="width: 100%;"></td>
+                    <td><input type="text" class="form-input inline-code" placeholder="SN-001" style="width: 100%;"></td>
+                    <td>
+                        <select class="form-select inline-status">
+                            <option value="입고완료">입고완료</option>
+                            <option value="결제완료">결제완료</option>
+                            <option value="생산중">생산중</option>
+                            <option value="운송중">운송중</option>
+                        </select>
+                    </td>
+                    <td class="text-right"><input type="number" class="form-input inline-price" step="0.01" placeholder="단가" style="width: 100%;"></td>
+                    <td class="text-right"><input type="number" class="form-input inline-krw" placeholder="원화" style="width: 100%;"></td>
+                    <td class="text-right"><input type="number" class="form-input inline-qty" placeholder="수량" style="width: 100%;"></td>
+                    <td><input type="date" class="form-input inline-eta" style="width: 100%;"></td>
+                    <td>
+                        <button class="btn btn--primary btn--sm" onclick="InboundPage.saveInlineRow(this)">저장</button>
+                        <button class="btn btn--secondary btn--sm" onclick="this.closest('tr').remove()">취소</button>
+                    </td>
+                `;
                 
-                // Scroll to details
-                document.getElementById('detail-panel').scrollIntoView({ behavior: 'smooth' });
+                if (tbody.querySelector('.text-center')) {
+                    tbody.innerHTML = '';
+                }
+                tbody.insertBefore(tr, tbody.firstChild);
+            },
+
+            async saveInlineRow(btn) {
+                const tr = btn.closest('tr');
+                try {
+                    const inv = tr.querySelector('.inline-inv').value;
+                    const code = tr.querySelector('.inline-code').value;
+                    if (!inv || !code) { Toast.show('입고 번호와 품목코드를 입력하세요', 'error'); return; }
+                    
+                    const payload = {
+                        invoice_no: inv,
+                        product_code: code,
+                        status: tr.querySelector('.inline-status').value,
+                        unit_price: parseFloat(tr.querySelector('.inline-price').value) || 0,
+                        payment_amount_krw: parseFloat(tr.querySelector('.inline-krw').value) || 0,
+                        carton_qty: parseInt(tr.querySelector('.inline-qty').value) || 0,
+                        eta: tr.querySelector('.inline-eta').value || null
+                    };
+                    
+                    await API.post('/api/inbound', payload);
+                    Toast.show('등록 완료', 'success');
+                    this.load();
+                } catch(e) {
+                    Toast.show('등록 실패', 'error');
+                }
+            },
+
+            async deleteInbound(id, invNo) {
+                if (!confirm(`입고 내역 '${invNo}'를 삭제하시겠습니까?`)) return;
+                try {
+                    await API.delete(`/api/inbound/${id}`);
+                    Toast.show('삭제 완료', 'success');
+                    this.load();
+                } catch(e) {
+                    Toast.show('삭제 실패', 'error');
+                }
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             Theme.init();
             Toast.init();
-            MatchingPage.load();
+            await BrandFilter.init('brand-filter', (val) => InboundPage.switchBrand(val));
+            InboundPage.init();
         });
     </script>
 </body>

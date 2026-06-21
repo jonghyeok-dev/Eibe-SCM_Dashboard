@@ -54,6 +54,7 @@ class ProductDB(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     product_code = Column(Text, unique=True, nullable=False)       # 품목코드 (수정 불가, ID)
     product_name = Column(Text, nullable=False)                    # 품목명
+    brand_category = Column(Text, nullable=False, default="FOOD")  # 브랜드/카테고리
     pack_qty_per_tu = Column(Integer, nullable=False, default=24)  # 카툰당 입수량
     currency_unit = Column(Text, nullable=False, default="USD")    # 환율단위 (USD, EUR 등)
     purchase_price = Column(Float, nullable=False, default=0)      # 매입가 (외화 기준)

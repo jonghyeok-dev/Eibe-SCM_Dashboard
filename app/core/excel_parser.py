@@ -59,39 +59,21 @@ TEMPLATE_DEFS = {
     },
     "warehouse_db": {
         "sheet_name": "창고DB",
-        "columns": ["창고명", "창고타입(ONLINE/OFFLINE/BUYOUT)", "허용유통기한일수", "이관MOQ(캔)"],
+        "columns": ["창고명", "창고타입(ONLINE/OFFLINE/BUYOUT)", "허용기한일수", "이관MOQ(캔)"],
         "example": ["용인 메인창고", "OFFLINE", 180, 0],
         "filename": "창고DB_양식.xlsx",
-    },
-    "logistics_cost": {
-        "sheet_name": "물류비DB",
-        "columns": ["출발창고ID", "도착창고ID", "카툰당물류비(원)"],
-        "example": [1, 2, 3500],
-        "filename": "물류비DB_양식.xlsx",
-    },
-    "order": {
-        "sheet_name": "발주",
-        "columns": ["발주월(YYYY-MM)", "품목코드", "발주수량(캔)"],
-        "example": ["2026-06", "SN-001", 36000],
-        "filename": "발주_양식.xlsx",
-    },
-    "production": {
-        "sheet_name": "생산",
-        "columns": ["구매코드", "생산코드", "발주월(YYYY-MM)", "생산수량(캔)", "품목코드"],
-        "example": ["PO-2026-001", "PRD-2026-05", "2026-05", 36000, "SN-001"],
-        "filename": "생산_양식.xlsx",
     },
     "inbound": {
         "sheet_name": "입고",
         "columns": [
-            "인보이스번호", "BL번호", "매핑값", "구매코드", "생산코드",
+            "입고번호", "BL번호", "매핑값", "구매코드", "생산코드",
             "선적일(YYYY-MM-DD)", "한국도착일(YYYY-MM-DD)", "ETA(YYYY-MM-DD)",
-            "제조일자(YYYY-MM-DD)", "유통기한(YYYY-MM-DD)", "카툰수", "캔수",
-            "단가(외화)", "총단가(외화)", "결제일(YYYY-MM-DD)", "인보이스발행일(YYYY-MM-DD)",
+            "제조일자(YYYY-MM-DD)", "기한(YYYY-MM-DD)", "카툰수", "캔수",
+            "단가(외화)", "총단가(외화)", "결제일(YYYY-MM-DD)", "입고증발행일(YYYY-MM-DD)",
             "결제환율", "결제금액(원화)", "품목코드",
             "상태(생산국출발/해상운송중/한국도착/통관중/입고일선정중/입고완료)"
         ],
-        "example": ["INV-2026-001", "BL-2026-001", "MAP-001", "PO-2026-001", "PRD-2026-05", 
+        "example": ["IN-2026-001", "BL-2026-001", "MAP-001", "PO-2026-001", "PRD-2026-05", 
                      "2026-03-01", "2026-04-15", "2026-04-10",
                      "2026-02-15", "2028-02-15", 300, 3600,
                      8.50, 2550.0, "2026-05-15", "2026-03-10",
@@ -100,7 +82,7 @@ TEMPLATE_DEFS = {
     },
     "inventory_snapshot": {
         "sheet_name": "현재고스냅샷",
-        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "유통기한(YYYY-MM-DD)", "수량(캔)"],
+        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "기한(YYYY-MM-DD)", "수량(캔)"],
         "example": ["2026-06-19", "용인 메인창고", "슈누프로1단계", "SN-001", "2028-05-15", 12000],
         "filename": "현재고스냅샷_양식.xlsx",
     },
@@ -110,9 +92,6 @@ TEMPLATE_DEFS = {
 TEMPLATE_LABELS = {
     "product_db": "품목DB",
     "warehouse_db": "창고DB",
-    "logistics_cost": "물류비DB",
-    "order": "발주",
-    "production": "생산",
     "inbound": "입고",
     "inventory_snapshot": "현재고스냅샷",
 }
@@ -183,21 +162,14 @@ def parse_excel_file(file_bytes: bytes, template_type: str = None) -> list:
         
         # 맵핑 설정
         field_mapping = {
-            "order": {
-                "발주월(YYYY-MM)": "order_month", "품목코드": "product_code", "발주수량(캔)": "order_qty"
-            },
-            "production": {
-                "구매코드": "purchase_code", "생산코드": "production_code", 
-                "발주월(YYYY-MM)": "order_month", "생산수량(캔)": "production_qty", "품목코드": "product_code"
-            },
             "inbound": {
-                "인보이스번호": "invoice_no", "BL번호": "bl_no", "매핑값": "mapping_value", 
+                "입고번호": "invoice_no", "BL번호": "bl_no", "매핑값": "mapping_value", 
                 "구매코드": "purchase_code", "생산코드": "production_code",
                 "선적일(YYYY-MM-DD)": "shipping_date", "한국도착일(YYYY-MM-DD)": "korea_arrival_date", 
                 "ETA(YYYY-MM-DD)": "eta", "제조일자(YYYY-MM-DD)": "manufacture_date", 
-                "유통기한(YYYY-MM-DD)": "expiry_date", "카툰수": "carton_qty", "캔수": "can_qty",
+                "기한(YYYY-MM-DD)": "expiry_date", "카툰수": "carton_qty", "캔수": "can_qty",
                 "단가(외화)": "unit_price", "총단가(외화)": "total_price", 
-                "결제일(YYYY-MM-DD)": "payment_date", "인보이스발행일(YYYY-MM-DD)": "invoice_date",
+                "결제일(YYYY-MM-DD)": "payment_date", "입고증발행일(YYYY-MM-DD)": "invoice_date",
                 "결제환율": "exchange_rate", "결제금액(원화)": "payment_amount_krw", "품목코드": "product_code",
                 "상태(생산국출발/해상운송중/한국도착/통관중/입고일선정중/입고완료)": "status"
             }

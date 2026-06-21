@@ -13,55 +13,16 @@
 </head>
 <body>
     <div class="app-wrapper">
-        <aside class="app-sidebar">
-            <button class="sidebar-toggle-btn" onclick="Sidebar.toggle()" title="사이드바 접기/펼치기">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M15 18l-6-6 6-6"/>
-                </svg>
-            </button>
-            <div class="sidebar-brand" style="justify-content: center;">
-                <h1 style="font-size: 1.1rem; letter-spacing: -0.5px;">EIBE SCM System</h1>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="/" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span>요약</span></a>
-                <a href="/inventory" class="nav-item active"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span>현재고</span></a>
-                <a href="/expiry" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span>폐기</span></a>
-                <a href="/order-plan" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></span><span>발주</span></a>
-                <a href="/matching" class="nav-item"><span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4a2 2 0 012 2v9a2 2 0 01-2 2H8a2 2 0 01-2-2v-4"/></svg></span><span>입고</span></a>
-                <div class="nav-group">
-                    <a href="/users" class="nav-parent"><span class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span><span>설정</span></a>
-                    <div class="nav-sub">
-                        <a href="/users#template-header">데이터 양식</a>
-                        <a href="/users#warehouse-header">창고 관리</a>
-                        <a href="/users#product-header">품목 관리</a>
-                        <a href="/users#user-header">사용자 관리</a>
-                        <a href="/users#snapshot-header">백업/스냅샷</a>
-                        <a href="/users#moq-header">이관 MOQ</a>
-                    </div>
-                </div>
-            </nav>
-            <div class="sidebar-user-info">
-                <div class="user-avatar">U</div>
-                <div class="user-meta">
-                    <div class="user-name">로딩 중...</div>
-                </div>
-            </div>
-            <!-- Modern Filter Component -->
-            <div id="warehouse-filter-container"></div>
-            <div class="sidebar-footer">
-                <button id="theme-toggle" class="theme-toggle" onclick="Theme.toggle()">
-                    <span class="toggle-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></span>
-                    <span class="theme-toggle-text">Dark</span>
-                </button>
-                <button class="btn btn--secondary btn--sm" onclick="Auth.logout()" style="width:100%; text-align:center;">로그아웃</button>
-            </div>
-        </aside>
+        
 
         <main class="main-content">
             <div class="page-header">
                 <div class="page-header-left">
                     <h1 class="page-title" id="main-page-title">현재고</h1>
                     <p class="page-subtitle" id="main-page-subtitle">창고별 재고 현황</p>
+                </div>
+                <div class="filter-group" style="margin-top: 10px;">
+                    <select id="brand-filter" class="form-select" style="width: 200px;"></select>
                 </div>
             </div>
 
@@ -108,7 +69,7 @@
                                     <th data-sort="string">창고</th>
                                     <th data-sort="string">품목코드</th>
                                     <th data-sort="string">품목명</th>
-                                    <th data-sort="string">유통기한</th>
+                                    <th data-sort="string" id="expiry-th">기한</th>
                                     <th data-sort="number" class="text-right">현재고 (캔)</th>
                                     <th data-sort="number" class="text-right">자산 금액</th>
                                     <th data-sort="string">업데이트 일시</th>
@@ -134,34 +95,20 @@
     <script src="/static/js/app.js"></script>
     <script>
         const InventoryPage = {
+            currentBrand: 'ALL',
+            
+            switchBrand(brand) {
+                this.currentBrand = brand;
+                const th = document.getElementById('expiry-th');
+                if (brand === 'ELECTRONICS') {
+                    th.textContent = '보증기한';
+                } else {
+                    th.textContent = '기한';
+                }
+                this.load();
+            },
 
-            // 샘플 데이터: 창고별, 품목별 실제 데이터
-            sampleFfcs: [
-                { id: 'hub', name: '용인 메인창고' },
-                { id: 'online', name: '온라인 FFC' },
-                { id: 'offline', name: '오프라인 FFC' },
-                { id: 'buyout', name: '바이아웃 채널' },
-                { id: 'coupang', name: '쿠팡 FFC' },
-            ],
-            sampleProducts: [
-                { code: 'SN-001', name: '산양분유 1단계', unitPrice: 22500 },
-                { code: 'SN-002', name: '산양분유 2단계', unitPrice: 21000 },
-                { code: 'SN-003', name: '산양분유 3단계', unitPrice: 22500 },
-                { code: 'SN-004', name: '산양분유 4단계', unitPrice: 20000 },
-            ],
-            // 창고별 × 품목별 실제 현재고 (없으면 해당 창고에 해당 품목 없음)
-            sampleInventory: [
-                { ffcId: 'hub', productCode: 'SN-001', qty: 42500, updated: '2026-06-19 09:15:42' },
-                { ffcId: 'hub', productCode: 'SN-002', qty: 28000, updated: '2026-06-19 09:15:42' },
-                { ffcId: 'hub', productCode: 'SN-003', qty: 22000, updated: '2026-06-19 09:15:42' },
-                { ffcId: 'hub', productCode: 'SN-004', qty: 18500, updated: '2026-06-19 09:15:42' },
-                { ffcId: 'online', productCode: 'SN-001', qty: 18200, updated: '2026-06-19 08:30:15' },
-                { ffcId: 'online', productCode: 'SN-003', qty: 8750, updated: '2026-06-19 08:30:15' },
-                { ffcId: 'offline', productCode: 'SN-002', qty: 12400, updated: '2026-06-18 17:45:08' },
-                { ffcId: 'buyout', productCode: 'SN-001', qty: 15300, updated: '2026-06-18 16:20:33' },
-                { ffcId: 'coupang', productCode: 'SN-001', qty: 5400, updated: '2026-06-19 07:55:20' },
-                { ffcId: 'coupang', productCode: 'SN-004', qty: 2300, updated: '2026-06-19 07:55:20' },
-            ],
+            // Removed sample inventory, using API.
             
             addInlineRow() {
                 const tbody = document.querySelector('#inventory-detail-table tbody');
@@ -170,10 +117,10 @@
                 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><select id="inline-ffc" class="form-select"><option value="1">용인 메인창고</option><option value="2">온라인 FFC</option><option value="3">오프라인 FFC</option></select></td>
-                    <td><select id="inline-product" class="form-select"><option value="1">SN-001</option><option value="2">SN-002</option></select></td>
+                    <td><select class="form-select inline-ffc"><option value="1">용인 메인창고</option><option value="2">온라인 FFC</option><option value="3">오프라인 FFC</option></select></td>
+                    <td><select class="form-select inline-product"><option value="1">SN-001</option><option value="2">SN-002</option></select></td>
                     <td>-</td>
-                    <td><input type="number" id="inline-qty" class="form-input" min="0" value="0" style="width:100px;"></td>
+                    <td><input type="number" class="form-input inline-qty" min="0" value="0" style="width:100px;"></td>
                     <td>-</td>
                     <td>자동 생성됨</td>
                     <td>
@@ -185,17 +132,17 @@
                 
                 // Fetch dynamic options
                 API.get('/api/warehouses').then(res => {
-                    document.getElementById('inline-ffc').innerHTML = (res || []).map(w => `<option value="${w.id}">${w.warehouse_name || w.ffc_name || w.name}</option>`).join('');
+                    tr.querySelector('.inline-ffc').innerHTML = (res || []).map(w => `<option value="${w.id}">${w.warehouse_name || w.ffc_name || w.name}</option>`).join('');
                 }).catch(() => {});
                 API.get('/api/products').then(res => {
-                    document.getElementById('inline-product').innerHTML = (res || []).map(p => `<option value="${p.id}">${p.product_code || p.code}</option>`).join('');
+                    tr.querySelector('.inline-product').innerHTML = (res || []).map(p => `<option value="${p.id}">${p.product_code || p.code}</option>`).join('');
                 }).catch(() => {});
             },
             async saveInlineRow(btn) {
                 const tr = btn.closest('tr');
-                const whId = tr.querySelector('#inline-ffc').value;
-                const prodId = tr.querySelector('#inline-product').value;
-                const qty = parseInt(tr.querySelector('#inline-qty').value);
+                const whId = tr.querySelector('.inline-ffc').value;
+                const prodId = tr.querySelector('.inline-product').value;
+                const qty = parseInt(tr.querySelector('.inline-qty').value);
                 
                 const today = new Date().toISOString().split('T')[0];
                 try {
@@ -226,35 +173,36 @@
                 return this.sampleFfcs.find(f => f.id === id);
             },
 
-            buildFilters() {
-                const filterGroup = document.getElementById('ffc-checkbox-filter');
-                // 실제 데이터에 존재하는 창고만 필터로 표시
-                const ffcIds = [...new Set(this.sampleInventory.map(i => i.ffcId))];
-                let html = '<label><input type="checkbox" value="all" checked onchange="InventoryPage.onFilterAll(this)"> 전체</label>';
-                ffcIds.forEach(id => {
-                    const ffc = this.getFfc(id);
-                    html += `<label><input type="checkbox" value="${id}" checked onchange="InventoryPage.onFilterChange()"> ${ffc ? ffc.name : id}</label>`;
-                });
-                filterGroup.innerHTML = html;
+            async buildFilters() {
+                try {
+                    const filterGroup = document.getElementById('ffc-checkbox-filter');
+                    const warehouses = await API.get('/api/warehouses');
+                    let html = '<label><input type="checkbox" value="all" checked onchange="InventoryPage.onFilterAll(this)"> 전체</label>';
+                    warehouses.forEach(wh => {
+                        html += `<label><input type="checkbox" value="${wh.id}" checked onchange="InventoryPage.onFilterChange()"> ${wh.warehouse_name}</label>`;
+                    });
+                    filterGroup.innerHTML = html;
+                } catch(e) {
+                    console.error('Failed to load warehouses', e);
+                }
             },
 
             renderInventoryTable() {
                 const tbody = document.querySelector('#inventory-detail-table tbody');
                 const checked = this.getCheckedFfcs();
 
-                const rows = this.sampleInventory
-                    .filter(inv => checked.includes(inv.ffcId) || checked.includes(inv.warehouse_id))
+                const rows = (this.allData || [])
+                    .filter(inv => checked.includes(String(inv.warehouse_id)))
                     .map(inv => {
-                        const ffc = this.getFfc(inv.ffcId || inv.warehouse_id);
-                        const prod = this.getProduct(inv.productCode);
+                        const prod = this.getProduct(inv.product_code);
                         const value = inv.totalValueKrw || 0;
-                        const ffcName = ffc ? ffc.name : (inv.warehouse_name || inv.ffcId);
+                        const ffcName = inv.warehouse_name || inv.warehouse_id;
                         
                         return `
                             <tr>
                                 <td>${ffcName}</td>
-                                <td class="mono">${inv.productCode}</td>
-                                <td>${prod ? prod.name : inv.product_name}</td>
+                                <td class="mono">${inv.product_code}</td>
+                                <td>${inv.product_name || (prod ? prod.name : '')}</td>
                                 <td class="mono">${inv.expiry_date || '-'}</td>
                                 <td class="text-right mono" style="font-weight:600;">${Format.number(inv.qty)}</td>
                                 <td class="text-right mono">${Format.currency(value)}</td>
@@ -320,11 +268,14 @@
 
             async load() {
                 try {
-                    const [summary, ffcs, products, recs] = await Promise.all([
-                        API.get('/api/inventory/summary'),
+                    let url = '/api/inventory/summary';
+                    if (this.currentBrand !== 'ALL') {
+                        url += `?brand_category=${this.currentBrand}`;
+                    }
+                    const [summary, ffcs, products] = await Promise.all([
+                        API.get(url),
                         API.get('/api/warehouses'),
-                        API.get('/api/products'),
-                        // API.get('/api/inventory/transfer-recommendations'), // Removed old endpoint
+                        API.get('/api/products')
                     ]);
                     // Replace sample data with API data if available
                     if (summary && summary.length) {
@@ -374,7 +325,11 @@
             }
         };
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
+            Theme.init();
+            Toast.init();
+            await BrandFilter.init('brand-filter', (val) => InventoryPage.switchBrand(val));
+            await InventoryPage.buildFilters();
             InventoryPage.init();
             InventoryPage.load();
 

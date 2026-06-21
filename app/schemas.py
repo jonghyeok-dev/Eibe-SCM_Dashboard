@@ -59,6 +59,7 @@ class SystemSnapshotResponse(BaseModel):
 class ProductCreate(BaseModel):
     product_code: str = Field(..., description="품목코드 (수정 불가)")
     product_name: str = Field(..., description="품목명")
+    brand_category: Optional[str] = Field(default="FOOD", description="브랜드 카테고리")
     pack_qty_per_tu: Optional[int] = Field(default=24, ge=1, description="카툰당 입수량")
     currency_unit: Optional[str] = Field(default="USD", description="환율단위")
     purchase_price: Optional[float] = Field(default=0, ge=0, description="매입가")
@@ -66,6 +67,7 @@ class ProductCreate(BaseModel):
 class ProductUpdate(BaseModel):
     """품목 수정 — product_code는 변경 불가"""
     product_name: Optional[str] = None
+    brand_category: Optional[str] = None
     pack_qty_per_tu: Optional[int] = Field(default=None, ge=1)
     currency_unit: Optional[str] = None
     purchase_price: Optional[float] = Field(default=None, ge=0)
@@ -74,6 +76,7 @@ class ProductResponse(BaseModel):
     id: int
     product_code: str
     product_name: str
+    brand_category: str
     pack_qty_per_tu: int
     currency_unit: str
     purchase_price: float
