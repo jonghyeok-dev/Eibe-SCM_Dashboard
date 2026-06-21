@@ -178,50 +178,6 @@ def delete_production(
     return MessageResponse(message="생산 삭제 완료")
 
 
-@router.get("/api/invoices", response_model=List[InvoiceResponse], tags=["입고 파이프라인"])
-def get_invoices(
-    invoice_no: Optional[str] = Query(None),
-    db: Session = Depends(get_db),
-):
-    """인보이스 목록 조회"""
-    query = db.query(InvoiceDB)
-    if invoice_no:
-        query = query.filter(InvoiceDB.invoice_no == invoice_no)
-    return query.order_by(InvoiceDB.id.desc()).all()
-
-
-@router.post("/api/invoices", response_model=InvoiceResponse, tags=["입고 파이프라인"])
-def create_invoice(
-    inv: InvoiceCreate,
-    current_user: UserAccount = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """인보이스 등록"""
-    db_inv = InvoiceDB(
-        **inv.model_dump(),
-        created_at=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-    )
-    db.add(db_inv)
-    db.commit()
-    db.refresh(db_inv)
-    return db_inv
-
-
-@router.delete("/api/invoices/{inv_id}", response_model=MessageResponse, tags=["입고 파이프라인"])
-def delete_invoice(
-    inv_id: int,
-    current_user: UserAccount = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """인보이스 삭제"""
-    obj = db.query(InvoiceDB).filter(InvoiceDB.id == inv_id).first()
-    if not obj:
-        raise HTTPException(status_code=404, detail="인보이스 데이터를 찾을 수 없습니다")
-    db.delete(obj)
-    db.commit()
-    return MessageResponse(message="인보이스 삭제 완료")
-
-
 @router.get("/api/inbound", response_model=List[InboundResponse], tags=["입고 파이프라인"])
 def get_inbounds(
     status_filter: Optional[str] = Query(None, alias="status"),
@@ -266,8 +222,10 @@ def update_inbound(
             detail=f"유효하지 않은 상태입니다. 허용: {VALID_INBOUND_STATUSES}",
         )
     allowed_fields = {
-        "invoice_no", "bl_no", "shipping_date", "korea_arrival_date",
-        "manufacture_date", "expiry_date", "carton_qty", "can_qty",
+        "invoice_no", "bl_no", "mapping_value", "purchase_code", "production_code", 
+        "shipping_date", "korea_arrival_date", "eta", "manufacture_date", "expiry_date", 
+        "carton_qty", "can_qty", "unit_price", "total_price", "payment_date", "invoice_date", 
+        "exchange_rate", "payment_amount_krw", "arrival_wh_id", "matched_production_id",
         "product_code", "status",
     }
     for key, value in data.items():
@@ -306,7 +264,7 @@ def link_matching(
     """
     matched_order_id = None
     matched_production_id = None
-    matched_invoice_id = None
+    matched_inbound_id = None
 
     # Stage 1: 발주 → 생산 연결
     if req.order_id and req.production_id:
@@ -320,24 +278,24 @@ def link_matching(
         matched_order_id = req.order_id
         matched_production_id = req.production_id
 
-    # Stage 2: 생산 → 인보이스 연결
-    if req.production_id and req.invoice_id:
+    # Stage 2: 생산 → 입고 연결
+    if req.production_id and req.inbound_id:
         production = db.query(ProductionDB).filter(ProductionDB.id == req.production_id).first()
         if not production:
             raise HTTPException(status_code=404, detail="생산을 찾을 수 없습니다")
-        invoice = db.query(InvoiceDB).filter(InvoiceDB.id == req.invoice_id).first()
-        if not invoice:
-            raise HTTPException(status_code=404, detail="인보이스를 찾을 수 없습니다")
-        invoice.matched_production_id = req.production_id
+        inbound = db.query(InboundDB).filter(InboundDB.id == req.inbound_id).first()
+        if not inbound:
+            raise HTTPException(status_code=404, detail="입고를 찾을 수 없습니다")
+        inbound.matched_production_id = req.production_id
         matched_production_id = req.production_id
-        matched_invoice_id = req.invoice_id
+        matched_inbound_id = req.inbound_id
 
     db.commit()
     return MatchResponse(
         message="매칭이 완료되었습니다",
         matched_order_id=matched_order_id,
         matched_production_id=matched_production_id,
-        matched_invoice_id=matched_invoice_id,
+        matched_inbound_id=matched_inbound_id,
     )
 
 
@@ -351,10 +309,10 @@ def get_matching_status(db: Session = Depends(get_db)):
         if prod.matched_order_id:
             order = db.query(OrderDB).filter(OrderDB.id == prod.matched_order_id).first()
             
-        invoices = db.query(InvoiceDB).filter(InvoiceDB.matched_production_id == prod.id).all()
+        inbounds = db.query(InboundDB).filter(InboundDB.matched_production_id == prod.id).all()
         
-        if invoices:
-            for inv in invoices:
+        if inbounds:
+            for inv in inbounds:
                 result.append({
                     "order_id": order.id if order else None,
                     "product_code": prod.product_code,
@@ -363,6 +321,7 @@ def get_matching_status(db: Session = Depends(get_db)):
                     "production_code": prod.production_code,
                     "production_qty": prod.production_qty,
                     "invoice_no": inv.invoice_no,
+                    "inbound_status": inv.status,
                     "carton_qty": inv.carton_qty,
                 })
         else:
@@ -374,6 +333,7 @@ def get_matching_status(db: Session = Depends(get_db)):
                 "production_code": prod.production_code,
                 "production_qty": prod.production_qty,
                 "invoice_no": None,
+                "inbound_status": None,
                 "carton_qty": None,
             })
             
@@ -398,3 +358,65 @@ def get_matching_status(db: Session = Depends(get_db)):
     return result
 
 
+
+from app.core.excel_parser import parse_excel_file
+
+@router.post("/api/orders/upload", response_model=MessageResponse, tags=["입고 파이프라인"])
+def upload_orders(
+    file: UploadFile = File(...),
+    current_user: UserAccount = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        contents = file.file.read()
+        records = parse_excel_file(contents, "order")
+        created = 0
+        for r in records:
+            obj = OrderDB(**r)
+            db.add(obj)
+            created += 1
+        db.commit()
+        return MessageResponse(message=f"발주 업로드 완료: {created}건 등록")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"엑셀 처리 중 오류: {str(e)}")
+
+@router.post("/api/productions/upload", response_model=MessageResponse, tags=["입고 파이프라인"])
+def upload_productions(
+    file: UploadFile = File(...),
+    current_user: UserAccount = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        contents = file.file.read()
+        records = parse_excel_file(contents, "production")
+        created = 0
+        for r in records:
+            obj = ProductionDB(**r)
+            db.add(obj)
+            created += 1
+        db.commit()
+        return MessageResponse(message=f"생산 업로드 완료: {created}건 등록")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"엑셀 처리 중 오류: {str(e)}")
+
+@router.post("/api/inbound/upload", response_model=MessageResponse, tags=["입고 파이프라인"])
+def upload_inbound(
+    file: UploadFile = File(...),
+    current_user: UserAccount = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    try:
+        contents = file.file.read()
+        records = parse_excel_file(contents, "inbound")
+        created = 0
+        for r in records:
+            obj = InboundDB(**r)
+            db.add(obj)
+            created += 1
+        db.commit()
+        return MessageResponse(message=f"입고 업로드 완료: {created}건 등록")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=f"엑셀 처리 중 오류: {str(e)}")

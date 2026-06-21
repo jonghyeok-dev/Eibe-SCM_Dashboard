@@ -10,11 +10,11 @@ echo [INFO] Checking virtual environment...
 if not exist "venv\Scripts\activate.bat" (
     echo [INFO] venv not found. Creating virtual environment...
     where py >nul 2>nul
-    if %errorlevel%==0 (
+    if not errorlevel 1 (
         py -3 -m venv venv
     ) else (
         where python >nul 2>nul
-        if %errorlevel%==0 (
+        if not errorlevel 1 (
             python -m venv venv
         ) else (
             echo [ERROR] Python not found. Please install Python 3.8+

@@ -31,7 +31,7 @@ except Exception:
 
 router = APIRouter(include_in_schema=False)
 WEB_DIR = os.path.join(BASE_DIR, "web")
-templates = Jinja2Templates(directory=os.path.join(WEB_DIR, "templates"))
+templates = Jinja2Templates(directory=WEB_DIR)
 
 @router.get("/", include_in_schema=False)
 async def serve_dashboard(request: Request):

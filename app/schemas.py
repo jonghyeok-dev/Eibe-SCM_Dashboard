@@ -194,46 +194,30 @@ class ProductionResponse(BaseModel):
 
 
 # ═══════════════════════════════════════════════════════════════════════
-# 인보이스 DB
-# ═══════════════════════════════════════════════════════════════════════
-
-class InvoiceCreate(BaseModel):
-    invoice_no: str
-    mapping_value: Optional[str] = None
-    purchase_code: Optional[str] = None
-    production_code: Optional[str] = None
-    carton_qty: Optional[int] = None
-    unit_price: Optional[float] = None
-    total_price: Optional[float] = None
-    product_name: Optional[str] = None
-    product_code: Optional[str] = None
-    eta: Optional[str] = None
-    payment_date: Optional[str] = None
-    invoice_date: Optional[str] = None
-    exchange_rate: Optional[float] = None
-    payment_amount_krw: Optional[int] = None
-    matched_production_id: Optional[int] = None
-
-class InvoiceResponse(InvoiceCreate):
-    id: int
-    created_at: Optional[str] = None
-    class Config:
-        from_attributes = True
-
-
-# ═══════════════════════════════════════════════════════════════════════
 # 입고 DB
 # ═══════════════════════════════════════════════════════════════════════
 
 class InboundCreate(BaseModel):
     invoice_no: Optional[str] = None
     bl_no: Optional[str] = None
+    mapping_value: Optional[str] = None
+    purchase_code: Optional[str] = None
+    production_code: Optional[str] = None
     shipping_date: Optional[str] = None
     korea_arrival_date: Optional[str] = None
+    eta: Optional[str] = None
     manufacture_date: Optional[str] = None
     expiry_date: Optional[str] = None
     carton_qty: Optional[int] = None
     can_qty: Optional[int] = None
+    unit_price: Optional[float] = None
+    total_price: Optional[float] = None
+    payment_date: Optional[str] = None
+    invoice_date: Optional[str] = None
+    exchange_rate: Optional[float] = None
+    payment_amount_krw: Optional[int] = None
+    arrival_wh_id: Optional[int] = None
+    matched_production_id: Optional[int] = None
     product_code: Optional[str] = None
     status: str = Field(default="생산국출발")
 
@@ -256,6 +240,7 @@ class InventorySnapshotCreate(BaseModel):
     product_code: Optional[str] = None
     expiry_date: Optional[str] = None
     qty_cans: int = Field(default=0, ge=0)
+    updated_at: Optional[str] = None
 
 class InventorySnapshotResponse(InventorySnapshotCreate):
     id: int
@@ -263,34 +248,7 @@ class InventorySnapshotResponse(InventorySnapshotCreate):
         from_attributes = True
 
 
-# ═══════════════════════════════════════════════════════════════════════
-# 이관 계획
-# ═══════════════════════════════════════════════════════════════════════
 
-class TransferPlanCreate(BaseModel):
-    product_id: int
-    departure_wh_id: int
-    arrival_wh_id: int
-    target_tu_qty: int = Field(default=0, ge=0)
-    target_can_qty: int = Field(default=0, ge=0)
-    estimated_logistics_cost: Optional[int] = None
-    transfer_date: Optional[str] = None
-
-class TransferPlanResponse(BaseModel):
-    transfer_id: int
-    product_id: int
-    departure_wh_id: int
-    arrival_wh_id: int
-    target_tu_qty: int
-    target_can_qty: int
-    estimated_logistics_cost: Optional[int] = None
-    transfer_date: Optional[str] = None
-    transfer_status: str
-    product_name: Optional[str] = None
-    departure_name: Optional[str] = None
-    arrival_name: Optional[str] = None
-    class Config:
-        from_attributes = True
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -329,10 +287,10 @@ class MatchRequest(BaseModel):
     """3단 매칭 요청"""
     order_id: Optional[int] = None
     production_id: Optional[int] = None
-    invoice_id: Optional[int] = None
+    inbound_id: Optional[int] = None
 
 class MatchResponse(BaseModel):
     message: str
     matched_order_id: Optional[int] = None
     matched_production_id: Optional[int] = None
-    matched_invoice_id: Optional[int] = None
+    matched_inbound_id: Optional[int] = None

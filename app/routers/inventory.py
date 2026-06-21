@@ -20,8 +20,10 @@ from app.core.snapshot import create_snapshot
 
 try:
     from app.core.excel_parser import generate_template, get_template_filename, parse_inventory_excel, generate_order_plan_export, TEMPLATE_LABELS
+    _EXCEL_PARSER_AVAILABLE = True
 except Exception:
     TEMPLATE_LABELS = {}
+    _EXCEL_PARSER_AVAILABLE = False
 
 try:
     from app.core.forecasting import *
@@ -54,7 +56,10 @@ def create_inventory_snapshot(
     db: Session = Depends(get_db),
 ):
     """현재고 스냅샷 단건 등록"""
-    db_snap = InventorySnapshot(**snap.model_dump())
+    dump = snap.model_dump()
+    if not dump.get("updated_at"):
+        dump["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    db_snap = InventorySnapshot(**dump)
     db.add(db_snap)
     db.commit()
     db.refresh(db_snap)
@@ -114,6 +119,14 @@ def upload_inventory_snapshot(
                 if wh:
                     wh_id = wh.id
 
+            updated_at = str(row.get("updated_at", "")).strip() if "updated_at" in df.columns and pd.notna(row.get("updated_at")) else None
+            # Also check Korean column name since parser might leave raw pandas columns
+            if not updated_at and "업데이트일시(YYYY-MM-DD HH:MM:SS)" in df.columns and pd.notna(row.get("업데이트일시(YYYY-MM-DD HH:MM:SS)")):
+                updated_at = str(row.get("업데이트일시(YYYY-MM-DD HH:MM:SS)")).strip()
+            
+            if not updated_at:
+                updated_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
             new_snap = InventorySnapshot(
                 snapshot_date=snap_date,
                 warehouse_id=wh_id,
@@ -122,6 +135,7 @@ def upload_inventory_snapshot(
                 product_code=str(row.get("product_code", "")).strip() if "product_code" in df.columns and pd.notna(row.get("product_code")) else None,
                 expiry_date=str(row.get("expiry_date", "")).strip() if "expiry_date" in df.columns and pd.notna(row.get("expiry_date")) else None,
                 qty_cans=int(row["qty_cans"]) if pd.notna(row.get("qty_cans")) else 0,
+                updated_at=updated_at,
             )
             db.add(new_snap)
             created += 1
@@ -135,6 +149,33 @@ def upload_inventory_snapshot(
         raise HTTPException(status_code=400, detail=f"엑셀 데이터 처리 중 오류 발생: {e}")
     return MessageResponse(message=f"스냅샷 업로드 완료: {created}건 등록")
 
+
+@router.put("/api/inventory-snapshot/{snap_id}", response_model=InventorySnapshotResponse, tags=["재고 관리"])
+def update_inventory_snapshot(
+    snap_id: int,
+    snap_update: InventorySnapshotCreate,
+    current_user: UserAccount = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """현재고 스냅샷 단건 수정 (권한 제한 등 가능)"""
+    # Note: Authorization check could be added here if OPERATOR/ADMIN distinction is strict
+    if current_user.role not in ["ADMIN", "OPERATOR"]:
+        raise HTTPException(status_code=403, detail="권한이 없습니다.")
+
+    db_snap = db.query(InventorySnapshot).filter(InventorySnapshot.id == snap_id).first()
+    if not db_snap:
+        raise HTTPException(status_code=404, detail="스냅샷을 찾을 수 없습니다.")
+
+    dump = snap_update.model_dump()
+    if not dump.get("updated_at"):
+        dump["updated_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    for key, value in dump.items():
+        setattr(db_snap, key, value)
+        
+    db.commit()
+    db.refresh(db_snap)
+    return db_snap
 
 @router.get("/api/inventory/summary", tags=["재고 관리"])
 def get_inventory_summary(db: Session = Depends(get_db)):
@@ -229,6 +270,7 @@ def get_inventory_summary(db: Session = Depends(get_db)):
             "remaining_days": remaining_days,
             "unit_price_krw": unit_price,
             "total_value_krw": batch_value,
+            "updated_at": snap.updated_at,
         })
         summary_by_wh[wh_key]["total_qty"] += snap.qty_cans
 
@@ -378,104 +420,7 @@ def get_expiry_summary(db: Session = Depends(get_db)):
     }
 
 
-@router.get("/api/transfer-plan", response_model=List[TransferPlanResponse], tags=["이관 계획"])
-def get_transfer_plans(
-    arrival_wh_id: Optional[int] = Query(None),
-    db: Session = Depends(get_db),
-):
-    """이관 계획 목록 조회"""
-    query = db.query(TransferPlan)
-    if arrival_wh_id:
-        query = query.filter(TransferPlan.arrival_wh_id == arrival_wh_id)
-    plans = query.order_by(TransferPlan.transfer_id.desc()).all()
-    result = []
-    for plan in plans:
-        product = db.query(ProductDB).filter(ProductDB.id == plan.product_id).first()
-        dep_wh = db.query(WarehouseDB).filter(WarehouseDB.id == plan.departure_wh_id).first()
-        arr_wh = db.query(WarehouseDB).filter(WarehouseDB.id == plan.arrival_wh_id).first()
-        result.append(
-            TransferPlanResponse(
-                transfer_id=plan.transfer_id,
-                product_id=plan.product_id,
-                departure_wh_id=plan.departure_wh_id,
-                arrival_wh_id=plan.arrival_wh_id,
-                target_tu_qty=plan.target_tu_qty,
-                target_can_qty=plan.target_can_qty,
-                estimated_logistics_cost=plan.estimated_logistics_cost,
-                transfer_date=plan.transfer_date,
-                transfer_status=plan.transfer_status,
-                product_name=product.product_name if product else None,
-                departure_name=dep_wh.warehouse_name if dep_wh else None,
-                arrival_name=arr_wh.warehouse_name if arr_wh else None,
-            )
-        )
-    return result
 
-
-@router.post("/api/transfer-plan", response_model=MessageResponse, tags=["이관 계획"])
-def create_transfer_plan(
-    plan: TransferPlanCreate,
-    current_user: UserAccount = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """이관 계획 생성"""
-    # 물류비 자동 계산
-    estimated_cost = plan.estimated_logistics_cost
-    if estimated_cost is None:
-        lc = (
-            db.query(LogisticsCostDB)
-            .filter(
-                LogisticsCostDB.departure_wh_id == plan.departure_wh_id,
-                LogisticsCostDB.arrival_wh_id == plan.arrival_wh_id,
-            )
-            .first()
-        )
-        if lc:
-            estimated_cost = plan.target_tu_qty * lc.cost_per_tu
-
-    new_plan = TransferPlan(
-        product_id=plan.product_id,
-        departure_wh_id=plan.departure_wh_id,
-        arrival_wh_id=plan.arrival_wh_id,
-        target_tu_qty=plan.target_tu_qty,
-        target_can_qty=plan.target_can_qty,
-        estimated_logistics_cost=estimated_cost,
-        transfer_date=plan.transfer_date,
-        transfer_status="PLANNED",
-    )
-    db.add(new_plan)
-    db.commit()
-    return MessageResponse(message="이관 계획이 생성되었습니다")
-
-
-@router.put("/api/transfer-plan/{plan_id}/confirm", response_model=MessageResponse, tags=["이관 계획"])
-def confirm_transfer_plan(
-    plan_id: int,
-    current_user: UserAccount = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """이관 계획 확정"""
-    plan = db.query(TransferPlan).filter(TransferPlan.transfer_id == plan_id).first()
-    if not plan:
-        raise HTTPException(status_code=404, detail="이관 계획을 찾을 수 없습니다")
-    plan.transfer_status = "IN_TRANSIT"
-    db.commit()
-    return MessageResponse(message="이관 계획이 확정되었습니다")
-
-
-@router.delete("/api/transfer-plan/{plan_id}", response_model=MessageResponse, tags=["이관 계획"])
-def delete_transfer_plan(
-    plan_id: int,
-    current_user: UserAccount = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    """이관 계획 삭제"""
-    plan = db.query(TransferPlan).filter(TransferPlan.transfer_id == plan_id).first()
-    if not plan:
-        raise HTTPException(status_code=404, detail="이관 계획을 찾을 수 없습니다")
-    db.delete(plan)
-    db.commit()
-    return MessageResponse(message="이관 계획이 삭제되었습니다")
 
 
 @router.get("/api/order-plan/simulation", tags=["발주 계획"])
@@ -569,7 +514,7 @@ def get_order_plan_simulation(
         if simulation and simulation[-1]["ending_stock"] < smoothing * 6:
             shortage = smoothing * 6 - simulation[-1]["ending_stock"]
             # MOQ 적용 (ProductDB.pack_qty_per_tu 활용)
-            moq = product.pack_qty_per_tu if product.pack_qty_per_tu > 0 else 24
+            moq = product.pack_qty_per_tu if (product.pack_qty_per_tu and product.pack_qty_per_tu > 0) else 24
             suggested_qty = calc_order_suggestion(shortage, moq)
 
         today = date.today()
@@ -749,8 +694,7 @@ def get_excel_template(template_type: str):
             "inventory": ["snapshot_date", "warehouse_name", "product_code", "product_name", "expiry_date", "qty_cans"],
             "order": ["order_month", "product_code", "order_qty"],
             "production": ["purchase_code", "production_code", "order_month", "production_qty", "product_code"],
-            "invoice": ["invoice_no", "product_code", "product_name", "carton_qty", "unit_price", "total_price", "eta"],
-            "inbound": ["invoice_no", "bl_no", "shipping_date", "korea_arrival_date", "manufacture_date", "expiry_date", "carton_qty", "can_qty", "product_code"],
+            "inbound": ["invoice_no", "bl_no", "mapping_value", "purchase_code", "production_code", "shipping_date", "korea_arrival_date", "eta", "manufacture_date", "expiry_date", "carton_qty", "can_qty", "unit_price", "total_price", "payment_date", "invoice_date", "exchange_rate", "payment_amount_krw", "product_code", "status"],
         }
         headers = headers_map.get(template_type, ["column1", "column2"])
         for col_idx, header in enumerate(headers, 1):
@@ -792,6 +736,5 @@ def get_template_types():
         {"type": "inventory", "label": "현재고 스냅샷"},
         {"type": "order", "label": "발주"},
         {"type": "production", "label": "생산"},
-        {"type": "invoice", "label": "인보이스"},
         {"type": "inbound", "label": "입고"},
     ]

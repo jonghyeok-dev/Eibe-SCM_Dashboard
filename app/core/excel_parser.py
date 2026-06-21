@@ -81,33 +81,27 @@ TEMPLATE_DEFS = {
         "example": ["PO-2026-001", "PRD-2026-05", "2026-05", 36000, "SN-001"],
         "filename": "생산_양식.xlsx",
     },
-    "invoice": {
-        "sheet_name": "인보이스",
-        "columns": [
-            "인보이스번호", "매핑값", "구매코드", "생산코드", "카툰수",
-            "단가", "총단가", "품목명", "품목코드", "ETA(YYYY-MM-DD)",
-            "결제일(YYYY-MM-DD)", "인보이스발행일(YYYY-MM-DD)", "결제환율", "결제금액(원화)"
-        ],
-        "example": ["INV-2026-001", "MAP-001", "PO-2026-001", "PRD-2026-05", 300,
-                     8.50, 2550.0, "슈누프로1단계", "SN-001", "2026-08-15",
-                     "2026-09-15", "2026-07-01", 1350.5, 3442275],
-        "filename": "인보이스_양식.xlsx",
-    },
     "inbound": {
         "sheet_name": "입고",
         "columns": [
-            "인보이스번호", "BL번호", "선적일(YYYY-MM-DD)", "한국도착일(YYYY-MM-DD)",
-            "제조일자(YYYY-MM-DD)", "유통기한(YYYY-MM-DD)", "카툰수", "캔수", "품목코드",
+            "인보이스번호", "BL번호", "매핑값", "구매코드", "생산코드",
+            "선적일(YYYY-MM-DD)", "한국도착일(YYYY-MM-DD)", "ETA(YYYY-MM-DD)",
+            "제조일자(YYYY-MM-DD)", "유통기한(YYYY-MM-DD)", "카툰수", "캔수",
+            "단가(외화)", "총단가(외화)", "결제일(YYYY-MM-DD)", "인보이스발행일(YYYY-MM-DD)",
+            "결제환율", "결제금액(원화)", "품목코드",
             "상태(생산국출발/해상운송중/한국도착/통관중/입고일선정중/입고완료)"
         ],
-        "example": ["INV-2026-001", "BL-2026-001", "2026-03-01", "2026-04-15",
-                     "2026-02-15", "2028-02-15", 300, 3600, "SN-001", "해상운송중"],
+        "example": ["INV-2026-001", "BL-2026-001", "MAP-001", "PO-2026-001", "PRD-2026-05", 
+                     "2026-03-01", "2026-04-15", "2026-04-10",
+                     "2026-02-15", "2028-02-15", 300, 3600,
+                     8.50, 2550.0, "2026-05-15", "2026-03-10",
+                     1350.5, 3442275, "SN-001", "해상운송중"],
         "filename": "입고_양식.xlsx",
     },
     "inventory_snapshot": {
         "sheet_name": "현재고스냅샷",
-        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "유통기한(YYYY-MM-DD)", "수량(캔)"],
-        "example": ["2026-06-19", "용인 메인창고", "슈누프로1단계", "SN-001", "2028-05-15", 12000],
+        "columns": ["스냅샷일자(YYYY-MM-DD)", "창고이름", "품목명", "품목코드", "유통기한(YYYY-MM-DD)", "수량(캔)", "업데이트일시(YYYY-MM-DD HH:MM:SS)"],
+        "example": ["2026-06-19", "용인 메인창고", "슈누프로1단계", "SN-001", "2028-05-15", 12000, "2026-06-19 15:30:00"],
         "filename": "현재고스냅샷_양식.xlsx",
     },
 }
@@ -119,7 +113,6 @@ TEMPLATE_LABELS = {
     "logistics_cost": "물류비DB",
     "order": "발주",
     "production": "생산",
-    "invoice": "인보이스",
     "inbound": "입고",
     "inventory_snapshot": "현재고스냅샷",
 }
@@ -214,6 +207,7 @@ def parse_inventory_excel(file_bytes: bytes) -> list:
                 "product_code": str(row.iloc[3]).strip() if pd.notna(row.iloc[3]) else None,
                 "expiry_date": str(row.iloc[4]).strip() if pd.notna(row.iloc[4]) else None,
                 "qty_cans": int(row.iloc[5]) if pd.notna(row.iloc[5]) else 0,
+                "updated_at": str(row.iloc[6]).strip() if len(row) > 6 and pd.notna(row.iloc[6]) else None,
             }
             results.append(item)
         except (ValueError, IndexError):

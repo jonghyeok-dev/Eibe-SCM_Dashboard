@@ -416,7 +416,7 @@ function switchTab(tabGroupId, tabName) {
 
 /** Excel template download helper */
 function downloadTemplate(type) {
-    const url = type === 'all' ? '/api/excel/template' : `/api/excel/template/${type}`;
+    const url = type === 'all' ? '/api/excel/template/all' : `/api/excel/template/${type}`;
     window.location.href = url;
 }
 
@@ -496,6 +496,96 @@ const TableSort = {
         });
         
         tbody.append(...rows);
+    }
+};
+
+const FilterUI = {
+    init(containerId, options, onChange) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        let selected = [...options]; // default select all
+
+        container.innerHTML = `
+            <div class="custom-filter">
+                <button class="filter-dropdown-btn">
+                    <span class="filter-label">필터: 전체 선택됨</span>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+                </button>
+                <div class="filter-dropdown-menu hidden">
+                    <div class="filter-menu-header">
+                        <button class="btn btn--secondary btn--sm" id="btn-select-all-${containerId}">전체 선택</button>
+                        <button class="btn btn--secondary btn--sm" id="btn-clear-all-${containerId}">선택 해제</button>
+                    </div>
+                    <div class="filter-options">
+                        ${options.map(opt => `
+                            <label class="filter-option-label">
+                                <input type="checkbox" value="${opt}" checked>
+                                <span>${opt}</span>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="filter-chips">
+                ${options.map(opt => `
+                    <div class="filter-chip" data-value="${opt}">
+                        ${opt}
+                        <span class="chip-remove">×</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+
+        const btn = container.querySelector('.filter-dropdown-btn');
+        const menu = container.querySelector('.filter-dropdown-menu');
+        const checkboxes = container.querySelectorAll('.filter-options input[type="checkbox"]');
+        const btnAll = container.querySelector(`#btn-select-all-${containerId}`);
+        const btnClear = container.querySelector(`#btn-clear-all-${containerId}`);
+        const chipsContainer = container.querySelector('.filter-chips');
+
+        // Toggle dropdown
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('hidden');
+        });
+        document.addEventListener('click', (e) => {
+            if (!container.contains(e.target)) menu.classList.add('hidden');
+        });
+
+        // Update UI
+        const updateUI = () => {
+            selected = Array.from(checkboxes).filter(cb => cb.checked).map(cb => cb.value);
+            
+            // Update button label
+            const label = container.querySelector('.filter-label');
+            if (selected.length === options.length) label.textContent = '필터: 전체 선택됨';
+            else if (selected.length === 0) label.textContent = '필터: 선택 없음';
+            else label.textContent = `필터: ${selected.length}개 선택됨`;
+
+            // Update chips
+            chipsContainer.innerHTML = selected.map(opt => `
+                <div class="filter-chip" data-value="${opt}">
+                    ${opt}
+                    <span class="chip-remove">×</span>
+                </div>
+            `).join('');
+
+            // Re-bind chip remove
+            chipsContainer.querySelectorAll('.chip-remove').forEach(rmBtn => {
+                rmBtn.addEventListener('click', (e) => {
+                    const val = e.target.closest('.filter-chip').dataset.value;
+                    const cb = Array.from(checkboxes).find(c => c.value === val);
+                    if (cb) { cb.checked = false; updateUI(); }
+                });
+            });
+
+            if (onChange) onChange(selected);
+        };
+
+        checkboxes.forEach(cb => cb.addEventListener('change', updateUI));
+        btnAll.addEventListener('click', () => { checkboxes.forEach(cb => cb.checked = true); updateUI(); });
+        btnClear.addEventListener('click', () => { checkboxes.forEach(cb => cb.checked = false); updateUI(); });
     }
 };
 

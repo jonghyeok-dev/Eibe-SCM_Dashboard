@@ -63,7 +63,6 @@ class ProductDB(Base):
     productions = relationship("ProductionDB", back_populates="product")
     inbounds = relationship("InboundDB", back_populates="product")
     outflow_histories = relationship("OutflowHistory", back_populates="product")
-    transfer_plans = relationship("TransferPlan", back_populates="product")
     order_plans = relationship("MonthlyOrderPlan", back_populates="product")
 
 
@@ -86,8 +85,6 @@ class WarehouseDB(Base):
 
     snapshots = relationship("InventorySnapshot", back_populates="warehouse")
     outflow_histories = relationship("OutflowHistory", back_populates="warehouse")
-    departures = relationship("TransferPlan", foreign_keys="TransferPlan.departure_wh_id", back_populates="departure_wh")
-    arrivals = relationship("TransferPlan", foreign_keys="TransferPlan.arrival_wh_id", back_populates="arrival_wh")
     departure_costs = relationship("LogisticsCostDB", foreign_keys="LogisticsCostDB.departure_wh_id", back_populates="departure_wh")
     arrival_costs = relationship("LogisticsCostDB", foreign_keys="LogisticsCostDB.arrival_wh_id", back_populates="arrival_wh")
 
@@ -154,49 +151,38 @@ class ProductionDB(Base):
 
     product = relationship("ProductDB", back_populates="productions")
     matched_order = relationship("OrderDB", back_populates="matched_productions")
-    matched_invoices = relationship("InvoiceDB", back_populates="matched_production")
+    matched_inbounds = relationship("InboundDB", back_populates="matched_production")
 
-
-class InvoiceDB(Base):
-    """인보이스 DB"""
-    __tablename__ = "INVOICE_DB"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    invoice_no = Column(Text, nullable=False)                      # 인보이스번호
-    mapping_value = Column(Text)                                   # 매핑값
-    purchase_code = Column(Text)                                   # 구매코드
-    production_code = Column(Text)                                 # 생산코드
-    carton_qty = Column(Integer)                                   # 카툰수
-    unit_price = Column(Float)                                     # 단가
-    total_price = Column(Float)                                    # 총단가
-    product_name = Column(Text)                                    # 품목명
-    product_code = Column(Text)                                    # 품목코드
-    eta = Column(Text)                                             # ETA
-    payment_date = Column(Text)                                    # 결제일
-    invoice_date = Column(Text)                                    # 인보이스 발행일
-    exchange_rate = Column(Float)                                  # 결제환율
-    payment_amount_krw = Column(Integer)                           # 결제금액(원화)
-    matched_production_id = Column(Integer, ForeignKey("PRODUCTION_DB.id"), nullable=True)
-    created_at = Column(Text)
-
-    matched_production = relationship("ProductionDB", back_populates="matched_invoices")
 
 
 class InboundDB(Base):
-    """입고 DB"""
+    """입고 DB (인보이스 기능 통합)"""
     __tablename__ = "INBOUND_DB"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     invoice_no = Column(Text)                                      # 인보이스번호
     bl_no = Column(Text)                                           # BL번호
+    mapping_value = Column(Text)                                   # 매핑값
+    purchase_code = Column(Text)                                   # 구매코드
+    production_code = Column(Text)                                 # 생산코드
     shipping_date = Column(Text)                                   # 선적일
     korea_arrival_date = Column(Text)                              # 한국도착일
+    eta = Column(Text)                                             # ETA
     manufacture_date = Column(Text)                                # 제조일자
     expiry_date = Column(Text)                                     # 유통기한
     carton_qty = Column(Integer)                                   # 카툰수
     can_qty = Column(Integer)                                      # 캔수
+    unit_price = Column(Float)                                     # 단가
+    total_price = Column(Float)                                    # 총단가
+    payment_date = Column(Text)                                    # 결제일
+    invoice_date = Column(Text)                                    # 인보이스 발행일
+    exchange_rate = Column(Float)                                  # 결제환율
+    payment_amount_krw = Column(Integer)                           # 결제금액(원화)
+    arrival_wh_id = Column(Integer, ForeignKey("WAREHOUSE_DB.id"), nullable=True) # 도착창고
+    matched_production_id = Column(Integer, ForeignKey("PRODUCTION_DB.id"), nullable=True)
     product_code = Column(Text, ForeignKey("PRODUCT_DB.product_code"), nullable=True)
     status = Column(Text, default="생산국출발")
+    created_at = Column(Text)
 
     __table_args__ = (
         CheckConstraint(
@@ -206,6 +192,8 @@ class InboundDB(Base):
     )
 
     product = relationship("ProductDB", back_populates="inbounds")
+    matched_production = relationship("ProductionDB", back_populates="matched_inbounds")
+    arrival_wh = relationship("WarehouseDB")
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -224,6 +212,7 @@ class InventorySnapshot(Base):
     product_code = Column(Text)                                    # 품목코드
     expiry_date = Column(Text)                                     # 유통기한
     qty_cans = Column(Integer, nullable=False, default=0)          # 수량 (캔)
+    updated_at = Column(Text)                                      # 업데이트 일시
 
     warehouse = relationship("WarehouseDB", back_populates="snapshots")
 
@@ -249,27 +238,7 @@ class OutflowHistory(Base):
     product = relationship("ProductDB", back_populates="outflow_histories")
 
 
-class TransferPlan(Base):
-    """이관 계획 — 거점 간 재고 밸런싱"""
-    __tablename__ = "TRANSFER_PLAN"
-
-    transfer_id = Column(Integer, primary_key=True, autoincrement=True)
-    product_id = Column(Integer, ForeignKey("PRODUCT_DB.id"), nullable=False)
-    departure_wh_id = Column(Integer, ForeignKey("WAREHOUSE_DB.id"), nullable=False)
-    arrival_wh_id = Column(Integer, ForeignKey("WAREHOUSE_DB.id"), nullable=False)
-    target_tu_qty = Column(Integer, nullable=False)
-    target_can_qty = Column(Integer, nullable=False)
-    estimated_logistics_cost = Column(Integer)
-    transfer_date = Column(Text)
-    transfer_status = Column(Text, default="PLANNED")
-
-    __table_args__ = (
-        CheckConstraint("transfer_status IN ('PLANNED', 'IN_TRANSIT', 'DONE')", name="chk_transfer_status"),
-    )
-
-    product = relationship("ProductDB", back_populates="transfer_plans")
-    departure_wh = relationship("WarehouseDB", foreign_keys=[departure_wh_id], back_populates="departures")
-    arrival_wh = relationship("WarehouseDB", foreign_keys=[arrival_wh_id], back_populates="arrivals")
+    product = relationship("ProductDB", back_populates="outflow_histories")
 
 
 class MonthlyOrderPlan(Base):
