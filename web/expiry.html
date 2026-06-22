@@ -12,13 +12,10 @@
 
         <main class="main-content">
             <div class="page-header">
-                <div class="page-header-left">
-                    <h1 class="page-title" id="main-page-title">폐기</h1>
-                    <p class="page-subtitle" id="main-page-subtitle">기한 임박 관리</p>
-                </div>
-                <div class="filter-group" style="margin-top: 10px;">
-                    <select id="brand-filter" class="form-select" style="width: 200px;"></select>
-                </div>
+                <h1 class="page-title" id="main-page-title">폐기</h1>
+            </div>
+            <div class="filter-group" style="margin-bottom: var(--space-md); display: flex; justify-content: flex-start;">
+                <select id="brand-filter" class="form-select" style="width: 200px;"></select>
             </div>
 
             <section class="kpi-grid section-gap">
@@ -94,20 +91,17 @@
 
             updateTitleByBrand() {
                 const th = document.getElementById('expiry-th');
-                const st = document.getElementById('main-page-subtitle');
                 const kpi1 = document.querySelector('.kpi-card:nth-child(1) .kpi-label');
                 const title = document.getElementById('expiry-section-title');
                 
                 if (this.currentBrand === 'ELECTRONICS') {
                     th.textContent = '보증기한';
-                    st.textContent = '기한 임박 관리';
-                    kpi1.textContent = '기한 임박 품목';
-                    title.textContent = 'FEFO 기반 보증기한 임박 및 폐기 예상';
+                    kpi1.textContent = '3개월 내 보증만료';
+                    title.textContent = '보증만료 임박 상품 리스트';
                 } else {
-                    th.textContent = '기한';
-                    st.textContent = '기한 임박 관리';
-                    kpi1.textContent = '기한 임박 품목';
-                    title.textContent = 'FEFO 기반 기한 임박 및 폐기 예상';
+                    th.textContent = '유통기한';
+                    kpi1.textContent = '3개월 내 폐기예정';
+                    title.textContent = '폐기 임박 상품 리스트';
                 }
             },
 
