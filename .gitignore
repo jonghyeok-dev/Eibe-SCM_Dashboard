@@ -12,3 +12,8 @@ data/backups/
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Dev-only scripts
+capture_screenshots.py
+fix_db.py
+remove_sidebar.py
