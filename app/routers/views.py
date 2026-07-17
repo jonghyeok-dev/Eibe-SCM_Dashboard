@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query, status, Request
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
@@ -31,48 +30,46 @@ except Exception:
 
 router = APIRouter(include_in_schema=False)
 WEB_DIR = os.path.join(BASE_DIR, "web")
-templates = Jinja2Templates(directory=WEB_DIR)
-
 @router.get("/", include_in_schema=False)
-async def serve_dashboard(request: Request):
+async def serve_dashboard():
     """메인 통합 대시보드 화면"""
-    return templates.TemplateResponse("index.html", {"request": request, "active_page": "dashboard"})
+    return FileResponse(os.path.join(WEB_DIR, "index.html"))
 
 
 @router.get("/inventory", include_in_schema=False)
-async def serve_inventory(request: Request):
-    return templates.TemplateResponse("inventory.html", {"request": request, "active_page": "inventory"})
+async def serve_inventory():
+    return FileResponse(os.path.join(WEB_DIR, "inventory.html"))
 
 
 @router.get("/inventory/transfer", include_in_schema=False)
-async def serve_inventory_transfer(request: Request):
+async def serve_inventory_transfer():
     """이관 계획 페이지 — inventory.html의 이관 탭으로 라우팅"""
-    return templates.TemplateResponse("inventory.html", {"request": request, "active_page": "inventory", "tab": "transfer"})
+    return FileResponse(os.path.join(WEB_DIR, "inventory.html"))
 
 
 @router.get("/expiry", include_in_schema=False)
-async def serve_expiry(request: Request):
-    return templates.TemplateResponse("expiry.html", {"request": request, "active_page": "expiry"})
+async def serve_expiry():
+    return FileResponse(os.path.join(WEB_DIR, "expiry.html"))
 
 
 @router.get("/order-plan", include_in_schema=False)
-async def serve_order_plan(request: Request):
+async def serve_order_plan():
     """월 1회 발주 제안 편집 및 수정 저장 화면"""
-    return templates.TemplateResponse("order_plan.html", {"request": request, "active_page": "order_plan"})
+    return FileResponse(os.path.join(WEB_DIR, "order_plan.html"))
 
 
 @router.get("/matching", include_in_schema=False)
-async def serve_matching(request: Request):
-    return templates.TemplateResponse("matching.html", {"request": request, "active_page": "matching"})
+async def serve_matching():
+    return FileResponse(os.path.join(WEB_DIR, "matching.html"))
 
 
 @router.get("/users", include_in_schema=False)
-async def serve_users(request: Request):
-    return templates.TemplateResponse("users.html", {"request": request, "active_page": "users"})
+async def serve_users():
+    return FileResponse(os.path.join(WEB_DIR, "users.html"))
 
 
 @router.get("/login", include_in_schema=False)
-async def serve_login(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+async def serve_login():
+    return FileResponse(os.path.join(WEB_DIR, "login.html"))
 
 
