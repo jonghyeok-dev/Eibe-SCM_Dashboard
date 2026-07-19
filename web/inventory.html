@@ -188,10 +188,10 @@
                 const tbody = document.querySelector('#inventory-detail-table tbody');
                 const checked = this.getCheckedFfcs();
 
-                const rows = (this.allData || [])
-                    .filter(inv => checked.includes(String(inv.warehouse_id)))
+                const rows = (this.sampleInventory || [])
+                    .filter(inv => checked.includes(String(inv.warehouse_id)) || checked.includes(String(inv.ffcId)))
                     .map(inv => {
-                        const prod = this.getProduct(inv.product_code);
+                        const prod = this.getProduct(inv.productCode) || this.getProduct(inv.product_code);
                         const value = inv.totalValueKrw || 0;
                         const ffcName = inv.warehouse_name || inv.warehouse_id;
                         
